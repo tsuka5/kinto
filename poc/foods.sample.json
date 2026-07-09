@@ -1,0 +1,17 @@
+{
+  "_note": "文科省『日本食品標準成分表』の代表値を参考にしたPoC用サンプルデータ。可食部100gあたり。price_yen_per_100gは概算の代表小売価格（PoC用ダミー）。effort=調理/下処理の手間スコア(1=ほぼ不要〜5=手間大)。本番ではe-Stat/EC価格と食品成分DB APIで置換する。",
+  "foods": [
+    { "id": "salmon_raw",      "name": "サーモン(生)",        "category": "fish",   "price_yen_per_100g": 480, "effort": 4, "nutrients": { "protein_g": 22.3, "fat_g": 12.8, "omega3_g": 2.1, "calcium_mg": 14,  "iron_mg": 0.5, "vitD_ug": 32.0, "kcal": 204 } },
+    { "id": "salmon_can",      "name": "鮭水煮缶",            "category": "fish",   "price_yen_per_100g": 160, "effort": 1, "nutrients": { "protein_g": 21.0, "fat_g": 8.5,  "omega3_g": 1.9, "calcium_mg": 190, "iron_mg": 0.4, "vitD_ug": 8.0,  "kcal": 170 } },
+    { "id": "saba_can",        "name": "さば水煮缶",          "category": "fish",   "price_yen_per_100g": 130, "effort": 1, "nutrients": { "protein_g": 20.9, "fat_g": 10.7, "omega3_g": 2.6, "calcium_mg": 260, "iron_mg": 1.6, "vitD_ug": 11.0, "kcal": 190 } },
+    { "id": "tuna_can_oil",    "name": "ツナ缶(油漬)",        "category": "fish",   "price_yen_per_100g": 150, "effort": 1, "nutrients": { "protein_g": 17.7, "fat_g": 21.7, "omega3_g": 1.5, "calcium_mg": 4,   "iron_mg": 0.5, "vitD_ug": 2.0,  "kcal": 265 } },
+    { "id": "spinach_raw",     "name": "ほうれん草(生)",      "category": "veg",    "price_yen_per_100g": 120, "effort": 3, "nutrients": { "protein_g": 2.2,  "fat_g": 0.4,  "omega3_g": 0.0, "calcium_mg": 49,  "iron_mg": 2.0, "vitD_ug": 0.0,  "kcal": 20  } },
+    { "id": "spinach_frozen",  "name": "冷凍ほうれん草",      "category": "veg",    "price_yen_per_100g": 60,  "effort": 1, "nutrients": { "protein_g": 2.9,  "fat_g": 0.3,  "omega3_g": 0.0, "calcium_mg": 130, "iron_mg": 1.2, "vitD_ug": 0.0,  "kcal": 22  } },
+    { "id": "broccoli_frozen", "name": "冷凍ブロッコリー",    "category": "veg",    "price_yen_per_100g": 70,  "effort": 1, "nutrients": { "protein_g": 3.9,  "fat_g": 0.4,  "omega3_g": 0.0, "calcium_mg": 38,  "iron_mg": 1.0, "vitD_ug": 0.0,  "kcal": 30  } },
+    { "id": "beef_loin",       "name": "牛ロース(生)",        "category": "meat",   "price_yen_per_100g": 580, "effort": 3, "nutrients": { "protein_g": 16.5, "fat_g": 26.4, "omega3_g": 0.1, "calcium_mg": 4,   "iron_mg": 1.2, "vitD_ug": 0.0,  "kcal": 318 } },
+    { "id": "chicken_breast",  "name": "鶏むね肉(皮なし)",    "category": "meat",   "price_yen_per_100g": 90,  "effort": 3, "nutrients": { "protein_g": 23.3, "fat_g": 1.9,  "omega3_g": 0.1, "calcium_mg": 4,   "iron_mg": 0.3, "vitD_ug": 0.1,  "kcal": 113 } },
+    { "id": "egg",             "name": "鶏卵",                "category": "egg",    "price_yen_per_100g": 30,  "effort": 1, "nutrients": { "protein_g": 12.2, "fat_g": 10.2, "omega3_g": 0.1, "calcium_mg": 46,  "iron_mg": 1.5, "vitD_ug": 3.8,  "kcal": 142 } },
+    { "id": "tofu_silk",       "name": "絹ごし豆腐",          "category": "soy",    "price_yen_per_100g": 30,  "effort": 1, "nutrients": { "protein_g": 5.3,  "fat_g": 3.5,  "omega3_g": 0.2, "calcium_mg": 75,  "iron_mg": 1.2, "vitD_ug": 0.0,  "kcal": 56  } },
+    { "id": "natto",           "name": "納豆",                "category": "soy",    "price_yen_per_100g": 80,  "effort": 1, "nutrients": { "protein_g": 16.5, "fat_g": 10.0, "omega3_g": 0.7, "calcium_mg": 90,  "iron_mg": 3.3, "vitD_ug": 0.0,  "kcal": 190 } }
+  ]
+}

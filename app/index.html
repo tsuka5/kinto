@@ -1,0 +1,1989 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0d9488" />
+<meta name="description" content="安く賢く健康的に。相場チェック・安い代替食材の提案・レシピ・節約実績のトラッキング" />
+<link rel="icon" href="icon.svg" type="image/svg+xml" />
+<link rel="manifest" href="manifest.webmanifest" />
+<title>Kinto — 賢い一手</title>
+<style>
+  :root{
+    --bg:#eef3fa; --card:rgba(255,255,255,.86); --card2:#edf1f8; --ink:#0f172a; --sub:#5f6f85;
+    --teal:#0d9488; --teal-d:#0b7a70; --gold:#d17a00; --red:#e0485c; --line:rgba(15,23,42,.08); --blue:#3b82f6; --gray:#94a3b8;
+    --grad:linear-gradient(120deg,#0d9488,#0e9bb0 45%,#5b6cf0);
+    --grad-warm:linear-gradient(120deg,#f59e0b,#f97316);
+    --shadow:0 4px 20px -6px rgba(20,40,80,.10);
+    --glow:0 10px 26px -10px rgba(13,148,136,.5);
+    --spring:cubic-bezier(.22,1,.36,1);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0;color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+    font-feature-settings:"palt";}
+  body{background:var(--bg);padding-bottom:104px;max-width:540px;margin:0 auto;min-height:100vh}
+  /* 背景オーロラ（ゆっくり漂う） */
+  body::before,body::after{content:"";position:fixed;z-index:-1;border-radius:50%;filter:blur(72px);opacity:.5;pointer-events:none}
+  body::before{width:430px;height:430px;top:calc(-140px + var(--scr,0)*0.06px);left:-130px;background:radial-gradient(circle,#8ed4fb,transparent 65%);animation:drift1 19s ease-in-out infinite alternate}
+  body::after{width:480px;height:480px;bottom:calc(-170px + var(--scr,0)*0.05px);right:-150px;background:radial-gradient(circle,#8cf0dd,transparent 65%);animation:drift2 23s ease-in-out infinite alternate}
+  @keyframes drift1{to{transform:translate(70px,50px) scale(1.15)}}
+  @keyframes drift2{to{transform:translate(-60px,-70px) scale(1.12)}}
+
+  /* ヘッダー＝動くグラデーションバナー */
+  header{margin:14px 14px 4px;padding:18px 20px;border-radius:22px;display:flex;align-items:center;justify-content:space-between;
+    background:var(--grad);background-size:220% 220%;animation:gradShift 9s ease infinite;color:#fff;
+    box-shadow:var(--glow);position:relative;overflow:hidden}
+  header::after{content:"";position:absolute;inset:0;pointer-events:none;
+    background:radial-gradient(150px 150px at 88% -30%,rgba(255,255,255,.45),transparent 70%)}
+  @keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+  /* 左上に常駐する、うっすらした戻るボタン（スクロールしても追従） */
+  .backfab{position:fixed;top:22px;left:22px;z-index:40;width:42px;height:42px;border-radius:50%;padding:0;
+    background:rgba(255,255,255,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    border:1px solid rgba(15,23,42,.14);color:#3b4a5e;font-size:19px;font-weight:800;
+    box-shadow:0 4px 14px -6px rgba(20,40,80,.3);opacity:.6;transition:opacity .25s,transform .15s var(--spring)}
+  .backfab:hover{opacity:1}
+  .backfab:active{transform:scale(.9)}
+  .backfab.off{opacity:.18;pointer-events:none}
+  header h1{font-size:24px;margin:0;letter-spacing:.5px;font-weight:900}
+  header h1 span{color:#99f6e4}
+  header .sub{color:rgba(255,255,255,.88)}
+  .sub{color:var(--sub);font-size:12px}
+  main{padding:8px 16px 16px}
+  .view{display:none}
+  .view.active{display:block;animation:fade .3s var(--spring)}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+  /* カード：ガラス＋3D出現アニメ（奥から起き上がる。後続ほど遅れる） */
+  .card{background:var(--card);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    border:1px solid rgba(255,255,255,.7);border-radius:20px;padding:18px;margin:12px 0;
+    box-shadow:var(--shadow);animation:rise .55s var(--spring) backwards;position:relative}
+  .card:nth-child(2){animation-delay:.06s}.card:nth-child(3){animation-delay:.12s}
+  .card:nth-child(4){animation-delay:.18s}.card:nth-child(5){animation-delay:.24s}
+  @keyframes rise{from{opacity:0;transform:perspective(900px) translateY(22px) rotateX(9deg) scale(.97)}}
+  .card.hl{background:linear-gradient(155deg,rgba(224,250,243,.95),rgba(255,255,255,.9));border-color:#aee8de;
+    box-shadow:0 8px 26px -10px rgba(13,148,136,.35)}
+  .pill{display:inline-block;font-size:11px;font-weight:800;color:var(--teal-d);background:rgba(13,148,136,.09);
+    border:1px solid rgba(13,148,136,.35);padding:4px 11px;border-radius:999px;margin-bottom:8px}
+  .pill.warn{color:#b45309;background:rgba(245,158,11,.1);border-color:rgba(217,122,0,.4)}
+  button{font-family:inherit;border:0;border-radius:14px;padding:14px;font-size:16px;font-weight:700;cursor:pointer;
+    transition:transform .15s var(--spring),box-shadow .2s,filter .2s}
+  button:active{transform:scale(.96)}
+  .btn-adopt{background:var(--grad);background-size:220% auto;color:#fff;box-shadow:var(--glow)}
+  .btn-adopt:hover{background-position:right center;filter:brightness(1.05)}
+  .btn-ghost{background:rgba(255,255,255,.92);color:var(--ink);width:100%;margin-top:8px;
+    border:1.5px solid rgba(15,23,42,.16);box-shadow:0 3px 10px -4px rgba(20,40,80,.15)}
+  .btn-ghost:hover{border-color:var(--teal);color:var(--teal-d);box-shadow:0 5px 14px -5px rgba(13,148,136,.35)}
+  .link{background:none;color:var(--teal);font-size:13px;padding:8px 0;width:100%;text-align:center}
+  .done{text-align:center;padding:8px 6px}
+  .done .big{font-size:52px;animation:pop .5s var(--spring)}
+  @keyframes pop{from{transform:scale(.3) rotate(-12deg);opacity:0}}
+
+  h2{font-size:16px;margin:18px 2px 6px;color:var(--ink);font-weight:800}
+  .nutri-row{display:flex;justify-content:space-between;padding:8px 4px;border-bottom:1px solid var(--line);font-size:14px}
+  .nutri-row .val{color:var(--teal);font-weight:700}
+  .deal-row{display:flex;justify-content:space-between;align-items:center;padding:9px 6px;border-bottom:1px solid var(--line);font-size:14px;border-radius:10px}
+  .deal-row.tap{cursor:pointer;transition:background .15s,transform .15s var(--spring)}
+  .deal-row.tap:hover{background:rgba(13,148,136,.06)}
+  .deal-row.tap:active{transform:scale(.98);background:rgba(13,148,136,.1)}
+
+  .subhead{font-size:12px;color:var(--teal-d);font-weight:800;margin:14px 2px 4px;border-top:1px solid var(--line);padding-top:12px;letter-spacing:.3px}
+  /* 比較バー（0から伸びるアニメ付き） */
+  .cmp-legend{font-size:11px;margin:4px 0 8px}
+  .cmp-legend .lg{margin-right:12px}
+  .cmp-legend .o{color:var(--blue)}.cmp-legend .a{color:var(--teal)}.cmp-legend .t{color:var(--gray)}
+  .cmp{margin:10px 0}
+  .cmp-head{display:flex;justify-content:space-between;align-items:baseline;font-size:13px;font-weight:700;margin-bottom:4px}
+  .cmp-head .tgt{color:var(--sub);font-weight:400;font-size:11px}
+  .cmprow{display:flex;align-items:center;gap:8px;margin:4px 0}
+  .cmprow .sw{width:10px;height:10px;border-radius:3px;flex:none}
+  .cmprow .tr{flex:1;height:10px;background:rgba(15,23,42,.07);border-radius:99px;overflow:hidden}
+  .cmprow .fl{height:100%;border-radius:99px;animation:growBar .9s var(--spring) backwards;position:relative}
+  .cmprow .fl::after{content:"";position:absolute;inset:0;border-radius:99px;
+    background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.45) 50%,transparent 70%);
+    background-size:220% 100%;animation:shine 2.6s ease-in-out infinite}
+  @keyframes growBar{from{width:0}}
+  @keyframes shine{0%{background-position:130% 0}55%,100%{background-position:-90% 0}}
+  .sw.o{background:var(--blue)}.sw.a{background:var(--teal)}.sw.t{background:var(--gray)}
+  .fl.o{background:linear-gradient(90deg,#2f6fed,#61a5fa)}
+  .fl.a{background:linear-gradient(90deg,#0d9488,#34d3c0)}
+  .fl.t{background:linear-gradient(90deg,#94a3b8,#c3ced9)}
+  .cmprow .nm{font-size:11px;width:62px;flex:none;text-align:right;color:var(--ink);font-variant-numeric:tabular-nums}
+  /* 候補ランキング（横から3Dで流れ込む） */
+  .rankrow{display:flex;align-items:center;gap:10px;padding:10px 2px;border-bottom:1px solid var(--line);
+    animation:rankIn .5s var(--spring) backwards}
+  .rankrow:nth-child(3){animation-delay:.05s}.rankrow:nth-child(4){animation-delay:.11s}
+  .rankrow:nth-child(5){animation-delay:.17s}.rankrow:nth-child(6){animation-delay:.23s}
+  .rankrow:nth-child(7){animation-delay:.29s}
+  @keyframes rankIn{from{opacity:0;transform:perspective(600px) rotateY(-16deg) translateX(-14px)}}
+  .rankno{width:26px;height:26px;flex:none;border-radius:50%;background:var(--grad);color:#fff;font-weight:800;font-size:13px;
+    display:flex;align-items:center;justify-content:center;box-shadow:0 4px 10px -3px rgba(13,148,136,.55)}
+  .rankmain{flex:1;min-width:0}
+  .rankname{font-weight:800;font-size:14px}
+  /* ランキング行のミニ指標バー（節約幅・栄養マッチ） */
+  .rkm{display:flex;align-items:center;gap:6px;margin:4px 0}
+  .rkm-lab{font-size:10px;color:var(--sub);width:74px;flex:none}
+  .rkm-tr{flex:1;height:8px;background:rgba(15,23,42,.08);border-radius:99px;overflow:hidden}
+  .rkm-fl{height:100%;border-radius:99px;animation:growBar .8s var(--spring) backwards}
+  .rkm-fl.gold{background:linear-gradient(90deg,#f59e0b,#fbbf24)}
+  .rkm-fl.teal{background:linear-gradient(90deg,var(--teal),#34d3c0)}
+  .rkm-val{font-size:12px;width:46px;text-align:right;flex:none;font-variant-numeric:tabular-nums}
+  .rankact{display:flex;gap:6px;flex:none}
+  .mini{background:var(--card2);color:var(--ink);font-size:12px;font-weight:700;padding:8px 11px;border-radius:10px;cursor:pointer}
+  .mini.adopt{background:var(--grad);background-size:220% auto;color:#fff;box-shadow:0 5px 12px -5px rgba(13,148,136,.6)}
+
+  /* フローティングナビ */
+  nav{position:fixed;bottom:12px;left:12px;right:12px;max-width:516px;margin:0 auto;display:flex;gap:4px;
+    background:rgba(255,255,255,.82);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+    border:1px solid rgba(255,255,255,.75);border-radius:24px;padding:8px;
+    box-shadow:0 14px 34px -14px rgba(15,23,42,.35)}
+  nav button{flex:1;background:none;color:var(--sub);font-size:11px;font-weight:700;padding:8px 0 7px;display:flex;
+    flex-direction:column;align-items:center;gap:3px;border-radius:17px;transition:background .2s,color .2s}
+  nav button.active{color:var(--teal-d);background:linear-gradient(135deg,rgba(13,148,136,.14),rgba(91,108,240,.12))}
+  nav .ic{font-size:20px;transition:transform .3s cubic-bezier(.34,1.56,.64,1)}
+  nav button.active .ic{transform:translateY(-2px) scale(1.18)}
+  .toast{position:fixed;bottom:104px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--grad);color:#fff;
+    padding:11px 20px;border-radius:999px;font-size:14px;font-weight:700;opacity:0;transition:.3s var(--spring);
+    pointer-events:none;z-index:30;box-shadow:var(--glow)}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  /* モーダル（食材詳細→料理）*/
+  .modal{position:fixed;inset:0;background:rgba(8,15,32,.55);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+    display:flex;align-items:flex-end;justify-content:center;z-index:20;animation:fadeIn .2s ease}
+  @keyframes fadeIn{from{opacity:0}}
+  .modal.hidden{display:none}
+  .modal-card{background:linear-gradient(180deg,#f6fafd,#edf2fa);max-width:540px;width:100%;max-height:92vh;overflow-y:auto;
+    border-radius:26px 26px 0 0;padding:14px 18px 28px;border:1px solid rgba(255,255,255,.7);
+    animation:slideUp .38s var(--spring)}
+  @keyframes slideUp{from{transform:perspective(1100px) translateY(60px) rotateX(7deg);opacity:0}}
+  .modal-card::before{content:"";display:block;width:44px;height:5px;border-radius:99px;background:#c6d0dd;margin:0 auto 10px}
+  .modal-close{position:sticky;top:0;float:right;background:rgba(15,23,42,.06);color:var(--ink);width:36px;height:36px;border-radius:50%;padding:0;font-size:18px;z-index:2}
+  .cookpad{display:block;background:var(--grad-warm);color:#fff;text-align:center;padding:13px;border-radius:14px;margin-top:10px;
+    font-weight:800;text-decoration:none;box-shadow:0 8px 18px -8px rgba(249,115,22,.55);transition:transform .15s var(--spring),filter .2s}
+  .cookpad:active{transform:scale(.97)}
+  .cookpad.alt{background:var(--card2);color:var(--ink);box-shadow:none}
+  .pcrow{display:flex;gap:8px;margin:8px 0}
+  .pcinput{flex:1;width:100%;background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:12px;color:var(--ink);
+    padding:12px;font-size:15px;transition:border-color .2s,box-shadow .2s;outline:none}
+  .pcinput:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(13,148,136,.15)}
+  .pcinput::placeholder{color:var(--sub)}
+  small.note{display:block;color:var(--sub);font-size:11px;line-height:1.6;margin-top:10px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .chip{background:rgba(255,255,255,.8);color:var(--sub);border:1px solid var(--line);border-radius:999px;
+    padding:9px 15px;font-size:13px;font-weight:600;cursor:pointer;user-select:none;
+    transition:transform .18s cubic-bezier(.34,1.56,.64,1),background .18s,color .18s,box-shadow .18s}
+  .chip:active{transform:scale(.93)}
+  .chip.on{background:var(--grad);background-size:220% auto;color:#fff;border-color:transparent;
+    box-shadow:0 6px 15px -6px rgba(13,148,136,.6);transform:scale(1.05)}
+  .qlabel{font-size:14px;margin:14px 2px 2px;font-weight:800}
+  .hint{font-size:11px;color:var(--sub);line-height:1.6}
+  /* 提案カテゴリバー（今日の一手の最上部に常設）*/
+  .catbar{margin:2px 0 8px}
+  .catbar-lab{font-size:12px;color:var(--sub);margin:2px 2px 6px;font-weight:700}
+  .catbar-row{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 6px}
+  .catbar-row::-webkit-scrollbar{display:none}
+  .catbar-row .chip{white-space:nowrap;flex:none}
+  /* 実績ダッシュボード */
+  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;text-align:center;
+    box-shadow:var(--shadow);animation:rise .5s var(--spring) backwards}
+  .stat:nth-child(2){animation-delay:.05s}.stat:nth-child(3){animation-delay:.1s}.stat:nth-child(4){animation-delay:.15s}
+  .stat .num{font-size:23px;font-weight:900;color:var(--gold)}
+  .stat .num.green{color:var(--teal)}
+  .stat .lab{font-size:11px;color:var(--sub);margin-top:4px}
+  /* 週間チャート（下から伸びる棒） */
+  .wk{display:flex;gap:6px;align-items:flex-end;height:96px;margin-top:12px}
+  .wk .col{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;height:100%}
+  .wk .bar{width:100%;border-radius:6px 6px 3px 3px;background:linear-gradient(180deg,var(--teal),var(--teal-d));
+    min-height:3px;animation:growV .8s var(--spring) backwards}
+  @keyframes growV{from{height:0}}
+  .wk .d{font-size:10px;color:var(--sub)}
+  .wk .v{font-size:9px;color:var(--sub);font-variant-numeric:tabular-nums}
+  /* 店頭相場チェック：大きい入力とデカ文字判定 */
+  .chk-in{display:flex;gap:10px;margin:8px 0 10px}
+  .chk-in .pcinput{font-size:24px;font-weight:800;text-align:center;padding:14px 6px}
+  .chk-verdict{text-align:center;padding:16px 10px;border-radius:16px;animation:pop .35s var(--spring)}
+  .chk-verdict .big{font-size:25px;font-weight:900;letter-spacing:.5px}
+  .chk-verdict.ok{background:rgba(13,148,136,.13);color:var(--teal-d)}
+  .chk-verdict.mid{background:rgba(148,163,184,.16);color:var(--ink)}
+  .chk-verdict.ng{background:rgba(224,72,92,.12);color:var(--red)}
+  /* レシピの手順とコツ */
+  .rsteps{margin:8px 0 2px;padding-left:22px;font-size:13px;line-height:1.75;color:var(--ink)}
+  .rsteps li{margin:3px 0}
+  .rsteps li::marker{color:var(--teal);font-weight:800}
+  .rtip{background:rgba(13,148,136,.08);border-left:3px solid var(--teal);border-radius:0 8px 8px 0;
+    padding:8px 10px;font-size:12px;line-height:1.6;margin-top:8px;color:var(--ink)}
+  /* 電光掲示板（今月安くなった食材。LED風・タップで詳細・触ると一時停止） */
+  .ledbar{overflow:hidden;margin:10px 14px 0;border-radius:12px;background:#0b0e07;border:1px solid #2c3520;
+    box-shadow:inset 0 2px 14px rgba(0,0,0,.85),0 2px 10px rgba(0,0,0,.25)}
+  .led-track{display:inline-flex;align-items:center;white-space:nowrap;padding:9px 0;
+    animation:ledMove 45s linear infinite;will-change:transform}
+  .ledbar:hover .led-track,.ledbar:active .led-track{animation-play-state:paused}
+  @keyframes ledMove{to{transform:translateX(-50%)}}
+  .led-head{font-size:12px;font-weight:900;color:#7df3e3;text-shadow:0 0 10px rgba(45,212,191,.9);padding:0 12px;letter-spacing:1px}
+  .led-item{font-size:13px;font-weight:800;color:#ffcf40;text-shadow:0 0 9px rgba(255,180,0,.85);cursor:pointer;
+    padding:0 10px;letter-spacing:.5px;font-variant-numeric:tabular-nums}
+  .led-item i{font-style:normal;font-size:10px;opacity:.75}
+  .led-item b{color:#5dff7e;text-shadow:0 0 9px rgba(70,255,130,.9)}
+  .led-sep{color:#414d2e;font-size:8px}
+  /* 動きを減らす設定を尊重 */
+  @media (prefers-reduced-motion:reduce){
+    *,*::before,*::after{animation:none!important;transition:none!important}
+  }
+</style>
+</head>
+<body>
+<button class="backfab off" id="backBtn" onclick="goBack()" aria-label="前の画面に戻る">←</button>
+<header>
+  <div style="padding-left:44px"><h1>Kin<span>to</span></h1><div class="sub">安く賢く健康的に</div></div>
+</header>
+<!-- 電光掲示板：今月安くなった食材（相場更新後に表示。タップで詳細） -->
+<div class="ledbar" id="ledbar" style="display:none"><div class="led-track" id="ledTrack"></div></div>
+
+<main>
+  <!-- ホーム -->
+  <section id="view-home" class="view active">
+    <div id="catBar" class="catbar"></div>
+    <div id="homeCard"></div>
+    <small class="note">※価格は e-Stat 小売物価統計ベースの相場目安（円/100g）です。本番では e-Stat / EC連携の地域別実価格に置き換えます。</small>
+  </section>
+
+  <!-- 店頭で相場チェック（スーパーで値札を見た瞬間に判定） -->
+  <section id="view-check" class="view">
+    <h2 style="margin-top:12px">🏷️ 店頭で相場チェック</h2>
+    <div class="hint" style="margin:0 2px 6px">スーパーで値札を見たら、その場で「安いかどうか」を判定。食材を選んで値段と内容量を入れるだけ。</div>
+    <input class="pcinput" id="chkSearch" placeholder="🔍 食材名で検索（ひらがな・漢字OK）" oninput="renderCheckList(this.value)" style="margin-bottom:6px">
+    <div id="chkBody"></div>
+  </section>
+
+  <!-- お買い得ランキング（全食材） -->
+  <section id="view-deals" class="view">
+    <h2 style="margin-top:12px">💪 栄養コスパ</h2>
+    <div class="hint" style="margin:0 2px 6px">カテゴリ別に「栄養充実度 ÷ 相場」が高い順。タップで相場・栄養・代替を表示します。</div>
+    <input class="pcinput" id="cospaSearch" placeholder="食材を検索（例：鶏 / ほうれん / さば）" oninput="renderDealsFull()" style="margin-bottom:6px">
+    <div id="dealsFull"></div>
+  </section>
+
+  <!-- 自分の料理を計算 -->
+  <section id="view-calc" class="view">
+    <h2 style="margin-top:12px">🧮 自分の料理を計算</h2>
+    <div class="hint" id="calcNote" style="margin:0 2px 8px">クックパッド等で見た料理の材料を入力すると栄養を計算します。</div>
+    <input class="pcinput" id="calcSearch" placeholder="材料を検索（例：とりむね / ほうれんそう / こめ）" oninput="doSearch(this.value)">
+    <div id="calcResults" style="margin-top:6px"></div>
+    <div class="card"><div class="qlabel">追加した材料（gを編集できます）</div><div id="calcMeal" style="margin-top:8px"></div></div>
+    <div id="calcTotal"></div>
+  </section>
+
+  <!-- 実績（N=1自己実験ダッシュボード） -->
+  <section id="view-stats" class="view">
+    <div class="stat-grid" style="margin-top:12px">
+      <div class="stat"><div class="num" id="stSaving">¥0</div><div class="lab">累計節約</div></div>
+      <div class="stat"><div class="num" id="stMonth">¥0</div><div class="lab">今月の節約</div></div>
+      <div class="stat"><div class="num green" id="stStreak">0</div><div class="lab">継続日数</div></div>
+      <div class="stat"><div class="num green" id="stAdopt">0</div><div class="lab">採用回数</div></div>
+    </div>
+    <div class="card" id="goalCard"></div>
+    <div class="card"><span class="pill">📊 直近7日の節約</span><div id="weekChart"></div></div>
+    <div class="card"><span class="pill">栄養の積み上げ（賢い一手による増減）</span><div id="nutriCard"></div></div>
+    <div class="card"><span class="pill">採用履歴</span><div id="histCard" style="margin-top:6px"></div></div>
+  </section>
+
+  <!-- データ -->
+  <section id="view-data" class="view">
+    <div class="card">
+      <div class="qlabel">地域（相場の基準）</div>
+      <div class="hint">相場をこの地域基準で表示します。現在地はIPからおおよそ自動推定（誤差・VPNで外れることあり）。手動で変更できます。</div>
+      <select class="pcinput" id="prefSel" style="margin-top:8px;width:100%"></select>
+      <button class="btn-ghost" id="redetectBtn">📍 現在地から再判定（IP）</button>
+      <div class="hint" id="regionNote" style="margin-top:6px"></div>
+      <div class="hint" style="margin-top:4px">※IP判定は外部サービス（ipwho.is / ipapi.co）にIPを送ります（健康データは端末内のまま）。判定した都道府県の県庁所在市の実売価格を相場更新で使います。</div>
+    </div>
+    <div class="card" id="refCard"></div>
+    <div class="card" id="estatCard">
+      <div class="qlabel">📡 相場データの自動更新（e-Stat 実データ）</div>
+      <div class="hint">政府統計「小売物価統計調査」から<b>今月の実売価格</b>を取得して相場を更新します。無料の appId を一度設定すれば、以後は<b>月が変わるたびに自動更新</b>され、値下がりした食材が上の電光掲示板に流れます。<br>
+      appId の取得（無料・数分）：<a href="https://www.e-stat.go.jp/api/" target="_blank" rel="noopener" style="color:var(--teal)">e-Stat API</a> でユーザー登録 → appId 発行 → 下に貼り付け。</div>
+      <input class="pcinput" id="estatAppId" placeholder="e-Stat appId を貼り付け" style="margin-top:8px">
+      <button class="btn-adopt" id="mkUpdateBtn" style="width:100%;margin-top:8px">📡 今月の相場に更新</button>
+      <div class="hint" id="mkStatus" style="margin-top:8px"></div>
+    </div>
+    <div class="card" id="aiKeyCard">
+      <div class="qlabel">✨ AIレシピ検索（Claude API）</div>
+      <div class="hint">Claude がWeb検索で<b>最近人気のレシピ</b>を探し、このアプリにためられます（1日3回まで — 使いすぎ防止）。<br>
+      APIキーは <a href="https://platform.claude.com/" target="_blank" rel="noopener" style="color:var(--teal)">Claude Platform</a> で発行。<b>キーはこの端末にのみ保存</b>され、api.anthropic.com 以外には送信されません。利用料はキーの持ち主に課金されます（1回あたり数円〜数十円目安）。</div>
+      <input class="pcinput" id="aiKeyInput" type="password" placeholder="sk-ant-... を貼り付け" style="margin-top:8px">
+      <div class="hint" id="aiKeyStatus" style="margin-top:6px"></div>
+    </div>
+    <div class="card">
+      <div class="qlabel">自己実験データの書き出し</div>
+      <div class="hint">分析用にデータをファイル保存できます。データは<b>この端末の中だけ</b>に保存され、外部には一切送信されません。</div>
+      <button class="btn-adopt" id="exportCsv" style="width:100%;margin-top:12px">CSVで書き出す</button>
+      <button class="btn-ghost" id="exportJson">JSONで書き出す（バックアップ）</button>
+    </div>
+    <div class="card">
+      <div class="qlabel">バックアップから復元</div>
+      <div class="hint">「JSONで書き出す」で保存したファイルを読み込み、記録を復元します。<b>現在の記録は上書き</b>されます（機種変更・ブラウザ変更時に）。</div>
+      <input type="file" id="importFile" accept=".json,application/json" style="display:none">
+      <button class="btn-ghost" id="importBtn">📂 JSONから復元</button>
+    </div>
+    <div class="card">
+      <div class="qlabel">記録のリセット</div>
+      <div class="hint">すべての記録を消去します（元に戻せません）。</div>
+      <button class="btn-ghost" id="resetBtn" style="color:var(--red)">すべての記録を削除</button>
+    </div>
+    <small class="note">Kinto self-experiment build / N=1。思想：努力ゼロで、安く、脳のパフォーマンスを上げる。</small>
+  </section>
+</main>
+
+<nav>
+  <button data-view="home" class="active"><span class="ic">🍱</span>今日の一手</button>
+  <button data-view="check"><span class="ic">🏷️</span>安い？</button>
+  <button data-view="deals"><span class="ic">💪</span>コスパ</button>
+  <button data-view="calc"><span class="ic">🧮</span>料理計算</button>
+  <button data-view="stats"><span class="ic">📈</span>実績</button>
+  <button data-view="data"><span class="ic">⚙️</span>設定</button>
+</nav>
+<div class="toast" id="toast"></div>
+<div class="modal hidden" id="modal"><div class="modal-card"><button class="modal-close" id="modalClose">×</button><div id="modalBody"></div></div></div>
+
+<script>
+/* ============================================================
+   食品データ（文科省 食品成分表の代表値を参考。可食部100gあたり）
+============================================================ */
+const FOODS = [
+  // --- 魚 ---
+  {id:"salmon_raw",name:"サーモン(生)",cat:"fish",price:480,effort:4,n:{protein:22.3,fat:12.8,carb:0.1,omega3:2.1,calcium:14,iron:0.5,vitD:32.0,kcal:204}},
+  {id:"salmon_can",name:"鮭水煮缶",cat:"fish",price:160,effort:1,n:{protein:21.0,fat:8.5,carb:0.1,omega3:1.9,calcium:190,iron:0.4,vitD:8.0,kcal:170}},
+  {id:"saba_can",name:"さば水煮缶",cat:"fish",price:130,effort:1,n:{protein:20.9,fat:10.7,carb:0.2,omega3:2.6,calcium:260,iron:1.6,vitD:11.0,kcal:190}},
+  {id:"tuna_can",name:"ツナ缶(油漬)",cat:"fish",price:150,effort:1,n:{protein:17.7,fat:21.7,carb:0.1,omega3:1.5,calcium:4,iron:0.5,vitD:2.0,kcal:265}},
+  {id:"sardine_can",name:"いわし缶(味付)",cat:"fish",price:130,effort:1,n:{protein:20.4,fat:11.9,carb:5.7,omega3:2.8,calcium:370,iron:2.6,vitD:6.0,kcal:200}},
+  {id:"maguro",name:"まぐろ赤身(生)",cat:"fish",price:520,effort:3,n:{protein:26.4,fat:1.4,carb:0.1,omega3:0.1,calcium:5,iron:1.1,vitD:5.0,kcal:125}},
+  // --- 肉 ---
+  {id:"beef_loin",name:"牛ロース(生)",cat:"meat",price:580,effort:3,n:{protein:16.5,fat:26.4,carb:0.3,omega3:0.1,calcium:4,iron:1.2,vitD:0.0,kcal:318}},
+  {id:"pork_loin",name:"豚ロース(生)",cat:"meat",price:230,effort:3,n:{protein:19.3,fat:19.2,carb:0.2,omega3:0.1,calcium:4,iron:0.3,vitD:0.1,kcal:248}},
+  {id:"chicken_breast",name:"鶏むね肉(皮なし)",cat:"meat",price:90,effort:3,n:{protein:23.3,fat:1.9,carb:0.1,omega3:0.1,calcium:4,iron:0.3,vitD:0.1,kcal:113}},
+  {id:"chicken_thigh",name:"鶏もも肉(皮なし)",cat:"meat",price:120,effort:3,n:{protein:19.0,fat:5.0,carb:0.0,omega3:0.1,calcium:5,iron:0.6,vitD:0.2,kcal:127}},
+  // --- 卵 ---
+  {id:"egg",name:"鶏卵",cat:"egg",price:30,effort:1,n:{protein:12.2,fat:10.2,carb:0.3,omega3:0.1,calcium:46,iron:1.5,vitD:3.8,kcal:142}},
+  // --- 大豆 ---
+  {id:"tofu",name:"絹ごし豆腐",cat:"soy",price:30,effort:1,n:{protein:5.3,fat:3.5,carb:2.0,omega3:0.2,calcium:75,iron:1.2,vitD:0.0,kcal:56}},
+  {id:"natto",name:"納豆",cat:"soy",price:80,effort:1,n:{protein:16.5,fat:10.0,carb:12.1,omega3:0.7,calcium:90,iron:3.3,vitD:0.0,kcal:190}},
+  {id:"atsuage",name:"厚揚げ",cat:"soy",price:50,effort:1,n:{protein:10.7,fat:11.3,carb:0.9,omega3:0.5,calcium:240,iron:2.6,vitD:0.0,kcal:143}},
+  // --- 乳製品 ---
+  {id:"greek_yogurt",name:"ギリシャヨーグルト",cat:"dairy",price:120,effort:1,n:{protein:10.0,fat:5.0,carb:4.0,omega3:0.1,calcium:110,iron:0.0,vitD:0.0,kcal:100}},
+  {id:"milk",name:"牛乳",cat:"dairy",price:25,effort:1,n:{protein:3.3,fat:3.8,carb:4.8,omega3:0.0,calcium:110,iron:0.0,vitD:0.3,kcal:67}},
+  {id:"cheese",name:"プロセスチーズ",cat:"dairy",price:140,effort:1,n:{protein:22.7,fat:26.0,carb:1.3,omega3:0.3,calcium:630,iron:0.3,vitD:0.0,kcal:339}},
+  // --- 野菜 ---
+  {id:"spinach_raw",name:"ほうれん草(生)",cat:"veg",price:120,effort:3,n:{protein:2.2,fat:0.4,carb:3.1,omega3:0.0,calcium:49,iron:2.0,vitD:0.0,kcal:20}},
+  {id:"spinach_frz",name:"冷凍ほうれん草",cat:"veg",price:60,effort:1,n:{protein:2.9,fat:0.3,carb:3.4,omega3:0.0,calcium:130,iron:1.2,vitD:0.0,kcal:22}},
+  {id:"broccoli_raw",name:"ブロッコリー(生)",cat:"veg",price:130,effort:3,n:{protein:5.4,fat:0.6,carb:6.6,omega3:0.1,calcium:50,iron:1.3,vitD:0.0,kcal:37}},
+  {id:"broccoli_frz",name:"冷凍ブロッコリー",cat:"veg",price:70,effort:1,n:{protein:3.9,fat:0.4,carb:5.2,omega3:0.0,calcium:38,iron:1.0,vitD:0.0,kcal:30}},
+  {id:"komatsuna",name:"小松菜(生)",cat:"veg",price:90,effort:3,n:{protein:1.5,fat:0.2,carb:2.4,omega3:0.0,calcium:170,iron:2.8,vitD:0.0,kcal:13}},
+  // --- 炭水化物系（主食。可食部=食べる状態100gあたり）---
+  {id:"rice_bowl",name:"白米ごはん",cat:"carb",price:35,effort:2,n:{protein:2.5,fat:0.3,carb:37.1,omega3:0.0,calcium:3,iron:0.1,vitD:0.0,kcal:156}},
+  {id:"oatmeal",name:"オートミール(調理)",cat:"carb",price:70,effort:1,n:{protein:2.4,fat:1.4,carb:12.0,omega3:0.0,calcium:8,iron:0.9,vitD:0.0,kcal:65}},
+  {id:"bread_white",name:"食パン",cat:"carb",price:60,effort:1,n:{protein:8.9,fat:4.1,carb:46.4,omega3:0.0,calcium:22,iron:0.5,vitD:0.0,kcal:248}},
+  {id:"bread_whole",name:"全粒粉パン",cat:"carb",price:90,effort:1,n:{protein:7.9,fat:5.0,carb:47.0,omega3:0.1,calcium:23,iron:1.3,vitD:0.0,kcal:251}},
+  {id:"pasta",name:"パスタ(ゆで)",cat:"carb",price:50,effort:2,n:{protein:5.2,fat:0.9,carb:28.0,omega3:0.0,calcium:8,iron:0.5,vitD:0.0,kcal:150}},
+  {id:"satsumaimo",name:"さつまいも",cat:"carb",price:55,effort:2,n:{protein:1.2,fat:0.2,carb:31.9,omega3:0.0,calcium:36,iron:0.5,vitD:0.0,kcal:126}}
+];
+
+/* レシピの副材料（栄養計算＋コスト計算。100gあたり。priceは円/100g） */
+const PANTRY = {
+  rice:{name:"ご飯",price:35,n:{protein:2.5,fat:0.3,carb:37.1,omega3:0,calcium:3,iron:0.1,vitD:0,kcal:156}},
+  bread:{name:"食パン",price:60,n:{protein:8.9,fat:4.1,carb:46.4,omega3:0,calcium:22,iron:0.5,vitD:0,kcal:248}},
+  onion:{name:"玉ねぎ",price:30,n:{protein:1.0,fat:0.1,carb:8.4,omega3:0,calcium:21,iron:0.3,vitD:0,kcal:33}},
+  oil:{name:"油",price:40,n:{protein:0,fat:100,carb:0,omega3:6.8,calcium:0,iron:0,vitD:0,kcal:921}},
+  soy:{name:"醤油",price:40,n:{protein:7.7,fat:0,carb:7.9,omega3:0,calcium:29,iron:1.7,vitD:0,kcal:71}},
+  miso:{name:"味噌",price:50,n:{protein:12.5,fat:6.0,carb:21.9,omega3:0,calcium:100,iron:4.0,vitD:0,kcal:192}},
+  negi:{name:"長ねぎ",price:60,n:{protein:1.4,fat:0.1,carb:8.3,omega3:0,calcium:36,iron:0.3,vitD:0,kcal:35}},
+  carrot:{name:"にんじん",price:25,n:{protein:0.7,fat:0.2,carb:9.3,omega3:0,calcium:28,iron:0.2,vitD:0,kcal:35}},
+  tomato:{name:"トマト",price:50,n:{protein:0.7,fat:0.1,carb:4.7,omega3:0,calcium:7,iron:0.2,vitD:0,kcal:20}},
+  cabbage:{name:"キャベツ",price:20,n:{protein:1.3,fat:0.2,carb:5.2,omega3:0,calcium:43,iron:0.3,vitD:0,kcal:23}},
+  mayo:{name:"マヨネーズ",price:30,n:{protein:1.4,fat:75.0,carb:3.6,omega3:3.0,calcium:8,iron:0.3,vitD:0,kcal:700}}
+};
+const ALL = {}; FOODS.forEach(f=>ALL[f.id]=f); Object.keys(PANTRY).forEach(k=>ALL[k]={id:k,...PANTRY[k]});
+
+/* 食材→おすすめ料理（1食材に複数。meal: b=朝食 / l=昼食 / d=夕食） */
+const MEALS={b:"朝食",l:"昼食",d:"夕食"};
+const RECIPES=[
+  // 魚
+  {food:"salmon_raw",meal:["l","d"],name:"サーモンの塩焼き定食",time:15,ing:[{id:"salmon_raw",g:100},{id:"rice",g:180},{id:"spinach_frz",g:50}],
+    steps:["サーモンの両面に塩少々をふり、5分おいて水気を拭く。","魚焼きグリル（またはフライパンに薄く油）で中火5〜6分、返して3〜4分焼く。","冷凍ほうれん草はレンジ600Wで1分半解凍し、軽く塩をふって添える。ご飯と一緒に。"],
+    tip:"皮目から焼くと崩れにくく、脂も落ちて香ばしい。"},
+  {food:"salmon_raw",meal:["l","d"],name:"サーモンとブロッコリーのレンジ蒸し",time:10,ing:[{id:"salmon_raw",g:100},{id:"broccoli_frz",g:80},{id:"oil",g:3}],
+    steps:["耐熱皿にサーモンを置き、まわりに冷凍ブロッコリーを並べる。","塩少々と油を全体にかけ、ふんわりラップ。","600Wで4〜5分加熱し、そのまま1分蒸らす。"],
+    tip:"火を使わない最速調理。オメガ3は加熱しすぎない方が残る。"},
+  {food:"salmon_can",meal:["l","d"],name:"鮭缶とほうれん草の混ぜご飯",time:5,ing:[{id:"salmon_can",g:70},{id:"rice",g:180},{id:"spinach_frz",g:50},{id:"soy",g:5}],
+    steps:["冷凍ほうれん草をレンジ600Wで1分半解凍し、水気を絞る。","温かいご飯に鮭缶を汁ごと入れ、ほうれん草・醤油を加える。","缶の身をほぐしながらさっくり混ぜる。"],
+    tip:"缶汁にDHA/EPAとカルシウムが溶け出ているので捨てない。"},
+  {food:"salmon_can",meal:["l","d"],name:"鮭缶のミルクパスタ",time:12,ing:[{id:"salmon_can",g:70},{id:"pasta",g:200},{id:"milk",g:60}],
+    steps:["フライパンに鮭缶を汁ごと入れ、中火でほぐしながら1分温める。","牛乳を加えて弱火にし、ふつふつしたら塩こしょうで味を調える。","ゆでたパスタを加えて1〜2分和え、軽くとろみがつけば完成。"],
+    tip:"牛乳は沸騰させないと分離しない。粉チーズをかけても◎。"},
+  {food:"salmon_can",meal:["b","l"],name:"鮭缶おにぎり",time:5,ing:[{id:"salmon_can",g:50},{id:"rice",g:150}],
+    steps:["鮭缶の汁を軽く切り、身をほぐす。","温かいご飯に混ぜ、塩少々で味を調える。","ラップにのせて包み、両手でにぎる。"],
+    tip:"朝に作っておけば昼の分も。冷めてもおいしい。"},
+  {food:"saba_can",meal:["l","d"],name:"さば缶と玉ねぎのポン酢丼",time:5,ing:[{id:"saba_can",g:90},{id:"onion",g:40},{id:"rice",g:180}],
+    steps:["玉ねぎを薄切りにし、水に2分さらして辛味を抜き、水気を切る。","丼にご飯→さば缶（軽く汁を切る）→玉ねぎの順にのせる。","ポン酢を回しかける。あれば七味やごまを。"],
+    tip:"玉ねぎの辛味が苦手ならレンジ600W30秒でも。包丁1回の最速丼。"},
+  {food:"saba_can",meal:["d"],name:"さば缶の味噌煮込み",time:10,ing:[{id:"saba_can",g:90},{id:"miso",g:15},{id:"negi",g:15},{id:"rice",g:180}],
+    steps:["小鍋にさば缶を汁ごと入れ、水50mlを足して中火にかける。","ふつふつしたら味噌を溶き入れ、斜め切りのねぎを加える。","弱火で3〜4分煮て、ご飯と一緒に。"],
+    tip:"味噌は煮立てすぎると香りが飛ぶ。最後に入れて短時間で。"},
+  {food:"tuna_can",meal:["l","d"],name:"ツナと卵の最強丼",time:5,ing:[{id:"tuna_can",g:60},{id:"egg",g:50},{id:"rice",g:180},{id:"soy",g:5}],
+    steps:["温かいご飯を丼に盛り、油を切ったツナをのせる。","中央にくぼみを作り、卵（生または温泉卵）を落とす。","醤油を回しかけ、全体を混ぜながら食べる。"],
+    tip:"たんぱく質25g超を3分で。ねぎや刻み海苔があれば風味UP。"},
+  {food:"tuna_can",meal:["l","d"],name:"ツナトマトパスタ",time:12,ing:[{id:"tuna_can",g:50},{id:"pasta",g:200},{id:"tomato",g:60}],
+    steps:["トマトを1.5cm角に切る。","フライパンにツナを油ごと入れて中火で温め、トマトを加えて2分炒める。","ゆでたパスタと塩こしょうを加えて和える。"],
+    tip:"ツナ缶の油がソース代わり。トマトは加熱でうまみが増す。"},
+  {food:"tuna_can",meal:["b","l"],name:"ツナマヨトースト",time:6,ing:[{id:"tuna_can",g:40},{id:"bread",g:60},{id:"mayo",g:10}],
+    steps:["ツナの油を切り、マヨネーズと混ぜる。","パンに塗り広げ、トースターで3〜4分、縁がきつね色になるまで焼く。"],
+    tip:"黒こしょうをひとふりすると味が締まる。"},
+  {food:"sardine_can",meal:["b","l"],name:"いわし缶のっけトースト",time:6,ing:[{id:"sardine_can",g:70},{id:"bread",g:60}],
+    steps:["パンを軽くトーストする。","いわし缶の身をのせて粗くほぐし、トースターでさらに2分焼く。"],
+    tip:"カルシウムは骨ごと食べる缶詰が最強。仕上げにレモンがあれば◎。"},
+  {food:"sardine_can",meal:["d"],name:"いわし缶と小松菜の煮浸し",time:8,ing:[{id:"sardine_can",g:70},{id:"komatsuna",g:80},{id:"soy",g:5},{id:"rice",g:180}],
+    steps:["小松菜を4cm幅に切る。","小鍋にいわし缶を汁ごと入れ、水50mlと醤油を加えて中火にかける。","煮立ったら小松菜を加え、しんなりするまで2〜3分煮る。ご飯と。"],
+    tip:"小松菜は茹でこぼし不要でアクが少なく、鉄・カルシウムが摂れる。"},
+  {food:"maguro",meal:["l","d"],name:"まぐろ漬け丼",time:10,ing:[{id:"maguro",g:100},{id:"rice",g:180},{id:"soy",g:8}],
+    steps:["まぐろをそぎ切りにし、醤油（あればみりん少々）に5分漬ける。","丼にご飯を盛り、漬けまぐろを並べる。","漬けだれを少しかけ、あればわさび・刻み海苔を。"],
+    tip:"漬けすぎると固くなる。5分で十分味が入る。"},
+  {food:"maguro",meal:["l","d"],name:"まぐろのねぎ和え丼",time:8,ing:[{id:"maguro",g:100},{id:"negi",g:15},{id:"rice",g:180},{id:"soy",g:8}],
+    steps:["まぐろを1.5cm角に切り、小口切りのねぎと醤油で和える。","ご飯にのせ、あればごま油を数滴たらす。"],
+    tip:"高たんぱく低脂質の代表格。ごま油数滴で満足感が大きく上がる。"},
+  // 肉
+  {food:"beef_loin",meal:["l","d"],name:"牛ロースの玉ねぎソース丼",time:15,ing:[{id:"beef_loin",g:120},{id:"onion",g:50},{id:"rice",g:180},{id:"soy",g:8}],
+    steps:["玉ねぎを薄切りにする。牛肉は室温に5分置き、塩こしょう。","フライパンを強めの中火で熱し、牛肉を両面1〜2分ずつ焼いて取り出す。","同じフライパンで玉ねぎを2分炒め、醤油（あればみりん）を加えてひと煮立ち。","ご飯に牛肉をのせ、玉ねぎソースをかける。"],
+    tip:"肉を焼いた後の脂で玉ねぎを炒めると、うまみを余さず回収できる。"},
+  {food:"beef_loin",meal:["d"],name:"牛と野菜の炒め物",time:12,ing:[{id:"beef_loin",g:120},{id:"cabbage",g:60},{id:"carrot",g:30},{id:"oil",g:5},{id:"rice",g:180}],
+    steps:["キャベツはざく切り、にんじんは短冊切り、牛肉は一口大に切る。","フライパンに油を熱し、にんじん→牛肉→キャベツの順に強火で炒める。","塩こしょう（あればオイスターソース）で調味。ご飯と。"],
+    tip:"火の通りにくい順に入れるのが炒め物の鉄則。強火で手早く。"},
+  {food:"pork_loin",meal:["l","d"],name:"豚の生姜焼き",time:12,ing:[{id:"pork_loin",g:120},{id:"onion",g:50},{id:"soy",g:8},{id:"rice",g:180}],
+    steps:["玉ねぎを薄切りに。豚ロースは筋を数か所切る。","フライパンで豚を中火で両面2分ずつ焼き、玉ねぎを加えて2分炒める。","醤油＋おろし生姜（チューブ2cm・あればみりん）を回しかけ、絡める。"],
+    tip:"豚のビタミンB1は糖質をエネルギーに変える＝脳の燃料補給に好相性。"},
+  {food:"pork_loin",meal:["d"],name:"豚とキャベツの味噌炒め",time:12,ing:[{id:"pork_loin",g:120},{id:"cabbage",g:80},{id:"miso",g:12},{id:"oil",g:5},{id:"rice",g:180}],
+    steps:["豚は一口大、キャベツはざく切りにする。味噌は水大さじ1で溶いておく。","フライパンに油を熱し、豚を中火で2〜3分炒める。","キャベツを加えて強火で2分、溶き味噌を回し入れて絡める。"],
+    tip:"味噌は焦げやすいので最後に。ピリ辛好きは豆板醤少々。"},
+  {food:"chicken_breast",meal:["l","d"],name:"鶏むねとブロッコリーのレンジ蒸し",time:10,ing:[{id:"chicken_breast",g:120},{id:"broccoli_frz",g:80},{id:"rice",g:180}],
+    steps:["鶏むねをそぎ切りにし、塩少々と酒（あれば）をもみ込む。","耐熱皿に並べ、冷凍ブロッコリーを散らしてふんわりラップ。","600Wで4分加熱し、2分蒸らす（中まで白くなればOK）。ご飯と。"],
+    tip:"そぎ切り＋蒸らしがパサつかせないコツ。ポン酢やごまだれで。"},
+  {food:"chicken_breast",meal:["l","d"],name:"鶏むねの照り焼き丼",time:15,ing:[{id:"chicken_breast",g:120},{id:"onion",g:40},{id:"soy",g:8},{id:"rice",g:180}],
+    steps:["鶏むねをそぎ切りにし、片栗粉（あれば）を薄くまぶす。","フライパンに薄く油を熱し、中火で両面2分ずつ焼く。","薄切り玉ねぎを加えて2分、醤油（＋砂糖またはみりん少々）を絡める。","ご飯にのせる。"],
+    tip:"片栗粉の薄衣が水分を閉じ込め、たれも絡みやすくなる。"},
+  {food:"chicken_breast",meal:["l"],name:"サラダチキン風プレート",time:12,ing:[{id:"chicken_breast",g:120},{id:"tomato",g:60},{id:"cabbage",g:40}],
+    steps:["鶏むねに塩少々をふり、耐熱皿でふんわりラップ、600Wで3分半。","そのまま3分蒸らして余熱で火を通し、食べやすく裂く。","くし切りトマト・千切りキャベツと盛り合わせる。"],
+    tip:"蒸し汁はうまみの塊。野菜にかけてドレッシング代わりに。"},
+  {food:"chicken_thigh",meal:["l","d"],name:"鶏もも照り焼き",time:15,ing:[{id:"chicken_thigh",g:120},{id:"onion",g:50},{id:"soy",g:8},{id:"rice",g:180}],
+    steps:["鶏ももを一口大に切る。玉ねぎはくし切り。","フライパンで鶏ももを中火で4〜5分、焼き色がつくまで焼く。","玉ねぎを加えて2分、醤油（＋みりん少々）を絡めて照りを出す。ご飯と。"],
+    tip:"皮なしでも焼き色をしっかりつけると香ばしさで満足度が上がる。"},
+  {food:"chicken_thigh",meal:["d"],name:"鶏ももと野菜の煮物",time:20,ing:[{id:"chicken_thigh",g:120},{id:"carrot",g:40},{id:"onion",g:40},{id:"soy",g:8},{id:"rice",g:180}],
+    steps:["鶏ももは一口大、にんじんは乱切り、玉ねぎはくし切りにする。","鍋に材料と水150ml・醤油（＋みりん少々）を入れて中火にかける。","煮立ったらアクを取り、落とし蓋（アルミ箔でOK）をして弱火12分。"],
+    tip:"作り置きOK。翌日は味が染みてさらにおいしい。"},
+  // 卵
+  {food:"egg",meal:["b","l"],name:"卵かけご飯＋納豆",time:3,ing:[{id:"egg",g:50},{id:"natto",g:45},{id:"rice",g:180},{id:"soy",g:5}],
+    steps:["納豆をよく混ぜて温かいご飯にのせる。","卵を割り入れ、醤油をかけて混ぜる。"],
+    tip:"最速3分で、たんぱく質・鉄・ビタミンB群がそろう定番。"},
+  {food:"egg",meal:["b"],name:"ほうれん草オムレツ",time:10,ing:[{id:"egg",g:100},{id:"spinach_frz",g:40},{id:"oil",g:5},{id:"bread",g:60}],
+    steps:["冷凍ほうれん草をレンジ600Wで1分解凍し、水気を絞る。","卵2個を溶き、ほうれん草と塩こしょうを混ぜる。","フライパンに油を中火で熱し、卵液を流して大きくかき混ぜ、半熟で折りたたむ。","トーストを添える。"],
+    tip:"火を止めるのは半熟のうちに。余熱でちょうどよく固まる。"},
+  // 大豆
+  {food:"tofu",meal:["b","l","d"],name:"豆腐とねぎの味噌汁定食",time:8,ing:[{id:"tofu",g:150},{id:"miso",g:18},{id:"negi",g:15},{id:"rice",g:180}],
+    steps:["鍋に水250mlを沸かし、さいの目に切った豆腐を入れる。","再び煮立ったら火を弱め、味噌を溶き入れる。","小口切りのねぎを加えて火を止める。ご飯と。"],
+    tip:"顆粒だしがあれば水と一緒に。味噌を入れたら沸騰させない。"},
+  {food:"tofu",meal:["d"],name:"麻婆風豆腐丼",time:12,ing:[{id:"tofu",g:150},{id:"pork_loin",g:50},{id:"miso",g:12},{id:"negi",g:15},{id:"rice",g:180}],
+    steps:["豚ロースを細かく刻む（ひき肉代わり）。豆腐は2cm角に切る。","フライパンで豚を中火で炒め、色が変わったら味噌＋水80mlを加える。","豆腐とねぎを入れて3分煮る。とろみが欲しければ水溶き片栗粉。ご飯に。"],
+    tip:"豆板醤やラー油を足せば本格麻婆に。豆腐は崩れてもおいしい。"},
+  {food:"natto",meal:["b","l"],name:"納豆たまごご飯",time:3,ing:[{id:"natto",g:45},{id:"egg",g:50},{id:"rice",g:180}],
+    steps:["納豆をたれと混ぜ、温かいご飯にのせる。","卵を落として混ぜながら食べる。"],
+    tip:"鉄分＋たんぱく質の最強コスパ朝食。"},
+  {food:"natto",meal:["b","l"],name:"納豆と長ねぎご飯",time:4,ing:[{id:"natto",g:45},{id:"negi",g:15},{id:"rice",g:180},{id:"soy",g:5}],
+    steps:["ねぎを小口切りにして納豆と混ぜる。","温かいご飯にのせ、醤油少々。"],
+    tip:"ねぎの香り成分は納豆のビタミンB1吸収を助ける組み合わせ。"},
+  {food:"atsuage",meal:["l","d"],name:"厚揚げの甘辛焼き",time:10,ing:[{id:"atsuage",g:120},{id:"soy",g:8},{id:"negi",g:15},{id:"rice",g:180}],
+    steps:["厚揚げを2cm幅に切る。","フライパン（油不要）で中火、両面2〜3分ずつカリッと焼く。","醤油（＋みりん少々）を回しかけて絡め、ねぎを散らす。ご飯と。"],
+    tip:"厚揚げ自体の油で焼ける。表面カリカリまで焼くのがコツ。"},
+  {food:"atsuage",meal:["d"],name:"厚揚げと小松菜の煮浸し",time:10,ing:[{id:"atsuage",g:100},{id:"komatsuna",g:80},{id:"soy",g:6},{id:"rice",g:180}],
+    steps:["厚揚げは一口大、小松菜は4cm幅に切る。","小鍋に水100mlと醤油（＋みりん少々）を煮立て、厚揚げを2分煮る。","小松菜を加えてしんなりするまで2分。ご飯と。"],
+    tip:"カルシウム源の厚揚げ×鉄の小松菜は、この価格帯で最強の組み合わせ。"},
+  // 乳製品
+  {food:"greek_yogurt",meal:["b"],name:"ギリシャヨーグルトボウル",time:2,ing:[{id:"greek_yogurt",g:150}],
+    steps:["器に盛る。あればはちみつ・バナナ・ナッツをトッピング。"],
+    tip:"そのままで高たんぱく。運動後や小腹満たしにも。"},
+  {food:"greek_yogurt",meal:["b"],name:"ヨーグルト＆オートミール",time:3,ing:[{id:"greek_yogurt",g:100},{id:"oatmeal",g:40}],
+    steps:["オートミールにヨーグルトを混ぜ、5分おいてふやかす。","あればはちみつやフルーツを添える。"],
+    tip:"前夜に混ぜて冷蔵すれば「オーバーナイトオーツ」。朝は食べるだけ。"},
+  {food:"milk",meal:["b"],name:"ミルクパン朝食",time:4,ing:[{id:"milk",g:200},{id:"bread",g:60}],
+    steps:["パンをトーストする。","牛乳（温めても）と一緒に。"],
+    tip:"忙しい朝の最低ライン。卵を足せれば栄養バランスが跳ね上がる。"},
+  {food:"milk",meal:["b"],name:"ミルクオートミール",time:5,ing:[{id:"milk",g:150},{id:"oatmeal",g:40}],
+    steps:["耐熱ボウルにオートミールと牛乳を入れる。","600Wで1分半→混ぜて30秒加熱。塩ひとつまみか、はちみつで味付け。"],
+    tip:"鍋不要。とろみが足りなければ10秒ずつ追加加熱。"},
+  {food:"cheese",meal:["b","l"],name:"チーズトースト",time:5,ing:[{id:"cheese",g:40},{id:"bread",g:60}],
+    steps:["パンにチーズをのせる。","トースターで3〜4分、チーズが溶けて縁が色づくまで焼く。"],
+    tip:"黒こしょうやはちみつをかけると一気に「店の味」。"},
+  {food:"cheese",meal:["b"],name:"チーズオムレツ",time:8,ing:[{id:"cheese",g:30},{id:"egg",g:100},{id:"oil",g:3}],
+    steps:["卵2個を溶き、塩こしょうする。チーズは小さくちぎる。","フライパンに油を中火で熱し、卵液を流して大きくかき混ぜる。","半熟のうちに中央にチーズをのせ、折りたたむ。"],
+    tip:"カルシウム×たんぱく質。チーズの塩気があるので塩は控えめに。"},
+  // 野菜
+  {food:"spinach_raw",meal:["l","d"],name:"ほうれん草のおひたし定食",time:8,ing:[{id:"spinach_raw",g:100},{id:"soy",g:5},{id:"rice",g:180}],
+    steps:["たっぷりの湯を沸かし、ほうれん草を根元から入れて1分茹でる。","冷水にとって色止めし、水気をしっかり絞って4cm幅に切る。","醤油（あればかつお節）で和える。ご飯と。"],
+    tip:"茹でて水にさらすことでシュウ酸が減り、鉄の吸収を邪魔しにくくなる。"},
+  {food:"spinach_raw",meal:["b","l","d"],name:"ほうれん草と卵の炒め",time:8,ing:[{id:"spinach_raw",g:100},{id:"egg",g:50},{id:"oil",g:5}],
+    steps:["ほうれん草を4cm幅に切る（できれば下茹で30秒）。","フライパンに油を熱し、溶き卵を半熟に炒めて一度取り出す。","ほうれん草を1分炒め、卵を戻して塩こしょうで調味。"],
+    tip:"卵を一度取り出すのがふわふわに仕上げる定番テク。"},
+  {food:"spinach_frz",meal:["b","l","d"],name:"ほうれん草と卵の炒め",time:6,ing:[{id:"spinach_frz",g:100},{id:"egg",g:50},{id:"oil",g:5},{id:"rice",g:180}],
+    steps:["冷凍ほうれん草をレンジ600Wで2分解凍し、水気を絞る。","フライパンに油を熱し、溶き卵を半熟に炒めて一度取り出す。","ほうれん草を1分炒めて卵を戻し、塩こしょう。ご飯と。"],
+    tip:"下処理不要の冷凍が時短の勝ち筋。栄養も生と大差ない。"},
+  {food:"spinach_frz",meal:["l","d"],name:"ほうれん草のごま和え",time:4,ing:[{id:"spinach_frz",g:100},{id:"soy",g:5}],
+    steps:["冷凍ほうれん草をレンジ600Wで2分解凍し、水気を絞る。","醤油とすりごま（あれば砂糖ひとつまみ）で和える。"],
+    tip:"ごまの脂質でほうれん草の脂溶性ビタミンの吸収が良くなる。"},
+  {food:"broccoli_raw",meal:["l","d"],name:"ブロッコリーと鶏むねの温サラダ",time:12,ing:[{id:"broccoli_raw",g:100},{id:"chicken_breast",g:80}],
+    steps:["ブロッコリーを小房に分け、鶏むねはそぎ切りにして塩少々。","耐熱皿に並べてふんわりラップ、600Wで4分→2分蒸らす。","オリーブ油やポン酢をかけて和える。"],
+    tip:"筋トレ民の定番コンビ。蒸し汁ごとどうぞ。"},
+  {food:"broccoli_raw",meal:["l","d"],name:"ブロッコリーとツナのサラダ",time:8,ing:[{id:"broccoli_raw",g:100},{id:"tuna_can",g:50}],
+    steps:["ブロッコリーを小房に分け、耐熱容器で600W3分レンジ蒸し。","粗熱を取り、ツナを油ごと加えて和える。塩こしょうで調味。"],
+    tip:"ツナの油がドレッシング代わり。マヨ少々でコクUPも。"},
+  {food:"broccoli_frz",meal:["l","d"],name:"ブロッコリーとツナのサラダ",time:5,ing:[{id:"broccoli_frz",g:100},{id:"tuna_can",g:50}],
+    steps:["冷凍ブロッコリーをレンジ600Wで2分解凍し、水気を切る。","ツナを油ごと加えて和え、塩こしょうで調味。"],
+    tip:"包丁もまな板も不要。あと一品に最適。"},
+  {food:"broccoli_frz",meal:["l","d"],name:"ブロッコリーのチーズ焼き",time:8,ing:[{id:"broccoli_frz",g:100},{id:"cheese",g:30}],
+    steps:["冷凍ブロッコリーをレンジ600Wで2分解凍し、耐熱皿に並べる。","チーズをのせ、トースターで4〜5分、チーズが溶けて色づくまで焼く。"],
+    tip:"塩こしょう＋チーズの塩気だけで十分。カルシウムも摂れる。"},
+  {food:"komatsuna",meal:["l","d"],name:"小松菜の煮浸し定食",time:8,ing:[{id:"komatsuna",g:120},{id:"soy",g:6},{id:"rice",g:180}],
+    steps:["小松菜を4cm幅に切る。","小鍋に水100mlと醤油（＋みりん少々）を煮立てる。","小松菜を茎→葉の順に入れ、2〜3分煮る。ご飯と。"],
+    tip:"小松菜はアク抜き不要が強み。ほうれん草より手間なしで鉄・カルシウム◎。"},
+  {food:"komatsuna",meal:["d"],name:"小松菜と厚揚げの炒め",time:10,ing:[{id:"komatsuna",g:100},{id:"atsuage",g:80},{id:"oil",g:5},{id:"soy",g:6},{id:"rice",g:180}],
+    steps:["小松菜は4cm幅、厚揚げは一口大に切る。","フライパンに油を熱し、厚揚げを中火で2分焼き色をつける。","小松菜を加えて強火で1〜2分、醤油で調味。ご飯と。"],
+    tip:"茎から先に炒めるとシャキシャキ感が残る。"},
+  // 主食
+  {food:"rice_bowl",meal:["b","l"],name:"卵かけご飯",time:2,ing:[{id:"rice",g:180},{id:"egg",g:50},{id:"soy",g:5}],
+    steps:["温かいご飯に卵を割り入れる。","醤油をかけて混ぜる。"],
+    tip:"白身を先に混ぜてから黄身を混ぜるとふわふわ食感に。"},
+  {food:"rice_bowl",meal:["b","l"],name:"納豆ご飯",time:2,ing:[{id:"rice",g:180},{id:"natto",g:45}],
+    steps:["納豆を50回ほど混ぜて粘りを出す。","温かいご飯にのせる。"],
+    tip:"よく混ぜるほどうまみ成分が増える。"},
+  {food:"oatmeal",meal:["b"],name:"ミルクオートミール",time:5,ing:[{id:"oatmeal",g:40},{id:"milk",g:150}],
+    steps:["耐熱ボウルにオートミールと牛乳を入れる。","600Wで1分半→混ぜて30秒。はちみつや塩で味付け。"],
+    tip:"食物繊維で血糖が緩やかに上がる＝午前の集中が続きやすい。"},
+  {food:"oatmeal",meal:["b"],name:"オートミールの卵がゆ",time:6,ing:[{id:"oatmeal",g:40},{id:"egg",g:50}],
+    steps:["耐熱ボウルにオートミールと水180ml・塩ひとつまみを入れ、600Wで2分。","溶き卵を回し入れて混ぜ、さらに40秒加熱。","あればねぎ・ごま油数滴で中華がゆ風に。"],
+    tip:"和風だしや鶏ガラ顆粒を少し入れると一気においしくなる。"},
+  {food:"bread_white",meal:["b"],name:"トースト＆ヨーグルト",time:4,ing:[{id:"bread",g:60},{id:"greek_yogurt",g:100}],
+    steps:["パンをトーストする。","ヨーグルトを添える（はちみつやフルーツがあれば）。"],
+    tip:"パン単品より、たんぱく質を足すだけで腹持ちが段違い。"},
+  {food:"bread_white",meal:["b","l"],name:"ツナマヨトースト",time:6,ing:[{id:"bread",g:60},{id:"tuna_can",g:40},{id:"mayo",g:10}],
+    steps:["ツナの油を切り、マヨネーズと混ぜてパンに塗る。","トースターで3〜4分焼く。"],
+    tip:"朝のたんぱく質補給に。黒こしょうで味が締まる。"},
+  {food:"bread_whole",meal:["b"],name:"全粒粉トースト＆卵",time:12,ing:[{id:"bread",g:60},{id:"egg",g:50}],
+    steps:["卵を水から10分茹でてゆで卵にする（前夜に作り置きでも）。","全粒粉パンをトーストし、スライスしたゆで卵と塩こしょうをのせる。"],
+    tip:"全粒粉の食物繊維×卵のたんぱく質で、血糖の急上昇を防ぐ朝食。"},
+  {food:"bread_whole",meal:["b","l"],name:"全粒粉チーズサンド",time:5,ing:[{id:"bread",g:60},{id:"cheese",g:30},{id:"tomato",g:30}],
+    steps:["パンにチーズと薄切りトマトを挟む。","トースターまたはフライパンで両面2分ずつ焼く（ホットサンド風）。"],
+    tip:"焼かずにそのままでもOK。持ち運べる昼食に。"},
+  {food:"pasta",meal:["l","d"],name:"ツナトマトパスタ",time:12,ing:[{id:"pasta",g:200},{id:"tuna_can",g:50},{id:"tomato",g:50}],
+    steps:["トマトを角切りにする。","フライパンにツナを油ごと入れ、トマトと2分炒める。","ゆでたパスタを和え、塩こしょうで調味。"],
+    tip:"ゆで汁を大さじ2ほど足すとソースがよく絡む。"},
+  {food:"pasta",meal:["l","d"],name:"鮭缶クリームパスタ",time:12,ing:[{id:"pasta",g:200},{id:"salmon_can",g:60},{id:"milk",g:60}],
+    steps:["フライパンに鮭缶を汁ごと入れて中火でほぐす。","牛乳を加え、ふつふつしたら塩こしょう。","ゆでたパスタを和えて1〜2分、とろみがつけば完成。"],
+    tip:"鮭缶の骨ごと使えばカルシウムも。粉チーズで店の味に。"},
+  {food:"satsumaimo",meal:["b"],name:"焼き芋＆ヨーグルト",time:10,ing:[{id:"satsumaimo",g:150},{id:"greek_yogurt",g:100}],
+    steps:["さつまいもを洗い、濡れたキッチンペーパー＋ラップで包む。","600Wで2分→200W（解凍モード）で8分（しっとり甘くなる）。","半分に割り、ヨーグルトを添える。"],
+    tip:"低ワットでじっくり加熱すると甘みが引き出される。"},
+  {food:"satsumaimo",meal:["b","d"],name:"さつまいもの味噌汁",time:10,ing:[{id:"satsumaimo",g:80},{id:"miso",g:15},{id:"negi",g:10}],
+    steps:["さつまいもを1cm厚のいちょう切りにし、水にさっとさらす。","鍋に水250mlと入れて中火、柔らかくなるまで5〜6分煮る。","火を弱めて味噌を溶き、ねぎを散らす。"],
+    tip:"芋の甘み×味噌の塩気で満足感が高い。食物繊維もしっかり。"}
+];
+const RECIPES_BY_FOOD={};
+RECIPES.forEach(r=>{(RECIPES_BY_FOOD[r.food]=RECIPES_BY_FOOD[r.food]||[]).push(r);});
+// 食材IDからレシピを取得。複数あれば日付で日替わりローテーション。
+function recipeFor(id,seed){const list=RECIPES_BY_FOOD[id];
+  if(!list||!list.length)return{food:id,meal:["l","d"],name:ALL[id].name+"の簡単メニュー",time:10,ing:[{id,g:120}],steps:["塩こしょうで下味をつけ、焼く・蒸すなど好みの方法でシンプルに調理する。"]};
+  return list[hash(id+"|"+(seed||todayStr()))%list.length];}
+// 作り方の表示（番号付き手順＋所要時間＋コツ）。stepsは配列/文字列どちらでも受ける。
+function stepsList(rec){return Array.isArray(rec.steps)?rec.steps:[String(rec.steps||"")];}
+function stepsHTML(rec){return `<ol class="rsteps">${stepsList(rec).map(s=>`<li>${s}</li>`).join("")}</ol>`
+  +(rec.tip?`<div class="rtip">💡 ${rec.tip}</div>`:"");}
+function stepsText(rec){return stepsList(rec).join(" → ");}
+function timeLabel(rec){return rec.time?`⏱ 約${rec.time}分`:"";}
+
+/* 1日の摂取目安（割合表示用の基準）。設定タブでカスタマイズ可能（1食の目安＝この1/3） */
+const REF_DEFAULT={protein:65,fat:60,carb:320,omega3:2.0,iron:7.5,vitD:8.5,calcium:700};
+const REF_MICROS=[["omega3","オメガ3","g"],["calcium","カルシウム","mg"],["iron","鉄分","mg"],["vitD","ビタミンD","µg"]];
+const REF_DEFAULT_KCAL=REF_DEFAULT.protein*4+REF_DEFAULT.fat*9+REF_DEFAULT.carb*4; // 標準の1日エネルギー(2080kcal)
+// カロミル方式：①1日の目標カロリー → ②PFC比率(%) からグラム数を導出。
+// その他の栄養素は摂取エネルギーに比例して自動設定。
+function deriveFromKcal(kcal,p,f,c){
+  const factor=kcal/REF_DEFAULT_KCAL;
+  const r1=v=>Math.max(0.1,Math.round(v*10)/10);
+  return {
+    protein:Math.round(kcal*p/100/4), // たんぱく質 4kcal/g
+    fat:Math.round(kcal*f/100/9),     // 脂質 9kcal/g
+    carb:Math.round(kcal*c/100/4),    // 炭水化物 4kcal/g
+    omega3:r1(REF_DEFAULT.omega3*factor),
+    calcium:Math.max(1,Math.round(REF_DEFAULT.calcium*factor)),
+    iron:r1(REF_DEFAULT.iron*factor),
+    vitD:r1(REF_DEFAULT.vitD*factor)};
+}
+let REF=Object.assign({},REF_DEFAULT);
+let MEALS_N=3; // 1日の食数（1食の目安＝1日の目安÷食数）
+let MEAL_KCAL=0;
+function mealRef(k){return REF[k]/MEALS_N;} // 1食あたりの目安量
+function recalcMealKcal(){MEAL_KCAL=Math.round((REF.protein*4+REF.fat*9+REF.carb*4)/MEALS_N);}
+recalcMealKcal();
+// 目安を適用（r=null で標準に戻す）。バー・ランキング・不足判定すべてがこの値を参照する。
+function applyRef(r,meals){
+  REF=Object.assign({},REF_DEFAULT,r||{});
+  MEALS_N=Math.min(6,Math.max(1,parseInt(meals,10)||3));
+  recalcMealKcal();
+  S.refCustom=r?Object.assign({},REF):null;
+  S.mealsPerDay=MEALS_N;
+  save(S);
+}
+
+/* e-Stat「小売物価統計調査」ベースの相場（円/100g・目安）。
+   設定タブで appId を登録すると、毎月 e-Stat API から実データ（S.marketData）に自動更新される。 */
+const MARKET={egg:30,milk:22,bread_white:40,rice_bowl:40,chicken_breast:100,chicken_thigh:130,
+  pork_loin:250,beef_loin:600,salmon_raw:450,maguro:500,tofu:30,natto:80,
+  spinach_raw:130,broccoli_raw:140,komatsuna:100,cheese:160};
+function baselineOf(id){return MARKET[id]!=null?MARKET[id]:(ALL[id]?ALL[id].price:0);}
+function marketOf(id){ // 優先度: e-Stat実データ > 内蔵の目安 > 通常価格
+  if(S.marketData&&S.marketData.prices&&S.marketData.prices[id]!=null)return S.marketData.prices[id];
+  return baselineOf(id);}
+// 今月の値下がり率（%。正=前回データ（無ければ内蔵目安）より安くなった）
+function momDrop(id){
+  if(!S.marketData||!S.marketData.prices||S.marketData.prices[id]==null)return 0;
+  const prev=(S.marketData.prev&&S.marketData.prev[id]!=null)?S.marketData.prev[id]:baselineOf(id);
+  if(!(prev>0))return 0;
+  return Math.round((prev-S.marketData.prices[id])/prev*100);}
+
+/* 提案カテゴリ（ジャンル） */
+const ROLES={
+  main:{label:"メイン（主菜・たんぱく質）",short:"🍖 メイン",cats:["fish","meat","egg","soy"]},
+  veg:{label:"野菜（副菜）",short:"🥦 野菜",cats:["veg"]},
+  carb:{label:"炭水化物系（主食）",short:"🍚 主食",cats:["carb"]},
+  dairy:{label:"乳製品",short:"🧀 乳製品",cats:["dairy"]}
+};
+function foodRole(f){for(const r in ROLES)if(ROLES[r].cats.includes(f.cat))return r;return null;}
+function roleFoods(keys){return FOODS.filter(f=>keys.includes(foodRole(f)));}
+
+/* 評価・比較に使う栄養素 */
+const NK=["protein","omega3","calcium","iron","vitD"];
+const NLABEL={protein:"たんぱく質",omega3:"オメガ3",calcium:"カルシウム",iron:"鉄分",vitD:"ビタミンD",fat:"脂質",carb:"炭水化物"};
+const NUNIT={protein:"g",omega3:"g",calcium:"mg",iron:"mg",vitD:"µg",fat:"g",carb:"g"};
+const NWHY={omega3:"DHA/EPA＝脳・集中",iron:"酸素運搬＝集中持続",vitD:"気分・認知",calcium:"神経伝達",protein:"神経伝達物質の材料"};
+const PFC_KEYS=[["protein","たんぱく質 (P)","g"],["fat","脂質 (F)","g"],["carb","炭水化物 (C)","g"]];
+const OTHER_KEYS=[["omega3","オメガ3","g"],["calcium","カルシウム","mg"],["iron","鉄分","mg"],["vitD","ビタミンD","µg"]];
+// 各栄養素の「100kcalあたり量」の食品中の最大値（特徴量スケール正規化に使用）
+const NMAX100={};NK.forEach(k=>{NMAX100[k]=Math.max(...FOODS.map(f=>(f.n[k]||0)*100/(f.n.kcal>0?f.n.kcal:1)),1e-9);});
+
+/* ============================================================
+   検索（ひらがな・カタカナ・漢字のどれでもヒット）
+============================================================ */
+// 食材IDごとの読み（ひらがな検索用）。スペースは正規化で消えるため区切りは自由。
+const YOMI={salmon_raw:"さーもん さけ なま",salmon_can:"さけみずにかん",tuna_can:"つなかん まぐろ",
+  sardine_can:"いわしかん あじつけ",maguro:"まぐろあかみ",beef_loin:"ぎゅうろーす うしろーす びーふ",
+  pork_loin:"ぶたろーす ぽーく",chicken_breast:"とりむねにく むねにく ちきん かわなし",
+  chicken_thigh:"とりももにく ももにく ちきん",egg:"けいらん たまご",tofu:"きぬごしとうふ",
+  natto:"なっとう",atsuage:"あつあげ なまあげ",greek_yogurt:"よーぐると",milk:"ぎゅうにゅう みるく",
+  cheese:"ちーず",spinach_raw:"ほうれんそう",spinach_frz:"れいとうほうれんそう",
+  broccoli_frz:"れいとうぶろっこりー",komatsuna:"こまつな",rice_bowl:"はくまいごはん こめ ごはん",
+  bread_white:"しょくぱん",bread_whole:"ぜんりゅうふんぱん",satsumaimo:"さつまいも",
+  rice:"ごはん こめ",bread:"しょくぱん",onion:"たまねぎ",oil:"あぶら",soy:"しょうゆ",miso:"みそ",
+  negi:"ながねぎ",carrot:"にんじん",tomato:"とまと",cabbage:"きゃべつ",mayo:"まよねーず"};
+// 漢字⇔かなの言い換え（クエリ側を展開して照合。全食品DB＝ひらがな主体の公式名にも効く）
+const KANA_ALIAS=[["鶏","にわとり","とり"],["豚","ぶた"],["牛","ぎゅう","うし"],["肉","にく"],
+  ["鶏卵","けいらん"],["卵","たまご"],["白米","はくまい"],["米","こめ"],["ご飯","ごはん","めし"],
+  ["鮭","さけ","しゃけ"],["鯖","さば"],["鮪","まぐろ"],["鰯","いわし"],["魚","さかな"],
+  ["豆腐","とうふ"],["納豆","なっとう"],["厚揚げ","あつあげ"],["牛乳","ぎゅうにゅう"],
+  ["食パン","しょくぱん"],["全粒粉","ぜんりゅうふん"],["ほうれん草","ほうれんそう"],
+  ["小松菜","こまつな"],["さつま芋","さつまいも"],["薩摩芋","さつまいも"],["芋","いも"],
+  ["玉ねぎ","たまねぎ","玉葱"],["葱","ねぎ"],["人参","にんじん"],["味噌","みそ"],["醤油","しょうゆ"],
+  ["油","あぶら"],["赤身","あかみ"],["水煮","みずに"],["味付","あじつけ"],["缶","かん"],
+  ["皮","かわ"],["生","なま"],["冷凍","れいとう"],["麦","むぎ"],["乳","にゅう"]];
+function kata2hira(s){return s.replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60));}
+function normTxt(s){return kata2hira(String(s||"").toLowerCase()).replace(/[\s　()（）\[\]［］・,，、。]/g,"");}
+function queryVariants(tok){ // かな/漢字ゆらぎを吸収したクエリ変種を生成
+  const base=normTxt(tok);const out=new Set([base]);
+  KANA_ALIAS.forEach(g=>g.forEach(a=>{const an=normTxt(a);
+    if(an&&base.includes(an))g.forEach(b=>{const bn=normTxt(b);if(bn!==an)out.add(base.split(an).join(bn));});}));
+  return [...out].filter(Boolean);
+}
+function tokMatch(tok,hay){
+  if(queryVariants(tok).some(v=>hay.includes(v)))return true;
+  // 連続一致しない場合（例:「鶏むね」→公式名は「にわとり…むね…」）は別名部分で分割してAND照合
+  const base=normTxt(tok);
+  for(const g of KANA_ALIAS){for(const a of g){const an=normTxt(a);const i=base.indexOf(an);
+    if(i>=0&&an.length<base.length){
+      if(!g.some(b=>hay.includes(normTxt(b))))continue;
+      const rest=base.slice(0,i)+base.slice(i+an.length);
+      if(!rest||tokMatch(rest,hay))return true;
+    }}}
+  return false;
+}
+// 食品名（＋読み）に対する検索。空白区切りはAND。ひらがな/カタカナ/漢字/大文字小文字を吸収。
+function foodMatch(q,name,yomi){
+  if(!q||!String(q).trim())return true;
+  const hay=normTxt(name)+"|"+normTxt(yomi||"");
+  return String(q).split(/[\s　]+/).filter(Boolean).every(t=>tokMatch(t,hay));
+}
+
+/* ============================================================
+   価格（今日の値動きをデモ再現）
+============================================================ */
+function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
+function todayStr(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
+// 「物価」＝前年同月比（インフレ）。本来は e-Stat の前年同月平均と比較する。
+// 今はデモの確定的トレンド値（プラス寄り＝物価上昇）。e-Stat連携で実値に差し替え。
+function yoyPct(id){const f=ALL[id];if(!f||f.price==null)return 0;return (hash(id+"|yoy")%21)-4;} // -4〜+16%
+// 先月比（直近の動き）。デモ確定値。本来は e-Stat の前月平均と比較。過去比較は「参考程度」。
+function momPct(id){const f=ALL[id];if(!f||f.price==null)return 0;return (hash(id+"|mom")%13)-6;} // -6〜+6%
+// 食材ごとの懸念点（類似提案で添える）
+const CONCERNS={
+  salmon_raw:"価格が高め",salmon_can:"汁の塩分に注意",saba_can:"塩分・脂質多め",tuna_can:"油漬は脂質・カロリー高め",
+  sardine_can:"味付は塩分・糖分多め",maguro:"価格が高め・頻食は水銀に配慮",beef_loin:"脂質・カロリー高め",
+  pork_loin:"脂質多め",chicken_breast:"パサつきやすい・オメガ3少",chicken_thigh:"皮つきは脂質増",egg:"1日の摂取量に配慮",
+  tofu:"たんぱく質は中程度",natto:"好み分かれる・抗凝固薬の人は注意",atsuage:"揚げてあり脂質あり",
+  greek_yogurt:"無糖を選ぶ・やや高価",milk:"乳糖不耐の人は注意",cheese:"塩分・脂質高め",
+  spinach_raw:"シュウ酸（結石体質は茹でる）",spinach_frz:"下味なしを選ぶ",broccoli_raw:"下処理に手間",
+  broccoli_frz:"食感は落ちる",komatsuna:"日持ちが短い",rice_bowl:"糖質量に注意（血糖）",oatmeal:"好み分かれる",
+  bread_white:"GI高め・血糖が上がりやすい",bread_whole:"やや高価",pasta:"糖質量に注意",satsumaimo:"糖質多め"
+};
+function concernOf(id){return CONCERNS[id]||"";}
+// 同じ用途で栄養が近い食材（価格不問）。栄養マッチ（方向×量）の高い順。
+function similarFoods(id,n=3){const o=ALL[id];if(!o)return [];
+  return FOODS.filter(f=>f.id!==id&&f.cat===o.cat).map(f=>({f,m:nutriMatch(o,f)})).sort((a,b)=>b.m.pct-a.m.pct).slice(0,n);}
+function similarCard(id){const sims=similarFoods(id,3);if(!sims.length)return "";
+  return `<div class="card"><span class="pill">似た栄養の食材（参考・懸念点つき）</span>
+    <div class="hint" style="margin:4px 0 6px">同じ用途で栄養が近い候補。状況で使い分けると飽きずに続きます。各々の懸念点も確認を。</div>
+    ${sims.map(s=>`<div class="deal-row tap" onclick="viewFood('${s.f.id}')">
+      <span>${s.f.name} <span class="hint">栄養マッチ ${s.m.pct}%</span></span>
+      <span class="hint" style="text-align:right">${concernOf(s.f.id)?"⚠ "+concernOf(s.f.id)+" ":""}・相場¥${marketOf(s.f.id)} ›</span></div>`).join("")}</div>`;}
+// 食材1つの今日の実効価格（FOODSは値動きあり、PANTRYは固定）
+function priceOf(id){const f=ALL[id];if(!f||f.price==null)return 0;return f.price;} // 通常価格（MARKET未登録食材のフォールバック）
+// 料理1食あたりのコスト（円）。相場（marketOf）基準＝食材詳細の相場表示と同一
+function recipeCost(rec){return Math.round(rec.ing.reduce((s,i)=>s+marketOf(i.id)*i.g/100,0));}
+
+/* ============================================================
+   マッチングエンジン（同カテゴリ優先＋今日価格＋お買い得加点）
+============================================================ */
+// 栄養プロファイルのベクトル化：
+// ① 100kcalあたりに正規化（食品の「エネルギー密度の差」を排除し、栄養の質を比較）
+// ② 各栄養素を食品中の最大値で割り 0–1 に正規化（g/mg/µg の単位・桁差を排除し、各栄養素を対等に扱う）
+//    →これをしないと数値の大きいカルシウム(mg)だけが類似度を支配してしまう
+function nutriVec(f){const k=f.n.kcal>0?f.n.kcal:1;return NK.map(x=>((f.n[x]||0)*100/k)/NMAX100[x]);}
+// コサイン類似度：2食品の「栄養バランス（方向）」の近さを 0–1 で測る（非負ベクトルなので0–1に収まる）
+function cosine(a,b){let d=0,na=0,nb=0;for(let i=0;i<a.length;i++){d+=a[i]*b[i];na+=a[i]*a[i];nb+=b[i]*b[i];}return(na&&nb)?d/(Math.sqrt(na)*Math.sqrt(nb)):0;}
+/* 栄養マッチ度 = 方向（コサイン）× 量のカバー率。
+   コサインだけだと「プロファイルの形が同じなら量が1/4でも100%」となり見当外れになるため、
+   cov: 元食品が1食目安に対して意味のある量（5%以上）を持つ栄養素について、
+        候補が100gあたりでどれだけの量をカバーするか（重み=元食品の寄与度、上限100%）を掛け合わせる。 */
+function nutriMatch(o,c){
+  const cos=cosine(nutriVec(o),nutriVec(c));
+  let ws=0,acc=0;
+  NK.forEach(k=>{const need=mealRef(k),w=Math.min((o.n[k]||0)/need,1);
+    if(w<0.05)return; // 元食品にほぼ含まれない栄養素はカバー対象にしない
+    ws+=w;acc+=w*Math.min((c.n[k]||0)/(o.n[k]||1e-9),1);});
+  const cov=ws>0?acc/ws:0;
+  return{cos,cov,pct:Math.round(cos*cov*100)};
+}
+function rationale(o,c){
+  const ups=[],downs=[];const note={calcium:"缶詰は骨ごと/冷凍は損失が少ないため"};
+  for(const k of["calcium","iron","omega3","protein","vitD"]){
+    const a=o.n[k]||0,b=c.n[k]||0,need=mealRef(k);
+    // 「増えた」は候補側が1食目安の15%以上を持つ時だけ主張（微量同士の「2倍」は無意味）
+    if(b>=need*0.15&&(a===0||b/a>=1.3))ups.push(`${NLABEL[k]}が${a===0?"新たにとれ":"約"+(b/a).toFixed(1)+"倍"}${note[k]?`（${note[k]}）`:""}`);
+    else if(a>=need*0.15&&a>0&&b/a<=0.7)downs.push(`${NLABEL[k]}はやや少なめ`);
+  }
+  const save=marketOf(o.id)-marketOf(c.id);
+  const head=save>0?`相場では100gあたり約${save}円安い`:`価格はほぼ同等`;
+  let body;
+  if(ups.length&&downs.length)body=`栄養面ではむしろ${ups.join("、")}。一方で${downs.join("、")}。`;
+  else if(ups.length)body=`栄養面ではむしろ${ups.join("、")}。`;
+  else if(downs.length)body=`${downs.join("、")}ですが、主要素はおおむね同等。`;
+  else body=`栄養はほぼ同等。`;
+  return `${o.name}より、${head}。${body}「妥協」ではなく賢いアップグレードです。`;
+}
+function suggest(originId,{topN=3,minCov=0.55,sameCat=true}={}){
+  const o=ALL[originId];
+  const maxP=Math.max(...FOODS.map(f=>marketOf(f.id)));
+  return FOODS.filter(f=>f.id!==o.id).filter(f=>sameCat?f.cat===o.cat:true).map(f=>{
+    const m=nutriMatch(o,f);
+    const saving=marketOf(o.id)-marketOf(f.id); // 相場ベースの差額（画面の相場表示と同一基準）
+    const pm=Math.max(0,saving/maxP);
+    return{f,...m,saving,score:m.cos*m.cov*(1+0.8*pm),why:rationale(o,f)};
+  }).filter(r=>r.cov>=minCov&&r.saving>0).sort((a,b)=>b.score-a.score).slice(0,topN);
+}
+
+/* ============================================================
+   状態
+============================================================ */
+const KEY="kinto_state_v3";
+function load(){try{return JSON.parse(localStorage.getItem(KEY))||{}}catch(e){return{}}}
+function save(s){localStorage.setItem(KEY,JSON.stringify(s));}
+function withDefaults(s){
+  s.adoptions=s.adoptions||[];s.skips=s.skips||0;s.roles=s.roles||[];
+  s.showOtherCat=s.showOtherCat||false;s.pick=s.pick||null;s.myMeal=s.myMeal||[];
+  s.pref=s.pref||null;s.prefAuto=s.prefAuto||null;s.cospaNut=s.cospaNut||{};
+  s.priceLog=s.priceLog||[];      // 相場判定に入力した実売価格の記録
+  s.savedMeals=s.savedMeals||[];  // 料理計算の保存済み組み合わせ
+  s.goal=s.goal||null;            // 月間節約目標（円）
+  s.estatAppId=s.estatAppId||null;// e-Stat API の appId（相場の自動更新に使用）
+  s.marketData=s.marketData||null;// e-Stat から取得した今月の相場 {month,prices,prev,fetchedAt}
+  s.aiKey=s.aiKey||null;          // Claude API キー（AIレシピ検索に使用。この端末にのみ保存）
+  s.aiUses=s.aiUses||{date:"",count:0}; // AIレシピ検索の当日利用回数
+  s.aiRecipes=s.aiRecipes||[];    // AIで探した人気レシピの蓄積 {food,name,time,ingredients,steps,tip,source,date}
+  s.refCustom=s.refCustom||null;  // カスタムした1日の栄養目安（null=標準）
+  s.refPresets=s.refPresets||[];  // 名前付きで保存した目安設定 {name,ref,meals,date}
+  s.mealsPerDay=s.mealsPerDay||3; // 1日の食数
+  s.decidedPick=s.decidedPick||null; // 「◯◯に決定！」画面を出す対象（選び直すと解除。履歴は実績に残る）
+  return s;}
+let S=withDefaults(load());
+save(S);
+// 保存済みのカスタム栄養目安と食数を適用（バー・ランキング・不足判定の基準）
+MEALS_N=Math.min(6,Math.max(1,parseInt(S.mealsPerDay,10)||3));
+if(S.refCustom)REF=Object.assign({},REF_DEFAULT,S.refCustom);
+recalcMealKcal();
+
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1800);}
+function streak(){ // 「採用した日」を習慣とし、連続日数を数える
+  const days=new Set(S.adoptions.map(a=>a.date));let n=0;const d=new Date();
+  for(;;){const ds=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+    if(days.has(ds)){n++;d.setDate(d.getDate()-1);}else break;}return n;}
+
+/* ============================================================
+   栄養の比較バー
+============================================================ */
+function fmtv(v,u){return u==="g"?v.toFixed(1):(v<10?v.toFixed(1):Math.round(v).toString());}
+function legend(items){return `<div class="cmp-legend">${items.map(i=>`<span class="lg ${i.cls}">■ ${i.label}</span>`).join("")}</div>`;}
+function cmpRow(val,unit,w,cls){return `<div class="cmprow"><span class="sw ${cls}"></span>
+  <div class="tr"><div class="fl ${cls}" style="width:${w}%"></div></div><span class="nm">${fmtv(val,unit)}${unit}</span></div>`;}
+function cmpBlock(name,unit,rows,t){
+  const all=rows.concat([{val:t,cls:"t"}]);const max=Math.max(...all.map(r=>r.val),0.0001);const w=v=>Math.min(100,v/max*100);
+  return `<div class="cmp"><div class="cmp-head"><span>${name}</span><span class="tgt">1食目安 ${fmtv(t,unit)}${unit}</span></div>
+    ${all.map(r=>cmpRow(r.val,unit,w(r.val),r.cls)).join("")}</div>`;
+}
+// 提案カード用（origin food vs alt food vs 1食目安）。食品は100gあたり。
+function pfcCompare(o,a){return PFC_KEYS.map(([k,n,u])=>cmpBlock(n,u,[{val:o.n[k]||0,cls:"o"},{val:a.n[k]||0,cls:"a"}],mealRef(k))).join("");}
+function otherCompare(o,a){return OTHER_KEYS.map(([k,n,u])=>cmpBlock(`${NLABEL[k]}（${NWHY[k]}）`,u,[{val:o.n[k]||0,cls:"o"},{val:a.n[k]||0,cls:"a"}],mealRef(k))).join("");}
+// レシピ用（この料理 vs 1食目安）
+function pfcMeal(t){return PFC_KEYS.map(([k,n,u])=>cmpBlock(n,u,[{val:t[k]||0,cls:"a"}],mealRef(k))).join("");}
+function otherMeal(t){return OTHER_KEYS.map(([k,n,u])=>cmpBlock(`${NLABEL[k]}（${NWHY[k]}）`,u,[{val:t[k]||0,cls:"a"}],mealRef(k))).join("");}
+
+/* ============================================================
+   料理の栄養計算 & 不足の補完提案
+============================================================ */
+function recipeNutrition(rec){const t={protein:0,fat:0,carb:0,omega3:0,calcium:0,iron:0,vitD:0,kcal:0};
+  rec.ing.forEach(i=>{const f=ALL[i.id];if(!f)return;for(const k in t)t[k]+=(f.n[k]||0)*i.g/100;});return t;}
+function recipeHTML(rec){
+  const t=recipeNutrition(rec);const ing=rec.ing.map(i=>`${ALL[i.id].name} ${i.g}g`).join("・");
+  return `<div class="card" id="recipeCard">
+    <span class="pill">この一手で作るなら</span>
+    <div style="font-size:18px;font-weight:800;margin:4px 0">🍳 ${rec.name} <span class="hint" style="font-weight:400">${(rec.meal||[]).map(m=>MEALS[m]).join("・")}向き</span></div>
+    <div class="hint">材料：${ing}</div>
+    ${stepsHTML(rec)}
+    <div style="margin:8px 0;font-weight:800;color:var(--gold)">💰 1食あたり 約¥${recipeCost(rec)} <span class="hint" style="font-weight:400;margin-left:8px">${timeLabel(rec)}</span></div>
+    ${cookpadLinksHTML(rec)}
+  </div>
+  ${aiRecipesCardHTML(rec.food||mainFoodId(rec),"home")}
+  <div class="card">
+    <span class="pill">PFCバランス（1食の推奨量との比較）</span>
+    ${legend([{cls:"a",label:rec.name},{cls:"t",label:"1食目安"}])}
+    <div class="hint" style="margin-bottom:6px">エネルギー <b style="color:var(--ink)">${Math.round(t.kcal)} kcal</b>（1食目安 約${MEAL_KCAL}kcal）</div>
+    ${pfcMeal(t)}
+  </div>
+  <div class="card">
+    <span class="pill">その他の栄養素（脳・生産性／1食の推奨量との比較）</span>
+    ${legend([{cls:"a",label:rec.name},{cls:"t",label:"1食目安"}])}
+    ${otherMeal(t)}
+  </div>
+  ${complementCard(rec)}`;
+}
+// 1食目安に届かない栄養の検出 → 優先項目はユーザーが選択 → 補完食材＋最大カバー料理を提案
+let gapSel=null, currentMealRec=null;
+const GAP_KEYS=[["protein","たんぱく質"],["omega3","オメガ3"],["calcium","カルシウム"],["iron","鉄分"],["vitD","ビタミンD"]];
+function computeGaps(t){return GAP_KEYS.map(([k,n])=>({k,n,ratio:(t[k]||0)/(mealRef(k))})).filter(g=>g.ratio<0.6).sort((a,b)=>a.ratio-b.ratio);}
+function gapInner(rec){
+  const t=recipeNutrition(rec);const exclude=rec.ing.map(i=>i.id);const gaps=computeGaps(t);
+  if(gaps.length===0)return `<span class="pill">栄養チェック</span>
+    <div class="hint" style="margin-top:6px">この一食で主要な栄養素は1食の目安をおおむね満たしています 👍</div>`;
+  if(!gapSel||!gaps.find(g=>g.k===gapSel))gapSel=gaps[0].k;
+  const chips=gaps.map(g=>`<span class="chip ${g.k===gapSel?"on":""}" onclick="selectGap('${g.k}')">${g.n}（目安の${Math.round(g.ratio*100)}%）</span>`).join("");
+  const best=FOODS.filter(f=>!exclude.includes(f.id)).map(f=>({f,perYen:(f.n[gapSel]||0)/marketOf(f.id),amt:f.n[gapSel]||0}))
+    .filter(r=>r.amt>0).sort((a,b)=>b.perYen-a.perYen)[0];
+  return `<span class="pill warn">⚠ 1食目安に届かない栄養を補う</span>
+    <div class="hint" style="margin:4px 0 8px">料理の栄養を見たうえで、<b>優先的に補いたい栄養</b>を選んでください。安く足せる食材を提案します。</div>
+    <div class="chips" style="margin-bottom:8px">${chips}</div>
+    <div class="deal-row"><span><b style="color:var(--teal)">${NLABEL[gapSel]}</b>を補うなら</span>
+      <span>＋ <b style="color:var(--ink)">${best?best.f.name:"—"}</b>${best?` <span class="hint">が手軽（相場 約¥${marketOf(best.f.id)}/100g）</span>`:""}</span></div>`;
+}
+function gapHTML(rec){currentMealRec=rec;gapSel=null;return `<div class="card" id="gapBox">${gapInner(rec)}</div>`;}
+function selectGap(k){gapSel=k;const b=document.getElementById("gapBox");if(b&&currentMealRec)b.innerHTML=gapInner(currentMealRec);}
+
+/* ---- 食べ合わせ（献立の役割補完）＋ クックパッド ---- */
+const PAIR={main:["veg","carb"],veg:["main","carb"],carb:["main","veg"],dairy:["carb","main"]};
+const ROLE_JP={main:"主菜",veg:"副菜",carb:"主食",dairy:"乳製品"};
+function mainFoodId(rec){if(rec.food&&ALL[rec.food])return rec.food;
+  const fi=rec.ing.filter(i=>FOODS.some(f=>f.id===i.id));
+  if(!fi.length)return rec.ing[0].id;return fi.sort((a,b)=>priceOf(b.id)-priceOf(a.id))[0].id;}
+function dishRole(rec){return foodRole(ALL[mainFoodId(rec)])||"main";}
+// 不足を補い、かつ元の料理と ①献立の役割（食べ合わせ）②時間帯（朝/昼/夜）が合う一皿を選ぶ。
+// originMeals と候補レシピの meal が重なるものを優先（=同じ食事として一緒に食べられる）。
+function bestComplementDish(t,gaps,exclude,originRole,originMeals){
+  const allow=PAIR[originRole]||["veg","carb","main"];
+  function pick(requireMeal){let best=null,bs=-1;
+    FOODS.forEach(f=>{const role=foodRole(f);if(!allow.includes(role)||exclude.includes(f.id))return;
+      const dish=recipeFor(f.id),dn=recipeNutrition(dish);
+      const shared=(originMeals||[]).filter(m=>(dish.meal||[]).includes(m));
+      if(requireMeal&&shared.length===0)return; // 時間帯が合わない一皿は除外
+      let cov=0;gaps.forEach(g=>{if((t[g.k]+(dn[g.k]||0))>=mealRef(g.k))cov++;});
+      const add=gaps.reduce((s,g)=>s+Math.min(2,(dn[g.k]||0)/(mealRef(g.k))),0);
+      const sc=cov*100+(shared.length?5:0)+add;
+      if(sc>bs){bs=sc;best={f,dish,cov,role,shared};}});
+    return best;}
+  return pick(true)||pick(false); // まず時間帯一致で探し、無ければ役割のみで探す
+}
+// 外部レシピの参照先はクックパッドに一本化（レシピ数最多で「実在レシピを確実に見つける」用途に最適）
+function cookpadLinksHTML(rec){const mf=ALL[mainFoodId(rec)];
+  return `<a class="cookpad" href="${cookpadLink(rec.name)}" target="_blank" rel="noopener">🔗 クックパッドで「${rec.name}」の実在レシピを探す</a>
+    <a class="cookpad alt" href="${cookpadLink(mf.name)}" target="_blank" rel="noopener">🔗 「${mf.name}」のレシピをもっと見る</a>`;
+}
+// 不足を補う、食べ合わせの良いもう一皿（クックパッドの後に提案）
+function complementCard(rec){
+  const t=recipeNutrition(rec);const gaps=computeGaps(t);if(gaps.length===0)return "";
+  const exclude=rec.ing.map(i=>i.id);const originRole=dishRole(rec);
+  const comp=bestComplementDish(t,gaps,exclude,originRole,rec.meal);if(!comp)return "";
+  const cd=comp.dish;const dn=recipeNutrition(cd);
+  const mealLabel=(comp.shared&&comp.shared.length)?MEALS[comp.shared[0]]:"";
+  const ct={};["protein","fat","carb","omega3","calcium","iron","vitD","kcal"].forEach(k=>ct[k]=(t[k]||0)+(dn[k]||0));
+  return `<div class="card"><span class="pill warn">＋ 不足を補う、食べ合わせの良いもう一皿</span>
+    <div style="font-size:17px;font-weight:800;margin:4px 0">🍳 ${cd.name} <span class="hint" style="font-weight:400">${(cd.meal||[]).map(m=>MEALS[m]).join("・")}向き</span></div>
+    <div class="hint">${mealLabel?`${mealLabel}に`:""}この${ROLE_JP[originRole]||"料理"}と合わせるなら${ROLE_JP[comp.role]||""}の「${comp.f.name}」。食べ合わせ・栄養バランスともに◎。</div>
+    <div class="hint" style="margin:4px 0">材料：${cd.ing.map(i=>ALL[i.id].name+" "+i.g+"g").join("・")}　／　💰約¥${recipeCost(cd)}　${timeLabel(cd)}</div>
+    <div class="hint">作り方：${stepsText(cd)}</div>
+    <div class="hint" style="margin-top:4px">この一皿を足すと <b style="color:var(--teal)">${comp.cov}/${gaps.length}</b> 項目の不足が1食目安に到達。</div>
+    <div class="subhead">追加後の合計栄養（元の料理 ＋ このもう一皿 vs 1食目安）</div>
+    ${legend([{cls:"a",label:"追加後の合計"},{cls:"t",label:"1食目安"}])}
+    <div class="hint" style="margin-bottom:6px">エネルギー ${Math.round(ct.kcal)} kcal（1食目安 約${MEAL_KCAL}kcal）</div>
+    ${pfcMeal(ct)}
+    <div class="subhead">その他の栄養素（脳・生産性に効く）</div>
+    ${legend([{cls:"a",label:"追加後の合計"},{cls:"t",label:"1食目安"}])}
+    ${otherMeal(ct)}
+    <a class="cookpad" href="${cookpadLink(cd.name)}" target="_blank" rel="noopener">🔗 クックパッドで「${cd.name}」を探す</a></div>`;
+}
+
+/* ============================================================
+   食材詳細 → 料理 → クックパッド（モーダル）
+============================================================ */
+function cookpadLink(q){return `https://cookpad.com/search/${encodeURIComponent(q)}`;}
+// 単一食品の栄養（100gあたり）を 1食目安と比較
+function foodNutritionHTML(f){
+  const kc=Math.round(f.n.kcal);
+  return `<div class="card hl" style="margin:8px 0 4px">
+      <div style="display:flex;align-items:baseline;justify-content:space-between">
+        <span class="pill">🔥 カロリー（100gあたり）</span>
+        <span style="font-size:24px;font-weight:800;color:var(--gold)">${kc}<span class="hint" style="font-size:13px;font-weight:400"> kcal</span></span></div>
+      <div style="margin-top:8px">${cmpBlock("エネルギー","kcal",[{val:f.n.kcal,cls:"a"}],MEAL_KCAL)}</div></div>
+    <div class="subhead">PFCバランス（100gあたり vs 1食目安）</div>
+    ${legend([{cls:"a",label:f.name},{cls:"t",label:"1食目安"}])}
+    ${PFC_KEYS.map(([k,n,u])=>cmpBlock(n,u,[{val:f.n[k]||0,cls:"a"}],mealRef(k))).join("")}
+    <div class="subhead">その他の栄養素（脳・生産性に効く）</div>
+    ${legend([{cls:"a",label:f.name},{cls:"t",label:"1食目安"}])}
+    ${OTHER_KEYS.map(([k,n,u])=>cmpBlock(`${NLABEL[k]}（${NWHY[k]}）`,u,[{val:f.n[k]||0,cls:"a"}],mealRef(k))).join("")}`;
+}
+// この食材の「あなたの記録」（相場判定に入力した実売価格の履歴）
+function myPriceLine(id){
+  const logs=S.priceLog.filter(l=>l.id===id);if(!logs.length)return "";
+  const best=Math.min(...logs.map(l=>l.per100)),last=logs[logs.length-1];
+  return `<div class="hint" style="margin-top:6px">📒 あなたの記録（${logs.length}回）：最安 <b style="color:var(--teal)">¥${best}/100g</b> ・ 直近 ¥${last.per100}/100g（${last.date}）</div>`;
+}
+function openFoodModal(id){
+  const f=ALL[id];const mk=marketOf(id),lo=Math.round(mk*0.85),hiP=Math.round(mk*1.15);
+  document.getElementById("modalBody").innerHTML=`
+    <div style="font-size:21px;font-weight:800">${f.name}</div>
+    <div class="card hl" style="margin:6px 0 4px">
+      <span class="pill">相場の目安（${regionLabel()}）</span>
+      <div style="font-size:20px;font-weight:800;margin:4px 0">だいたい ¥${lo}〜¥${hiP} <span class="hint" style="font-weight:400">/100g</span></div>
+      <div class="hint">この食材は普段このくらい。お店で見た値段がこれより安ければ「買い」。高ければ下の代替も検討。<b>店頭で目で見て判断</b>してください。</div>
+      ${myPriceLine(id)}
+      <div class="hint" style="margin-top:6px">※相場は暫定の目安。店頭での判定は「🏷️ 安い？」タブでどうぞ。</div>
+    </div>
+    ${foodNutritionHTML(f)}
+    <button class="btn-adopt" style="width:100%;margin-top:14px" onclick="modalAdopt('${id}')">🛒 ${f.name} にする（決定）</button>
+    <button class="btn-ghost" id="toRecipe" style="width:100%;margin-top:8px">🍳 この食材を使った料理を見る</button>
+    ${similarCard(id)}`;
+  showModal();
+  document.getElementById("toRecipe").onclick=()=>openRecipeModal(id);
+}
+// 詳細モーダルからそのまま「今日の一手」に決定
+function modalAdopt(id){
+  hideModal();
+  const r=foodRole(ALL[id]);if(r)S.roles=[r];S.pick=id;save(S);
+  renderCatBar();
+  adoptSwap(id,id,0);
+  switchView("home");
+  const dc=document.getElementById("decidedCard");
+  if(dc)dc.scrollIntoView({behavior:MOTION_OK()?"smooth":"auto",block:"start"});
+}
+function recipesList(id){return RECIPES_BY_FOOD[id]||[recipeFor(id)];}
+function openRecipeModal(id,ri){
+  const list=recipesList(id);
+  const idx=(typeof ri==="number"&&ri>=0&&ri<list.length)?ri:(RECIPES_BY_FOOD[id]?hash(id+"|"+todayStr())%list.length:0);
+  const f=ALL[id],rec=list[idx],t=recipeNutrition(rec);
+  const others=list.map((r,i)=>({r,i})).filter(o=>o.i!==idx).slice(0,2);
+  const othersHTML=others.length?`<div class="card"><span class="pill">この食材の他の料理候補</span>
+    ${others.map(o=>`<div class="deal-row tap" onclick="openRecipeModal('${id}',${o.i})">
+      <span>🍳 ${o.r.name} <span class="hint">${(o.r.meal||[]).map(m=>MEALS[m]).join("・")}向き</span></span>
+      <span class="hint">約¥${recipeCost(o.r)}・${o.r.time||10}分 ›</span></div>`).join("")}
+    <div class="hint" style="margin-top:6px">タップで切り替え。</div></div>`:"";
+  document.getElementById("modalBody").innerHTML=`
+    <div style="font-size:21px;font-weight:800">🍳 ${rec.name} <span class="hint" style="font-weight:400">${(rec.meal||[]).map(m=>MEALS[m]).join("・")}向き</span></div>
+    <div class="hint" style="margin:4px 0">材料：${rec.ing.map(i=>ALL[i.id].name+" "+i.g+"g").join("・")}</div>
+    ${stepsHTML(rec)}
+    <div style="font-weight:800;color:var(--gold);margin:6px 0">💰 1食あたり 約¥${recipeCost(rec)} <span class="hint" style="font-weight:400;margin-left:8px">${timeLabel(rec)}</span></div>
+    ${cookpadLinksHTML(rec)}
+    ${aiRecipesCardHTML(id,"modal")}
+    ${othersHTML}
+    <div class="subhead">この料理の栄養（1食の推奨量との比較）</div>
+    ${legend([{cls:"a",label:rec.name},{cls:"t",label:"1食目安"}])}
+    <div class="hint" style="margin-bottom:6px">エネルギー ${Math.round(t.kcal)} kcal（1食目安 約${MEAL_KCAL}kcal）</div>
+    ${pfcMeal(t)}
+    <div class="subhead">その他の栄養素（脳・生産性に効く）</div>
+    ${legend([{cls:"a",label:rec.name},{cls:"t",label:"1食目安"}])}
+    ${otherMeal(t)}
+    ${complementCard(rec)}
+    <button class="btn-ghost" id="backFood">← この食材の栄養に戻る</button>`;
+  document.getElementById("backFood").onclick=()=>openFoodModal(id);
+  document.querySelector(".modal-card").scrollTop=0;
+}
+
+/* ============================================================
+   店頭で相場チェック（スーパー用の即時判定ページ）
+============================================================ */
+let chkSel=null;
+function renderCheck(){renderCheckList((document.getElementById("chkSearch")||{}).value||"");}
+function renderCheckList(q){
+  const el=document.getElementById("chkBody");if(!el)return;
+  chkSel=null;
+  const list=FOODS.filter(f=>foodMatch(q,f.name,YOMI[f.id]));
+  el.innerHTML=`<div class="card" style="padding:12px 14px">${list.length
+    ?list.map(f=>`<div class="deal-row tap" onclick="chkSelect('${f.id}')">
+        <span>${f.name}</span><span class="hint">相場 約¥${marketOf(f.id)}/100g ›</span></div>`).join("")
+    :`<div class="hint">該当する食材がありません（ひらがな・漢字どちらでもOK）。</div>`}</div>`;
+}
+function chkSelect(id){
+  chkSel=id;const f=ALL[id];const mk=marketOf(id),lo=Math.round(mk*0.85),hi=Math.round(mk*1.15);
+  const src=S.marketData&&S.marketData.prices[id]!=null?`e-Stat ${S.marketData.month}・${S.marketData.area}`:`目安（${regionLabel()}）`;
+  document.getElementById("chkBody").innerHTML=`<div class="card">
+    <button class="link" style="text-align:left;padding:2px 0" onclick="renderCheck()">← 別の食材を選ぶ</button>
+    <div style="font-size:20px;font-weight:800;margin:2px 0">${f.name}</div>
+    <div class="hint">相場：だいたい <b style="color:var(--ink)">¥${lo}〜¥${hi}</b>/100g <span class="hint">（${src}）</span></div>
+    <div id="chkMyPrice">${myPriceLine(id)}</div>
+    <div class="qlabel" style="margin-top:12px">値札の数字をそのまま入力</div>
+    <div class="chk-in">
+      <div style="flex:1"><input class="pcinput" id="chkPrice" type="number" inputmode="decimal" min="0" placeholder="298" oninput="chkJudge()"><div class="hint" style="text-align:center;margin-top:2px">値段（円）</div></div>
+      <div style="flex:1"><input class="pcinput" id="chkGram" type="number" inputmode="decimal" min="0" placeholder="350" oninput="chkJudge()"><div class="hint" style="text-align:center;margin-top:2px">内容量（g）</div></div>
+    </div>
+    <div id="chkVerdict"><div class="hint" style="text-align:center">値段と内容量を入れると、その場で判定が出ます。<br>※卵1パック(10個)は約600g、豆腐1丁は約300gが目安。</div></div>
+  </div>`;
+  const p=document.getElementById("chkPrice");if(p)p.focus();
+}
+function chkJudge(){
+  const v=document.getElementById("chkVerdict");if(!v||!chkSel)return;
+  const p=parseFloat(document.getElementById("chkPrice").value),g=parseFloat(document.getElementById("chkGram").value);
+  if(!(p>0)||!(g>0)){v.innerHTML=`<div class="hint" style="text-align:center">値段と内容量を入れると、その場で判定が出ます。</div>`;return;}
+  const per=p/g*100,ref=marketOf(chkSel),ratio=per/ref,diff=Math.round((ratio-1)*100);
+  let cls,head,sub;
+  if(ratio<=0.9){cls="ok";head="🟢 安い！買いです";sub="相場より下。今日の一手にどうぞ。";}
+  else if(ratio<1.1){cls="mid";head="⚪ 相場どおり";sub="普段の値段です。必要なら買ってOK。";}
+  else{cls="ng";head="🔴 相場より高い";sub="急ぎでなければ見送りや代替も検討を。";}
+  v.innerHTML=`<div class="chk-verdict ${cls}">
+      <div class="big">${head}</div>
+      <div style="font-weight:800;margin-top:2px">相場比 ${diff>=0?"+":""}${diff}%</div>
+      <div class="hint" style="margin-top:4px">100gあたり <b style="color:var(--ink)">¥${Math.round(per)}</b> ／ 相場 ¥${ref}/100g ・ ${sub}</div></div>
+    <button class="btn-adopt" style="width:100%;margin-top:10px" onclick="chkAdopt()">🛒 これに決定（今日の一手に記録）</button>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn-ghost" style="flex:1;margin-top:0" onclick="chkRecord()">📒 価格だけ記録</button>
+      <button class="btn-ghost" style="flex:1;margin-top:0" onclick="openRecipeModal(chkSel)">🍳 料理を見る</button>
+    </div>`;
+}
+function chkPer100(){
+  const p=parseFloat(document.getElementById("chkPrice").value),g=parseFloat(document.getElementById("chkGram").value);
+  return (p>0&&g>0)?Math.round(p/g*100):null;
+}
+function chkRecord(){
+  const per=chkPer100();if(per==null||!chkSel)return;
+  S.priceLog.push({id:chkSel,per100:per,date:todayStr()});
+  if(S.priceLog.length>500)S.priceLog.shift();
+  save(S);
+  const mp=document.getElementById("chkMyPrice");if(mp)mp.innerHTML=myPriceLine(chkSel);
+  toast("価格を記録しました");
+}
+function chkAdopt(){
+  if(!chkSel)return;
+  chkRecord(); // 価格も一緒に記録
+  const r=foodRole(ALL[chkSel]);if(r)S.roles=[r];S.pick=chkSel;save(S);
+  adoptSwap(chkSel,chkSel,0);
+  switchView("home"); // 決定カードとレシピを表示
+  const dc=document.getElementById("decidedCard"); // 「◯◯に決定！」が見える位置へ
+  if(dc)dc.scrollIntoView({behavior:MOTION_OK()?"smooth":"auto",block:"start"});
+}
+
+/* ============================================================
+   今日のお買い得
+============================================================ */
+// 金額あたり栄養素：選べる栄養素と、カテゴリ別デフォルト
+const COSPA_NUTS=["protein","carb","fat","calcium","iron","vitD","omega3"];
+const DEF_NUT={main:"protein",veg:"iron",carb:"carb",dairy:"calcium"};
+function cospaVal(f,nut){const mk=marketOf(f.id);return mk>0?(f.n[nut]||0)/mk*100:0;} // 栄養量/¥100
+function setCospaNut(r,nut){S.cospaNut[r]=nut;save(S);renderDealsFull();}
+function renderDealsFull(){
+  const el=document.getElementById("dealsFull");if(!el)return;
+  const q=((document.getElementById("cospaSearch")||{}).value||"").trim();
+  const match=f=>foodMatch(q,f.name,YOMI[f.id]);
+  let html="";
+  // カテゴリ別：金額あたりの栄養素（選択可）が多い順
+  Object.keys(ROLES).forEach(r=>{
+    const foods=roleFoods([r]).filter(match);
+    if(!foods.length)return;
+    const nut=S.cospaNut[r]||DEF_NUT[r];
+    const sorted=foods.map(f=>({f,v:cospaVal(f,nut)})).sort((a,b)=>b.v-a.v);
+    const chips=COSPA_NUTS.map(k=>`<span class="chip ${nut===k?"on":""}" onclick="setCospaNut('${r}','${k}')">${NLABEL[k]}</span>`).join("");
+    html+=`<div class="card"><span class="pill">${ROLES[r].short}</span>
+      <div class="hint" style="margin:4px 0 4px">金額あたりの<b>${NLABEL[nut]}</b>が多い順（相場：${regionLabel()}）。栄養素はタップで切替：</div>
+      <div class="chips" style="margin-bottom:8px">${chips}</div>
+      ${sorted.map((x,i)=>`<div class="deal-row tap" data-id="${x.f.id}">
+        <span>${i+1}. ${x.f.name} <span class="hint">›</span></span>
+        <span class="hint" style="text-align:right"><b style="color:var(--teal)">${NLABEL[nut]} ${x.v.toFixed(x.v<10?1:0)}${NUNIT[nut]}/¥100</b><br>相場 約¥${marketOf(x.f.id)}/100g</span></div>`).join("")}</div>`;
+  });
+  if(!html)html=`<div class="card"><div class="hint">該当する食材がありません。</div></div>`;
+  // 下部：安くなっている食材（e-Stat実データがあれば実値、無ければデモの暫定値）
+  const trendList=(arr,kind)=>arr.length?arr.map(x=>`<div class="deal-row tap" data-id="${x.f.id}">
+      <span>${x.f.name}</span><span style="color:var(--teal);font-weight:700">${kind} ${x.p}%</span></div>`).join(""):`<div class="hint">該当なし</div>`;
+  if(S.marketData){
+    const cheapReal=FOODS.filter(match).filter(f=>momDrop(f.id)>0).map(f=>({f,p:-momDrop(f.id)})).sort((a,b)=>a.p-b.p).slice(0,10);
+    html+=`<div class="card"><span class="pill">📉 ${S.marketData.month} 安くなった食材（e-Stat実データ）</span>
+      <div class="hint" style="margin:4px 0 6px">${S.marketData.area}の実売価格。前回データ（初回は内蔵目安）との比較。</div>
+      ${trendList(cheapReal,"")}</div>`;
+  }else{
+    const cheapMom=FOODS.filter(match).filter(f=>momPct(f.id)<0).map(f=>({f,p:momPct(f.id)})).sort((a,b)=>a.p-b.p).slice(0,8);
+    const cheapYoy=FOODS.filter(match).filter(f=>yoyPct(f.id)<0).map(f=>({f,p:yoyPct(f.id)})).sort((a,b)=>a.p-b.p).slice(0,8);
+    const estatLink=`<b style="color:var(--teal);cursor:pointer" onclick="goToSetting('estatCard')">API設定でe-Stat連携すると実値化 ›</b>`;
+    html+=`<div class="card"><span class="pill">📉 先月より安くなっている食材</span>
+      <div class="hint" style="margin:4px 0 6px">価格が下がり傾向のもの。※暫定値（${estatLink}）</div>
+      ${trendList(cheapMom,"先月比")}</div>`;
+    html+=`<div class="card"><span class="pill">📉 前年より安くなっている食材</span>
+      <div class="hint" style="margin:4px 0 6px">前年同月より安いもの。※暫定値（${estatLink}）</div>
+      ${trendList(cheapYoy,"前年比")}</div>`;
+  }
+  el.innerHTML=html;
+  el.querySelectorAll(".deal-row.tap").forEach(c=>c.onclick=()=>openFoodModal(c.dataset.id));
+}
+
+/* ============================================================
+   選んだ食材の栄養カード（ランキングの前に表示。決定ボタン付き）
+   食材詳細モーダルと同じ「100gあたり vs 1食でとりたい目安量」のバー表示。
+============================================================ */
+function nutriBalCardHTML(pick,withBtn){
+  return `<div class="card" id="nutriBalCard">
+    <span class="pill">🧬 ${pick.name} の栄養（100gあたり）</span>
+    <div class="hint" style="margin:2px 0 0">バーは<b>1食でとりたい目安量（1日の目安÷食数${MEALS_N!==3||S.refCustom?"・設定タブでカスタマイズ中":""}）</b>と比べた量。灰色が目安、緑がこの食材100g分です。</div>
+    ${foodNutritionHTML(pick)}
+    ${withBtn?`<button class="btn-adopt" style="width:100%;margin-top:12px" onclick="adoptSwap('${pick.id}','${pick.id}',0)">🛒 ${pick.name} にする（決定）</button>
+    <div class="hint" style="text-align:center;margin-top:6px">↓ 下の候補（安い乗り換え先・類似食材）も見てから決められます</div>`:""}
+  </div>`;
+}
+
+/* ============================================================
+   今日の一手
+============================================================ */
+// 買う食材の検索（全カテゴリ横断。選ぶとカテゴリも自動で切り替わる）
+let pickQuery="";
+function pickerChipsHTML(){
+  const q=pickQuery.trim();
+  const list=q?FOODS.filter(f=>foodMatch(q,f.name,YOMI[f.id])):(S.roles.length?roleFoods(S.roles):[]);
+  if(!list.length)return `<div class="hint" style="padding:4px">${q?`「${q}」に該当する食材がありません（ひらがな・漢字どちらでも検索できます）。`:"上のカテゴリを選ぶか、検索してください。"}</div>`;
+  return list.map(f=>`<span class="chip ${S.pick===f.id?"on":""}" onclick="setPick('${f.id}')">${f.name}${q?` <span style="opacity:.7;font-size:10px">${ROLES[foodRole(f)]?ROLES[foodRole(f)].short:""}</span>`:""}</span>`).join("");
+}
+function onPickSearch(v){pickQuery=v;
+  const el=document.getElementById("pickChips");if(el)el.innerHTML=pickerChipsHTML();}
+function pickerCardHTML(){
+  return `<div class="card"><div class="qlabel">今日買おうと思っているものは？</div>
+    <div class="hint">選ぶと栄養バランスと、もっと安く栄養がとれる候補（最安級なら類似食材）をランキングで出します。</div>
+    <input class="pcinput" id="pickSearch" placeholder="🔍 食材名で検索（全カテゴリから）" value="${pickQuery.replace(/"/g,"&quot;")}" oninput="onPickSearch(this.value)" style="margin-top:10px">
+    <div class="chips" id="pickChips" style="margin-top:10px">${pickerChipsHTML()}</div></div>`;
+}
+function renderHome(){
+  const el=document.getElementById("homeCard");
+  const pickerHTML=pickerCardHTML();
+  if(S.roles.length===0){
+    el.innerHTML=pickerHTML+`<div class="card"><div class="hint" style="text-align:center;padding:8px;line-height:1.8">上の<b style="color:var(--teal)">提案カテゴリ</b>を選ぶか、検索で直接選べます。</div></div>`;
+    return;
+  }
+  const foods=roleFoods(S.roles);
+  if(!S.pick||!foods.some(f=>f.id===S.pick)){
+    el.innerHTML=pickerHTML+`<div class="card"><div class="hint" style="text-align:center;padding:8px">↑ 今日買う予定の食材を選んでください。</div></div>`;
+    return;
+  }
+  const pick=ALL[S.pick];const pP=marketOf(pick.id);
+  // 決定済み画面は「決定した食材を選んだまま」の間だけ。選び直したら通常フロー（履歴は実績に残る）
+  let adopted=null;
+  if(S.decidedPick===pick.id){
+    for(let i=S.adoptions.length-1;i>=0;i--){const a=S.adoptions[i];
+      if(a.date===todayStr()&&a.originId===pick.id){adopted=a;break;}}
+  }
+  if(adopted){
+    const rec=recipeFor(adopted.altId);
+    const swapped=adopted.altId!==pick.id;
+    el.innerHTML=pickerHTML+`<div class="card hl" id="decidedCard"><div class="done"><div class="big">🛒</div>
+      <div style="font-size:19px;font-weight:800;margin:8px 0"><span style="color:var(--teal)">${adopted.altName}</span>に決定！</div>
+      <div class="hint">${swapped?`${adopted.originName} から乗り換え（相場で−¥${adopted.saving}/100g）`:`今日の一手として記録しました。`}</div>
+      <button class="btn-ghost" id="undoBtn" style="margin-top:10px;color:var(--red)">↩ 取り消す</button></div></div>`+recipeHTML(rec)+similarCard(adopted.altId);
+    document.getElementById("undoBtn").onclick=()=>undoTodayAdoption(pick.id);
+    return;
+  }
+  const alts=suggest(pick.id,{topN:5,sameCat:!S.showOtherCat});
+  // 候補行（安い候補・類似候補で共用）。saving負=相場は選択食材より高い。
+  const rowHTML=(f,pct,saving,i)=>{
+    const cheapPct=Math.min(99,Math.round(saving/pP*100));
+    const cheaper=saving>0;
+    // 高い側は%だと極端な数字になるので倍率で表示（例:×16.7）
+    const priceVal=cheaper?`−${cheapPct}%`:(saving===0?"±0":`×${(marketOf(f.id)/pP).toFixed(1)}`);
+    return `<div class="rankrow">
+      <div class="rankno">${i+1}</div>
+      <div class="rankmain"><div class="rankname">${f.name} <span class="hint" style="font-weight:400">¥${pP} → <b style="color:var(--gold)">¥${marketOf(f.id)}</b>/100g</span></div>
+        <div class="rkm"><span class="rkm-lab">💰 相場より</span><div class="rkm-tr"><div class="rkm-fl gold" style="width:${Math.max(0,cheapPct)}%"></div></div><b class="rkm-val" style="color:${cheaper?"var(--gold)":"var(--red)"}">${priceVal}</b></div>
+        <div class="rkm"><span class="rkm-lab">🧬 栄養マッチ</span><div class="rkm-tr"><div class="rkm-fl teal" style="width:${pct}%"></div></div><b class="rkm-val" style="color:var(--teal)">${pct}%</b></div>
+        <div class="hint">${cheaper?`100gあたり <b style="color:var(--gold)">¥${saving}おトク</b>`:(saving===0?"相場はほぼ同じ":`相場は¥${-saving}高め`)}・栄養は量も加味して${pct>=80?"ほぼ同等":pct>=60?"おおむね近い":"やや異なる"}</div></div>
+      <div class="rankact"><button class="mini" onclick="viewFood('${f.id}')">詳細</button>
+        <button class="mini adopt" onclick="adoptSwap('${pick.id}','${f.id}',${Math.max(0,saving)})">これにする</button></div></div>`;
+  };
+  let body;
+  if(alts.length===0){
+    // 最安級：安くなる乗り換え先が無くても、栄養が近い類似食材を必ず提案（飽き・売り切れ対策）
+    let sims=similarFoods(pick.id,5);
+    if(!sims.length){const r=foodRole(pick);
+      sims=FOODS.filter(f=>f.id!==pick.id&&foodRole(f)===r).map(f=>({f,m:nutriMatch(pick,f)})).sort((a,b)=>b.m.pct-a.m.pct).slice(0,5);}
+    const rows=sims.map((s,i)=>rowHTML(s.f,s.m.pct,pP-marketOf(s.f.id),i)).join("");
+    body=`<div class="card hl" id="rankCard"><span class="pill">👑 コスパ判定</span>
+      <div style="font-size:17px;font-weight:800;margin:6px 0">${pick.name} はこのカテゴリで最安級です</div>
+      <div class="hint" style="margin-bottom:8px">これより安く栄養がとれる乗り換え先はありません。上の「にする（決定）」でOK。飽きや売り切れに備えて<b>栄養が近い食材</b>も出しておきます（相場が高めのものも含む）。</div>
+      ${rows||`<div class="hint">似た食材が見つかりませんでした。</div>`}
+      <button onclick="viewFood('${pick.id}')" style="width:100%;margin-top:12px;padding:14px;border:2px solid var(--teal);color:var(--teal);background:transparent;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer">📋 ${pick.name} の詳細（相場・カロリー・栄養）を見る ›</button>
+      <button class="link" id="catToggle">${S.showOtherCat?"同じカテゴリだけに戻す":"他のカテゴリも見て探す"}</button></div>`;
+  }else{
+    const rows=alts.map((s,i)=>rowHTML(s.f,s.pct,s.saving,i)).join("");
+    body=`<div class="card" id="rankCard"><span class="pill">もっと安く栄養がとれる候補（ランキング）</span>
+      <div class="hint" style="margin:4px 0 8px">${pick.name}（相場 約¥${pP}/100g）の代わりに。相場で安く・栄養が近い順。気に入ったものを選んで買えます。</div>
+      ${rows}
+      <button class="btn-ghost" id="buyAsIs" style="margin-top:12px">🛒 候補ではなく ${pick.name} をそのまま買う（記録）</button>
+      <button onclick="viewFood('${pick.id}')" style="width:100%;margin-top:10px;padding:14px;border:2px solid var(--teal);color:var(--teal);background:transparent;border-radius:12px;font-weight:800;font-size:15px;cursor:pointer">📋 ${pick.name} の詳細（相場・カロリー・栄養）を見る ›</button>
+      <button class="link" id="catToggle">${S.showOtherCat?"同じカテゴリだけに戻す":"他のカテゴリの代替も見る"}</button></div>`;
+  }
+  el.innerHTML=pickerHTML+nutriBalCardHTML(pick,true)+body;
+  const buy=document.getElementById("buyAsIs");if(buy)buy.onclick=()=>adoptSwap(pick.id,pick.id,0);
+  const ct=document.getElementById("catToggle");if(ct)ct.onclick=()=>{S.showOtherCat=!S.showOtherCat;save(S);renderHome();};
+}
+function setPick(id){
+  const r=foodRole(ALL[id]);if(r)S.roles=[r]; // 検索で別カテゴリの食材を選んだらカテゴリも追従
+  S.pick=id;pickQuery="";
+  S.decidedPick=null; // 選び直したら決定済み画面は解除し、通常フロー（栄養＋ランキング）を表示
+  save(S);
+  renderCatBar();renderHome();
+  // 選んだら栄養バランス（採用済みなら「◯◯に決定！」）が見える位置へ自動スクロール
+  const t=document.getElementById("nutriBalCard")||document.getElementById("decidedCard")||document.getElementById("rankCard");
+  if(t)t.scrollIntoView({behavior:MOTION_OK()?"smooth":"auto",block:"start"});
+  else window.scrollTo({top:0,behavior:"smooth"});}
+function viewFood(id){openFoodModal(id);}
+function adoptSwap(originId,altId,saving){
+  const o=ALL[originId],a=ALL[altId];const delta={};
+  NK.concat(["fat","carb"]).forEach(k=>delta[k]=(a.n[k]||0)-(o.n[k]||0));
+  S.adoptions.push({date:todayStr(),originId,originName:o.name,altId,altName:a.name,saving,delta});
+  S.decidedPick=originId; // 決定直後は「◯◯に決定！」画面を表示（選び直すと解除）
+  save(S);toast(saving>0?`乗り換え！ −¥${saving} 積み上がり`:`${a.name}に決定！`);
+  celebrate(); // 紙吹雪
+  renderHome();renderStats();
+  // 決定したら「◯◯に決定！」カードが見える位置へ（レシピはそのすぐ下）
+  const dc=document.getElementById("decidedCard");
+  if(dc)dc.scrollIntoView({behavior:MOTION_OK()?"smooth":"auto",block:"start"});
+  else window.scrollTo({top:0,behavior:"smooth"});
+}
+// 採用の取り消し・削除
+function undoTodayAdoption(originId){
+  // 同じ食材で複数回決定していても、直近の1件を取り消す
+  for(let i=S.adoptions.length-1;i>=0;i--){
+    const a=S.adoptions[i];
+    if(a.date===todayStr()&&a.originId===originId){
+      S.adoptions.splice(i,1);S.decidedPick=null;save(S);
+      toast("取り消しました");renderHome();renderStats();return;
+    }
+  }
+}
+function deleteAdoptionAt(i){if(i<0||i>=S.adoptions.length)return;
+  S.adoptions.splice(i,1);save(S);toast("削除しました");renderStats();renderHome();}
+
+/* ============================================================
+   実績（N=1自己実験ダッシュボード）
+============================================================ */
+function monthSavings(){const ym=todayStr().slice(0,7);
+  return S.adoptions.filter(a=>a.date.startsWith(ym)).reduce((s,a)=>s+a.saving,0);}
+function setGoal(){const v=parseInt(document.getElementById("goalInput").value,10);
+  S.goal=(v>0)?v:null;save(S);renderStats();if(S.goal)toast("目標を設定しました");}
+function goalHTML(){
+  const m=monthSavings();
+  if(!S.goal)return `<span class="pill">🎯 月間節約目標</span>
+    <div class="hint" style="margin:4px 0 8px">目標額を決めると、今月の進捗が見えます。</div>
+    <div class="pcrow"><input class="pcinput" id="goalInput" type="number" inputmode="numeric" min="100" placeholder="例：3000（円/月）">
+    <button class="btn-adopt" style="flex:none;padding:12px 18px" onclick="setGoal()">設定</button></div>`;
+  const r=Math.min(1,m/S.goal),pct=Math.round(r*100);
+  return `<span class="pill">🎯 月間節約目標</span>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;margin:6px 0 4px">
+      <span style="font-size:20px;font-weight:900;color:var(--gold)">¥${m.toLocaleString()} <span class="hint" style="font-weight:400">/ ¥${S.goal.toLocaleString()}</span></span>
+      <b style="color:${r>=1?"var(--teal)":"var(--ink)"}">${pct}%${r>=1?" 達成🎉":""}</b></div>
+    <div class="tr" style="height:12px;border-radius:99px;overflow:hidden;background:var(--card2)"><div class="fl a" style="width:${pct}%;height:100%;border-radius:99px"></div></div>
+    <button class="link" onclick="S.goal=null;save(S);renderStats()">目標を変更する</button>`;
+}
+function weekChartHTML(){
+  const days=[];const d=new Date();
+  for(let i=6;i>=0;i--){const x=new Date(d);x.setDate(d.getDate()-i);
+    const ds=x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0");
+    days.push({ds,dow:"日月火水木金土"[x.getDay()],v:S.adoptions.filter(a=>a.date===ds).reduce((s,a)=>s+a.saving,0)});}
+  const max=Math.max(...days.map(x=>x.v),1);
+  return `<div class="wk">${days.map((x,i)=>`<div class="col">
+      ${x.v?`<span class="v">¥${x.v}</span>`:""}
+      <div class="bar" style="height:${Math.max(3,x.v/max*100)}%;animation-delay:${i*0.05}s;${x.v?"":"opacity:.25"}"></div>
+      <span class="d">${x.dow}</span></div>`).join("")}</div>`;
+}
+function renderStats(){
+  if(!document.getElementById("stSaving"))return;
+  document.getElementById("stSaving").textContent="¥"+S.adoptions.reduce((a,b)=>a+b.saving,0).toLocaleString();
+  document.getElementById("stMonth").textContent="¥"+monthSavings().toLocaleString();
+  document.getElementById("stStreak").textContent=streak()+"日";
+  document.getElementById("stAdopt").textContent=S.adoptions.length;
+  document.getElementById("goalCard").innerHTML=goalHTML();
+  document.getElementById("weekChart").innerHTML=weekChartHTML();
+  const sums={};NK.forEach(k=>sums[k]=0);
+  S.adoptions.forEach(a=>NK.forEach(k=>sums[k]+=(a.delta&&a.delta[k])||0));
+  document.getElementById("nutriCard").innerHTML=NK.map(k=>{const v=sums[k];const sg=v>=0?"+":"";
+    return `<div class="nutri-row"><span>${NLABEL[k]} <span class="hint">${NWHY[k]||""}</span></span><span class="val">${sg}${v.toFixed(1)} ${NUNIT[k]}</span></div>`;
+  }).join("")+`<div class="hint" style="margin-top:8px">※「よく買う食品」より、賢い一手でどれだけ栄養が増減したかの累計（100gあたり比較）</div>`;
+  const h=document.getElementById("histCard");
+  if(!S.adoptions.length){h.innerHTML=`<div class="hint">まだ採用した一手はありません。「今日の一手」から始めましょう。</div>`;return;}
+  h.innerHTML=S.adoptions.map((a,idx)=>({a,idx})).reverse().slice(0,30).map(({a,idx})=>
+    `<div class="deal-row"><span>${a.date}　${a.originName===a.altName?`<b style="color:var(--teal)">${a.altName}</b>`:`${a.originName}→<b style="color:var(--teal)">${a.altName}</b>`}</span>
+     <span class="hint">−¥${a.saving} <span style="color:var(--red);cursor:pointer;font-weight:800;margin-left:10px;font-size:16px" onclick="deleteAdoptionAt(${idx})">×</span></span></div>`).join("")
+    +(S.adoptions.length>30?`<div class="hint" style="margin-top:6px">※直近30件を表示（全${S.adoptions.length}件はCSV/JSONで）</div>`:"");
+}
+
+/* ============================================================
+   提案カテゴリ選択
+============================================================ */
+function renderCatBar(){
+  const el=document.getElementById("catBar");if(!el)return;
+  const none=S.roles.length===0;
+  el.innerHTML=`<div class="catbar-lab" style="${none?"color:var(--teal);font-size:15px":""}">${none?"はじめに、提案カテゴリを選んでください":"提案カテゴリ"} <span class="hint">（タップで選択）</span></div>
+    <div class="catbar-row">${Object.keys(ROLES).map(r=>`<span class="chip ${S.roles.includes(r)?"on":""}" data-r="${r}">${ROLES[r].short}</span>`).join("")}</div>`;
+  el.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{const r=c.dataset.r;
+    S.roles=(S.roles.length===1&&S.roles[0]===r)?[]:[r]; // 単一選択（同じものを再タップで解除）
+    save(S);renderCatBar();renderHome();});
+}
+
+/* ============================================================
+   エクスポート / リセット
+============================================================ */
+function download(name,text,type){const b=new Blob([text],{type}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);}
+document.getElementById("exportJson").onclick=()=>{download("kinto_data_"+todayStr()+".json",JSON.stringify(S,null,2),"application/json");toast("JSONを書き出しました");};
+document.getElementById("exportCsv").onclick=()=>{let rows=[["type","date","origin","alt","value"]];
+  S.adoptions.forEach(a=>rows.push(["adopt",a.date,a.originName,a.altName,a.saving]));
+  S.priceLog.forEach(l=>rows.push(["price",l.date,(ALL[l.id]||{}).name||l.id,"yen_per_100g",l.per100]));
+  download("kinto_data_"+todayStr()+".csv","﻿"+rows.map(r=>r.join(",")).join("\n"),"text/csv");toast("CSVを書き出しました");};
+// JSONインポート（バックアップからの復元）
+document.getElementById("importBtn").onclick=()=>document.getElementById("importFile").click();
+document.getElementById("importFile").onchange=(e)=>{
+  const file=e.target.files&&e.target.files[0];if(!file)return;
+  const fr=new FileReader();
+  fr.onload=()=>{
+    try{
+      const d=JSON.parse(fr.result);
+      if(typeof d!=="object"||d===null||!Array.isArray(d.adoptions))throw new Error("形式が違います");
+      if(!confirm(`採用履歴 ${d.adoptions.length}件を含むデータで、現在の記録を上書きします。よろしいですか？`))return;
+      S=withDefaults(d);save(S);renderAll();toast("復元しました");
+    }catch(err){toast("復元できません：Kintoの書き出しJSONを選んでください");}
+    e.target.value="";
+  };
+  fr.readAsText(file);
+};
+document.getElementById("resetBtn").onclick=()=>{if(confirm("すべての記録を削除します。よろしいですか？")){
+  localStorage.removeItem(KEY);S=withDefaults({});
+  save(S);renderAll();toast("リセットしました");}};
+
+/* ============================================================
+   自分の料理を計算（文科省 食品成分DB＝app/foods.full.json を検索）
+============================================================ */
+let FULLDB=null, CALC_RESULTS=[];
+// 内蔵39食品（サーバー未配信＝file://直開きでDBが読めない時のフォールバック）
+const BUILTIN_SEARCH=FOODS.map(f=>({name:f.name,yomi:YOMI[f.id],n:f.n})).concat(Object.keys(PANTRY).map(k=>({name:PANTRY[k].name,yomi:YOMI[k],n:PANTRY[k].n})));
+// 今日の一手/お買い得の28食材を、八訂DBの公式名に対応づけ（栄養を公式値に更新）。
+// 該当が無い変種(さば水煮缶/冷凍ブロッコリー/ギリシャヨーグルト/オートミール調理/全粒粉パン)は手当て値を維持。
+const FDB_MAP={
+  salmon_raw:["たいせいようさけ","養殖","皮つき","生"],salmon_can:["しろさけ","水煮缶詰"],
+  tuna_can:["まぐろ","缶詰","油漬","フレーク","ライト"],sardine_can:["いわし","缶詰","味付け"],
+  maguro:["くろまぐろ","天然","赤身","生"],beef_loin:["乳用肥育牛肉","リブロース","脂身つき","生"],
+  pork_loin:["大型種肉","ロース","脂身つき","生"],chicken_breast:["若どり","むね","皮なし","生"],
+  chicken_thigh:["若どり","もも","皮なし","生"],egg:["鶏卵","全卵","生"],tofu:["絹ごし豆腐"],
+  natto:["糸引き納豆"],atsuage:["生揚げ"],milk:["普通牛乳"],cheese:["プロセスチーズ"],
+  spinach_raw:["ほうれんそう","葉","通年平均","生"],spinach_frz:["ほうれんそう","葉","冷凍"],
+  broccoli_raw:["ブロッコリー","花序","生"],komatsuna:["こまつな","葉","生"],
+  rice_bowl:["水稲めし","精白米","うるち米"],bread_white:["角形食パン","食パン"],
+  pasta:["マカロニ","スパゲッティ","ゆで"],satsumaimo:["さつまいも","塊根","皮なし","生"]
+};
+// 八訂の公式値で栄養を上書き（omega3/価格/カテゴリ/手間は維持）。類似度の正規化係数も再計算。
+function reconcileFoodsWithDb(){
+  if(!FULLDB)return;let n=0;
+  for(const id in FDB_MAP){const f=ALL[id];if(!f)continue;const toks=FDB_MAP[id];
+    const hit=FULLDB.find(x=>toks.every(t=>x.name.includes(t)));
+    if(hit){["protein","fat","carb","calcium","iron","vitD","kcal"].forEach(k=>{if(hit.n[k]!=null)f.n[k]=hit.n[k];});f._fdb=hit.name;n++;}}
+  NK.forEach(k=>{NMAX100[k]=Math.max(...FOODS.map(x=>(x.n[k]||0)*100/(x.n.kcal>0?x.n.kcal:1)),1e-9);});
+  return n;
+}
+/* ============================================================
+   地域（相場の基準）：IPで都道府県をおおよそ自動推定＋手動選択
+============================================================ */
+const PREFS=["北海道","青森県","岩手県","宮城県","秋田県","山形県","福島県","茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県","新潟県","富山県","石川県","福井県","山梨県","長野県","岐阜県","静岡県","愛知県","三重県","滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県","鳥取県","島根県","岡山県","広島県","山口県","徳島県","香川県","愛媛県","高知県","福岡県","佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県","沖縄県"];
+const EN2JP={Hokkaido:"北海道",Aomori:"青森県",Iwate:"岩手県",Miyagi:"宮城県",Akita:"秋田県",Yamagata:"山形県",Fukushima:"福島県",Ibaraki:"茨城県",Tochigi:"栃木県",Gunma:"群馬県",Saitama:"埼玉県",Chiba:"千葉県",Tokyo:"東京都",Kanagawa:"神奈川県",Niigata:"新潟県",Toyama:"富山県",Ishikawa:"石川県",Fukui:"福井県",Yamanashi:"山梨県",Nagano:"長野県",Gifu:"岐阜県",Shizuoka:"静岡県",Aichi:"愛知県",Mie:"三重県",Shiga:"滋賀県",Kyoto:"京都府",Osaka:"大阪府",Hyogo:"兵庫県",Nara:"奈良県",Wakayama:"和歌山県",Tottori:"鳥取県",Shimane:"島根県",Okayama:"岡山県",Hiroshima:"広島県",Yamaguchi:"山口県",Tokushima:"徳島県",Kagawa:"香川県",Ehime:"愛媛県",Kochi:"高知県",Fukuoka:"福岡県",Saga:"佐賀県",Nagasaki:"長崎県",Kumamoto:"熊本県",Oita:"大分県",Miyazaki:"宮崎県",Kagoshima:"鹿児島県",Okinawa:"沖縄県"};
+function regionLabel(){return S.pref||S.prefAuto||"全国";}
+// IPから都道府県を推定（無料・HTTPS・キー不要）。ipwho.is を優先し、失敗時は ipapi.co にフォールバック。
+// ipwho.is の region_code は JIS都道府県コード（1〜47）なので PREFS の並びでそのまま引ける。
+function detectRegion(force){
+  if(S.pref&&!force)return;
+  const apply=jp=>{if(!jp)return false;S.prefAuto=jp;save(S);renderRegion();renderDealsFull();
+    if(force)toast(`地域を「${jp}」と判定しました`);return true;};
+  fetch("https://ipwho.is/").then(r=>r.ok?r.json():null).then(d=>{
+    if(d&&d.success!==false){
+      const byCode=d.region_code?PREFS[parseInt(d.region_code,10)-1]:null;
+      if(apply(byCode||EN2JP[d.region]||null))return;
+    }
+    return fetch("https://ipapi.co/json/").then(r=>r.ok?r.json():null).then(d2=>{
+      if(d2&&d2.region)apply(EN2JP[d2.region]||(PREFS.includes(d2.region)?d2.region:null));});
+  }).catch(()=>{if(force)toast("地域を判定できませんでした（通信エラー）");});}
+function renderRegion(){const sel=document.getElementById("prefSel");if(!sel)return;
+  sel.innerHTML=`<option value="">全国（IP推定: ${S.prefAuto||"判定中…"}）</option>`+PREFS.map(p=>`<option value="${p}" ${S.pref===p?"selected":""}>${p}</option>`).join("");
+  sel.onchange=()=>{S.pref=sel.value||null;save(S);renderRegion();renderDealsFull();};
+  const note=document.getElementById("regionNote");if(note)note.textContent=`現在の相場基準：${regionLabel()}（手動未選択ならIP推定→なければ全国）`;
+  const rd=document.getElementById("redetectBtn");if(rd)rd.onclick=()=>{S.pref=null;save(S);renderRegion();detectRegion(true);};
+  renderMarketCard();renderRefCard();}
+
+/* ============================================================
+   1食の目安（栄養基準）のカスタマイズ＋名前付きプリセット
+============================================================ */
+// 現在のREFからUI用の kcal / PFC比率(%) を逆算（合計100になるよう炭水化物で調整）
+function refToMeta(r){
+  const kcal=Math.round(r.protein*4+r.fat*9+r.carb*4);
+  const p=Math.round(r.protein*4/kcal*100),f=Math.round(r.fat*9/kcal*100);
+  return {kcal,p,f,c:100-p-f};
+}
+// 入力（カロリー・PFC比率・食数）を読む。不正なら null
+function readRefInputs(){
+  const g=id=>parseFloat((document.getElementById(id)||{}).value);
+  const kcal=g("ref_kcal"),p=g("ref_p"),f=g("ref_f"),c=g("ref_c");
+  const meals=parseInt((document.getElementById("ref_meals")||{}).value,10);
+  if(!(kcal>=800&&kcal<=6000))return null;
+  if(!(p>0&&f>0&&c>0))return null;
+  if(Math.round(p+f+c)!==100)return null; // PFC比率は合計100%
+  if(!(meals>=1&&meals<=6))return null;
+  return {ref:deriveFromKcal(kcal,p,f,c),meals,meta:{kcal,p,f,c}};
+}
+function refAutoText(r,meals){
+  const kcal=Math.round(r.protein*4+r.fat*9+r.carb*4);
+  return `グラム換算：<b style="color:var(--ink)">P ${r.protein}g・F ${r.fat}g・C ${r.carb}g</b> ／ 1食 約<b style="color:var(--ink)">${Math.round(kcal/meals)}kcal</b>（${meals}食で割った値）<br>
+    その他は摂取量に合わせて<b>自動設定</b>：${REF_MICROS.map(([k,label,unit])=>`${label} ${r[k]}${unit}`).join("・")}`;
+}
+function refPreview(){
+  const el=document.getElementById("refAutoLine");if(!el)return;
+  const g=id=>parseFloat((document.getElementById(id)||{}).value);
+  const sum=Math.round((g("ref_p")||0)+(g("ref_f")||0)+(g("ref_c")||0));
+  const r=readRefInputs();
+  el.innerHTML=r?refAutoText(r.ref,r.meals)
+    :`<span style="color:var(--red)">${sum!==100?`PFCの合計を100%にしてください（現在 ${sum}%）`:"カロリー（800〜6000）と比率を正しく入力してください"}</span>`;
+}
+function renderRefCard(){
+  const el=document.getElementById("refCard");if(!el)return;
+  const m=refToMeta(REF);
+  const pct=(id,label,val)=>`<div style="flex:1;min-width:28%">
+      <input class="pcinput" id="${id}" type="number" inputmode="numeric" min="1" max="98" step="1" value="${val}" oninput="refPreview()" style="font-size:18px;font-weight:800;text-align:center">
+      <div class="hint" style="text-align:center;margin-top:2px">${label}（%）</div></div>`;
+  const presets=S.refPresets.map((p,i)=>{const pm=refToMeta(p.ref);
+    return `<div class="deal-row"><span>📌 ${p.name} <span class="hint">${pm.kcal}kcal・P${pm.p}/F${pm.f}/C${pm.c}%・${p.meals||3}食</span></span>
+      <span><button class="mini adopt" onclick="refLoadPreset(${i})">適用</button>
+      <button class="mini" onclick="refDeletePreset(${i})" style="color:var(--red)">×</button></span></div>`;}).join("");
+  el.innerHTML=`<div class="qlabel">🍽 1日の目標とPFCバランス</div>
+    <div class="hint">①1日の目標カロリー → ②そのカロリーをとる<b>PFC比率（合計100%）</b> → ③1日の食数、の順に設定。今日の一手などの<b>1食の目安＝1日の目安÷食数</b>で表示されます。<br>
+    現在：1食 約<b style="color:var(--ink)">${MEAL_KCAL}kcal</b>×${MEALS_N}食 ／ ${S.refCustom?`<b style="color:var(--teal)">カスタム設定を適用中</b>`:"標準設定（成人の目安）"}</div>
+    <div class="qlabel" style="margin-top:12px">① 1日の目標カロリー</div>
+    <input class="pcinput" id="ref_kcal" type="number" inputmode="numeric" min="800" max="6000" step="10" value="${m.kcal}" oninput="refPreview()" style="font-size:20px;font-weight:800;text-align:center">
+    <div class="qlabel" style="margin-top:12px">② PFCバランス（合計100%）</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
+      ${pct("ref_p","たんぱく質",m.p)}${pct("ref_f","脂質",m.f)}${pct("ref_c","炭水化物",m.c)}
+    </div>
+    <div class="qlabel" style="margin-top:12px">③ 1日の食数</div>
+    <select class="pcinput" id="ref_meals" onchange="refPreview()" style="width:100%">
+      ${[1,2,3,4,5,6].map(n=>`<option value="${n}" ${n===MEALS_N?"selected":""}>${n}食</option>`).join("")}
+    </select>
+    <div class="hint" id="refAutoLine" style="margin-top:10px">${refAutoText(REF,MEALS_N)}</div>
+    <button class="btn-adopt" style="width:100%;margin-top:10px" onclick="refApply()">この目安を適用</button>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn-ghost" style="flex:1;margin-top:0" onclick="refSavePreset()">📌 名前を付けて保存</button>
+      <button class="btn-ghost" style="flex:1;margin-top:0" onclick="refReset()">標準に戻す</button>
+    </div>
+    ${S.refPresets.length?`<div class="subhead">保存した設定（タップでいつでも戻せます）</div>${presets}`:""}`;
+}
+function refApply(){
+  const r=readRefInputs();
+  if(!r){toast("入力を確認してください（PFC合計100%）");refPreview();return;}
+  applyRef(r.ref,r.meals);renderAll();
+  toast(`目安を更新しました（1食 約${MEAL_KCAL}kcal×${MEALS_N}食）`);
+}
+function refSavePreset(){
+  const r=readRefInputs();
+  if(!r){toast("入力を確認してください（PFC合計100%）");refPreview();return;}
+  const name=(prompt("この設定の名前（例：減量期／増量期／普段用）","マイ目安 "+(S.refPresets.length+1))||"").trim();
+  if(!name)return;
+  S.refPresets.push({name,ref:r.ref,meals:r.meals,date:todayStr()});
+  if(S.refPresets.length>20)S.refPresets.shift();
+  applyRef(r.ref,r.meals);renderAll();
+  toast(`「${name}」を保存して適用しました`);
+}
+function refLoadPreset(i){
+  const p=S.refPresets[i];if(!p)return;
+  applyRef(p.ref,p.meals||3);renderAll();
+  toast(`「${p.name}」を適用しました（1食 約${MEAL_KCAL}kcal×${MEALS_N}食）`);
+}
+function refDeletePreset(i){
+  const p=S.refPresets[i];if(!p)return;
+  if(!confirm(`「${p.name}」を削除しますか？`))return;
+  S.refPresets.splice(i,1);save(S);renderRefCard();
+}
+function refReset(){
+  applyRef(null,3);renderAll();
+  toast("標準の目安（2080kcal・3食）に戻しました");
+}
+
+/* ============================================================
+   相場の自動更新（e-Stat「小売物価統計調査」API・ブラウザから直接取得）
+   appId（無料）を設定すると、月が変わるたびに自動で今月の実売価格へ更新。
+============================================================ */
+const ESTAT_BASE="https://api.e-stat.go.jp/rest/3.0/app/json";
+const ESTAT_ID="0003421913"; // 小売物価統計調査（動向編）主要品目の月別小売価格
+// 開発者の共有appId。ここに1つ入れておくと、利用者は各自で取得しなくても自動更新が使える。
+// （appIdはブラウザのリクエストに載る公開情報。レート消費と利用責任は登録者に集約される点に注意）
+const ESTAT_SHARED_APP_ID="";
+function effectiveAppId(){return (S.estatAppId||"").trim()||ESTAT_SHARED_APP_ID;}
+// 都道府県 → 小売物価統計の調査市（県庁所在市）。IP判定した地域の実価格を取りに行く。
+const PREF_CAPITAL={北海道:"札幌市",青森県:"青森市",岩手県:"盛岡市",宮城県:"仙台市",秋田県:"秋田市",山形県:"山形市",福島県:"福島市",茨城県:"水戸市",栃木県:"宇都宮市",群馬県:"前橋市",埼玉県:"さいたま市",千葉県:"千葉市",東京都:"東京都区部",神奈川県:"横浜市",新潟県:"新潟市",富山県:"富山市",石川県:"金沢市",福井県:"福井市",山梨県:"甲府市",長野県:"長野市",岐阜県:"岐阜市",静岡県:"静岡市",愛知県:"名古屋市",三重県:"津市",滋賀県:"大津市",京都府:"京都市",大阪府:"大阪市",兵庫県:"神戸市",奈良県:"奈良市",和歌山県:"和歌山市",鳥取県:"鳥取市",島根県:"松江市",岡山県:"岡山市",広島県:"広島市",山口県:"山口市",徳島県:"徳島市",香川県:"高松市",愛媛県:"松山市",高知県:"高知市",福岡県:"福岡市",佐賀県:"佐賀市",長崎県:"長崎市",熊本県:"熊本市",大分県:"大分市",宮崎県:"宮崎市",鹿児島県:"鹿児島市",沖縄県:"那覇市"};
+// 品目名トークン → 食材ID の対応。g=販売単位のグラム数（¥/100g換算用）、f=補正係数。
+// 単位換算は目安（例:鶏卵1パック≒600g、米は5kg×炊飯増2.2倍）。異常値は基準の0.25〜4倍でガード。
+const ESTAT_MAP={
+  beef_loin:{t:[["牛肉","ロース"],["牛肉","国産"]],g:100},
+  pork_loin:{t:[["豚肉","ロース"],["豚肉"]],g:100},
+  chicken_thigh:{t:[["鶏肉"]],g:100},
+  chicken_breast:{t:[["鶏肉"]],g:100,f:0.75}, // むね肉はもも肉の約75%相場
+  salmon_raw:{t:[["さけ"]],g:100},
+  maguro:{t:[["まぐろ"]],g:100},
+  egg:{t:[["鶏卵"]],g:600},
+  milk:{t:[["牛乳"]],g:1000},
+  bread_white:{t:[["食パン"]],g:1000},
+  rice_bowl:{t:[["うるち米"],["米"]],g:11000}, // 5kg×炊飯後2.2倍
+  tofu:{t:[["豆腐"]],g:300},
+  spinach_raw:{t:[["ほうれんそう"]],g:1000},
+  broccoli_raw:{t:[["ブロッコリー"]],g:1000},
+  satsumaimo:{t:[["さつまいも"]],g:1000},
+  onion:{t:[["たまねぎ"]],g:1000},
+  cabbage:{t:[["キャベツ"]],g:1000},
+  carrot:{t:[["にんじん"]],g:1000},
+  tomato:{t:[["トマト"]],g:1000}
+};
+const asArr=x=>Array.isArray(x)?x:(x==null?[]:[x]);
+function mkStatusMsg(t){const el=document.getElementById("mkStatus");if(el)el.innerHTML=t;}
+async function updateMarket(silent){
+  const appId=effectiveAppId();
+  if(!appId){if(!silent){mkStatusMsg("⚠ 先に e-Stat の appId（無料）を入力してください。");toast("appIdが未設定です");}return;}
+  try{
+    mkStatusMsg("📡 e-Stat（政府統計）から取得中…");
+    // ① メタ情報から最新月と地域コードを特定
+    const meta=await(await fetch(`${ESTAT_BASE}/getMetaInfo?appId=${encodeURIComponent(appId)}&statsDataId=${ESTAT_ID}`)).json();
+    const mr=meta&&meta.GET_META_INFO;
+    if(!mr||String(mr.RESULT.STATUS)!=="0")throw new Error((mr&&mr.RESULT&&mr.RESULT.ERROR_MSG)||"メタ情報を取得できません");
+    const classes=asArr(mr.METADATA_INF.CLASS_INF.CLASS_OBJ);
+    const times=asArr((classes.find(c=>c["@id"]==="time")||{}).CLASS).map(c=>({code:c["@code"],name:c["@name"]})).sort((a,b)=>a.code<b.code?-1:1);
+    if(!times.length)throw new Error("時点情報がありません");
+    const latest=times[times.length-1];
+    const areas=asArr((classes.find(c=>c["@id"]==="area")||{}).CLASS).map(c=>({code:c["@code"],name:c["@name"]}));
+    const capital=PREF_CAPITAL[regionLabel()]||null;
+    const area=(capital&&areas.find(a=>a.name.includes(capital)))||areas.find(a=>a.name.includes("全国"))||areas.find(a=>a.name.includes("東京都区部"))||areas[0]||null;
+    // ② 最新月×地域の全品目価格を取得
+    let q=`${ESTAT_BASE}/getStatsData?appId=${encodeURIComponent(appId)}&statsDataId=${ESTAT_ID}&cdTime=${latest.code}&limit=5000`;
+    if(area)q+=`&cdArea=${area.code}`;
+    const data=await(await fetch(q)).json();
+    const dr=data&&data.GET_STATS_DATA;
+    if(!dr||String(dr.RESULT.STATUS)!=="0")throw new Error((dr&&dr.RESULT&&dr.RESULT.ERROR_MSG)||"データを取得できません");
+    const sd=dr.STATISTICAL_DATA;
+    const catObj=asArr(sd.CLASS_INF.CLASS_OBJ).find(c=>c["@id"].startsWith("cat"));
+    const catDict={};asArr(catObj&&catObj.CLASS).forEach(c=>catDict[c["@code"]]=c["@name"]);
+    const rows=asArr(sd.DATA_INF.VALUE);
+    const byName=[];// [品目名, 価格]
+    rows.forEach(r=>{const key=Object.keys(r).find(k=>/^@cat/.test(k));const nm=key?catDict[r[key]]:null;
+      const v=parseFloat(String(r["$"]).replace(/,/g,""));if(nm&&isFinite(v)&&v>0)byName.push([nm,v]);});
+    if(!byName.length)throw new Error("価格データが空です（statsDataIdの見直しが必要かも）");
+    // ③ 品目名トークンで食材に対応づけ、¥/100gに換算
+    const prices={};
+    for(const id in ESTAT_MAP){const m=ESTAT_MAP[id];let hit=null;
+      for(const toks of m.t){hit=byName.find(([nm])=>toks.every(t=>nm.includes(t)));if(hit)break;}
+      if(!hit)continue;
+      const per100=Math.round(hit[1]/m.g*100*(m.f||1));
+      const base=baselineOf(id);
+      if(base>0&&(per100<base*0.25||per100>base*4))continue; // 単位ずれ等の異常値ガード
+      prices[id]=per100;}
+    const n=Object.keys(prices).length;
+    if(!n)throw new Error("品目の対応づけに失敗しました（調査品目が変わった可能性）");
+    // ④ 前回値（同月の再取得なら前回のprevを維持＝値下がり表示が消えないように）
+    const sameMonth=S.marketData&&S.marketData.month===latest.name;
+    const prev=sameMonth?(S.marketData.prev||{}):Object.fromEntries(Object.keys(prices).map(id=>[id,marketOf(id)]));
+    S.marketData={month:latest.name,area:area?area.name:"全国",prices,prev,fetchedAt:todayStr()};
+    save(S);
+    renderAll();
+    mkStatusMsg(`✅ ${latest.name}・${S.marketData.area}の実売価格に更新しました（${n}品目）。`);
+    if(!silent)toast(`相場を${latest.name}の実データに更新（${n}品目）`);
+  }catch(e){
+    mkStatusMsg(`⚠ 更新できませんでした：${e.message}<br>appId が正しいか、通信環境をご確認ください。`);
+    if(!silent)toast("相場の更新に失敗しました");
+  }
+}
+function renderMarketCard(){
+  const inp=document.getElementById("estatAppId"),st=document.getElementById("mkStatus"),btn=document.getElementById("mkUpdateBtn");
+  if(!inp)return;
+  inp.value=S.estatAppId||"";
+  inp.onchange=()=>{S.estatAppId=inp.value.trim()||null;save(S);};
+  if(btn)btn.onclick=()=>updateMarket(false);
+  // AIレシピ用 Claude APIキー
+  const ak=document.getElementById("aiKeyInput"),aks=document.getElementById("aiKeyStatus");
+  if(ak){
+    ak.value=S.aiKey||"";
+    ak.onchange=()=>{S.aiKey=ak.value.trim()||null;save(S);
+      if(aks)aks.textContent=S.aiKey?`✅ 登録済み。今日あと${aiRemaining()}回検索できます。`:"未登録";
+      toast(S.aiKey?"APIキーを保存しました":"APIキーを削除しました");};
+    if(aks)aks.textContent=S.aiKey?`✅ 登録済み。今日あと${aiRemaining()}回検索できます。`:"未登録（登録するとAIレシピ検索が使えます）";
+  }
+  if(st&&!st.innerHTML)st.innerHTML=S.marketData
+    ?`✅ 最終更新：${S.marketData.month}・${S.marketData.area}（${Object.keys(S.marketData.prices).length}品目）。月が変わると自動更新されます。`
+    :(ESTAT_SHARED_APP_ID
+      ?`共有キーで自動更新が有効です（appIdの入力は不要。自分のキーを入れると優先されます）。`
+      :`未取得（内蔵の目安相場を使用中）。appId を設定すると毎月自動で実データに更新されます。`);
+}
+
+/* ============================================================
+   AIレシピ検索（Claude API＋Web検索。1日の回数制限つきで人気レシピを蓄積）
+   ブラウザから直接呼ぶ（anthropic-dangerous-direct-browser-access ヘッダーでCORS許可）。
+   キーはこの端末の localStorage のみに保存し、api.anthropic.com 以外へは送らない。
+============================================================ */
+const AI_MODEL="claude-opus-4-8";
+const AI_DAILY_LIMIT=3; // 1日にAI検索できる回数
+// 設定タブの該当カード（API設定など）へ直接ジャンプ
+function goToSetting(cardId){
+  switchView("data");
+  const el=document.getElementById(cardId);
+  if(el){el.scrollIntoView({behavior:MOTION_OK()?"smooth":"auto",block:"start"});}
+  const inp=cardId==="aiKeyCard"?document.getElementById("aiKeyInput"):(cardId==="estatCard"?document.getElementById("estatAppId"):null);
+  if(inp&&inp.focus)inp.focus();
+}
+function aiRemaining(){
+  if(S.aiUses.date!==todayStr())return AI_DAILY_LIMIT;
+  return Math.max(0,AI_DAILY_LIMIT-S.aiUses.count);
+}
+function aiRecordUse(){
+  if(S.aiUses.date!==todayStr())S.aiUses={date:todayStr(),count:0};
+  S.aiUses.count++;save(S);
+}
+// Claudeの応答テキストからレシピ配列を取り出す（コードフェンスや前置きに耐性を持たせる）
+function aiParseRecipes(text){
+  let s=String(text||"").replace(/```json|```/g,"").trim();
+  const a=s.indexOf("{"),b=s.lastIndexOf("}");
+  if(a<0||b<=a)return [];
+  try{
+    const d=JSON.parse(s.slice(a,b+1));
+    const list=Array.isArray(d.recipes)?d.recipes:[];
+    return list.filter(r=>r&&r.name&&Array.isArray(r.steps)&&r.steps.length).map(r=>({
+      name:String(r.name).slice(0,60),
+      time:Math.max(1,parseInt(r.time_min,10)||15),
+      ingredients:(Array.isArray(r.ingredients)?r.ingredients:[]).map(x=>String(x).slice(0,60)).slice(0,12),
+      steps:r.steps.map(x=>String(x).slice(0,200)).slice(0,6),
+      tip:r.tip?String(r.tip).slice(0,150):"",
+      source:(typeof r.source==="string"&&/^https?:\/\//.test(r.source))?r.source:""
+    }));
+  }catch(e){return [];}
+}
+async function aiFetchRecipes(foodId,ctx){
+  const f=ALL[foodId];if(!f)return;
+  if(!S.aiKey){toast("Claude APIキーを登録してください");goToSetting("aiKeyCard");return;}
+  if(aiRemaining()<=0){toast(`AI検索は1日${AI_DAILY_LIMIT}回まで。また明日どうぞ`);return;}
+  const btn=document.getElementById("aiFetchBtn");
+  if(btn){btn.disabled=true;btn.textContent="🔎 Webで人気レシピを検索中…（10〜30秒）";}
+  const prompt=`あなたは日本の家庭料理に詳しいアシスタントです。Web検索を使って、「${f.name}」を主材料にした、最近日本で人気のレシピを3つ調べてください。
+出力は次のJSONオブジェクトのみとし、説明文やコードフェンスは付けないでください:
+{"recipes":[{"name":"料理名","time_min":15,"ingredients":["材料と分量","..."],"steps":["手順1","手順2"],"tip":"おいしく作るコツ","source":"参考にしたページのURL"}]}
+条件: 手順は2〜5個で、火加減・レンジのW数・時間など具体的に。家庭で作りやすく、材料が手に入りやすいものを優先。`;
+  const headers={
+    "Content-Type":"application/json",
+    "x-api-key":S.aiKey,
+    "anthropic-version":"2023-06-01",
+    "anthropic-dangerous-direct-browser-access":"true"
+  };
+  let messages=[{role:"user",content:prompt}];
+  try{
+    let data=null;
+    for(let hop=0;hop<4;hop++){ // Web検索のサーバー側ループが pause_turn で返ったら継続
+      const res=await fetch("https://api.anthropic.com/v1/messages",{
+        method:"POST",headers,
+        body:JSON.stringify({
+          model:AI_MODEL,max_tokens:4000,
+          tools:[{type:"web_search_20260209",name:"web_search",max_uses:3}],
+          messages
+        })
+      });
+      data=await res.json();
+      if(!res.ok)throw new Error((data&&data.error&&data.error.message)||`HTTP ${res.status}`);
+      if(data.stop_reason==="pause_turn"){messages=messages.concat([{role:"assistant",content:data.content}]);continue;}
+      break;
+    }
+    if(data.stop_reason==="refusal")throw new Error("リクエストが拒否されました");
+    const text=(data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n");
+    const recipes=aiParseRecipes(text);
+    if(!recipes.length)throw new Error("レシピを読み取れませんでした（もう一度お試しください）");
+    aiRecordUse();
+    let added=0;
+    recipes.forEach(r=>{
+      if(S.aiRecipes.some(x=>x.food===foodId&&x.name===r.name))return; // 重複はスキップ
+      S.aiRecipes.push({food:foodId,...r,date:todayStr()});added++;
+    });
+    while(S.aiRecipes.length>60)S.aiRecipes.shift();
+    save(S);
+    toast(`✨ 人気レシピを${added}件保存しました（今日あと${aiRemaining()}回）`);
+    if(ctx==="modal")openRecipeModal(foodId);else{renderHome();}
+  }catch(e){
+    toast("AI検索に失敗: "+(e&&e.message?e.message:"通信エラー"));
+    if(btn){btn.disabled=false;btn.textContent=`✨ Webで人気レシピを探す（今日あと${aiRemaining()}回）`;}
+  }
+}
+// ためた人気レシピのカード（その日の気分で選べる一覧＋検索ボタン）
+function aiRecipesCardHTML(foodId,ctx){
+  const list=S.aiRecipes.map((r,i)=>({r,i})).filter(x=>x.r.food===foodId);
+  const rows=list.map(x=>`<div class="deal-row tap" onclick="aiRecipeModal(${x.i})">
+      <span>🍽️ ${x.r.name} <span class="hint">⏱${x.r.time}分</span></span>
+      <span class="hint">${x.r.date} ›</span></div>`).join("");
+  const rem=aiRemaining();
+  return `<div class="card"><span class="pill">✨ AIで探した人気レシピ${list.length?`（${list.length}件・タップで表示）`:""}</span>
+    ${list.length?`<div class="hint" style="margin:4px 0 4px">ためたレシピから、その日の気分で選べます。</div>${rows}`
+      :`<div class="hint" style="margin:4px 0 6px">Web検索で「${ALL[foodId].name}」の最近人気のレシピを探して、この端末にためられます。</div>`}
+    <button class="btn-ghost" id="aiFetchBtn" style="margin-top:8px" onclick="${S.aiKey?`aiFetchRecipes('${foodId}','${ctx}')`:`goToSetting('aiKeyCard')`}"${S.aiKey&&rem<=0?" disabled":""}>
+      ${S.aiKey?(rem>0?`✨ Webで人気レシピを探す（今日あと${rem}回）`:`本日の検索回数を使い切りました（1日${AI_DAILY_LIMIT}回）`):"🔑 API設定を開いてキーを登録する"}</button></div>`;
+}
+function aiRecipeModal(i){
+  const r=S.aiRecipes[i];if(!r||!ALL[r.food])return;
+  document.getElementById("modalBody").innerHTML=`
+    <div style="font-size:21px;font-weight:800">🍽️ ${r.name} <span class="hint" style="font-weight:400">⏱ 約${r.time}分</span></div>
+    <div class="hint" style="margin:4px 0">主材料：${ALL[r.food].name} ／ AIがWeb検索で収集（${r.date}）</div>
+    ${r.ingredients.length?`<div class="hint" style="margin:4px 0">材料：${r.ingredients.join("・")}</div>`:""}
+    <ol class="rsteps">${r.steps.map(s=>`<li>${s}</li>`).join("")}</ol>
+    ${r.tip?`<div class="rtip">💡 ${r.tip}</div>`:""}
+    ${r.source?`<a class="cookpad" href="${r.source}" target="_blank" rel="noopener">🔗 参考ページを開く</a>`:""}
+    <a class="cookpad alt" href="${cookpadLink(r.name)}" target="_blank" rel="noopener">🔗 クックパッドで「${r.name}」を探す</a>
+    <button class="btn-ghost" onclick="aiDeleteRecipe(${i})" style="color:var(--red)">このレシピを削除</button>
+    <button class="btn-ghost" onclick="openRecipeModal('${r.food}')">← ${ALL[r.food].name} の料理に戻る</button>`;
+  showModal();
+}
+function aiDeleteRecipe(i){
+  const r=S.aiRecipes[i];if(!r)return;
+  S.aiRecipes.splice(i,1);save(S);hideModal();toast("削除しました");renderHome();
+}
+
+/* ============================================================
+   電光掲示板（今月安くなった食材を流す。相場更新後に表示）
+============================================================ */
+function renderLed(){
+  const bar=document.getElementById("ledbar"),track=document.getElementById("ledTrack");if(!bar||!track)return;
+  if(!S.marketData){bar.style.display="none";return;}
+  const ids=Object.keys(S.marketData.prices).filter(id=>ALL[id]);
+  const drops=ids.map(id=>({id,d:momDrop(id)})).filter(x=>x.d>0).sort((a,b)=>b.d-a.d);
+  const list=drops.length?drops:ids.map(id=>({id,d:0}));
+  const head=`<span class="led-head">${drops.length?`📉 ${S.marketData.month} 安くなった食材`:`📡 ${S.marketData.month} の相場（${S.marketData.area}）`}</span>`;
+  const half=head+list.map(x=>`<span class="led-item" onclick="openFoodModal('${x.id}')">${ALL[x.id].name} ¥${S.marketData.prices[x.id]}<i>/100g</i>${x.d>0?` <b>▼${x.d}%</b>`:""}</span>`).join(`<span class="led-sep">◆</span>`)+`<span class="led-sep">◆</span>`;
+  track.innerHTML=half+half; // 2周分で無限ループ
+  bar.style.display="";
+}
+function loadFullDb(){
+  fetch("foods.full.json").then(r=>r.ok?r.json():null).then(d=>{
+    if(d&&d.foods){FULLDB=d.foods;const note=document.getElementById("calcNote");
+      if(note)note.textContent=`全${d.count}食品から検索（出典:日本食品標準成分表(八訂)・文部科学省）。クックパッド等のレシピの材料を入力すると栄養を計算します。`;
+      const n=reconcileFoodsWithDb(); // 今日の一手/お買い得の栄養も八訂値に
+      renderHome();renderDealsFull();renderStats();
+      console&&console.log&&console.log("八訂で更新した食材数:",n);}
+  }).catch(()=>{/* file://等で読めない時は内蔵39食品＋手当て栄養で動作 */});
+}
+function searchFoods(q){q=(q||"").trim();if(!q)return[];const list=FULLDB||BUILTIN_SEARCH;const out=[];
+  for(const f of list){if(foodMatch(q,f.name,f.yomi)){out.push(f);if(out.length>=15)break;}}return out;}
+function doSearch(q){CALC_RESULTS=searchFoods(q);const r=document.getElementById("calcResults");
+  r.innerHTML=CALC_RESULTS.length?CALC_RESULTS.map((f,i)=>`<div class="deal-row tap" onclick="addMy(${i})"><span>${f.name}</span><span class="hint">${Math.round(f.n.kcal)}kcal ＋</span></div>`).join(""):(q?`<div class="hint" style="padding:6px">該当なし。ひらがな・漢字どちらでも検索できます（例：鶏むね／とりむね）。</div>`:"");}
+function addMy(i){const f=CALC_RESULTS[i];if(!f)return;S.myMeal.push({name:f.name,n:f.n,g:100});save(S);renderCalc();toast(f.name+" を追加");}
+function setMyGram(i,v){const g=parseFloat(v);if(g>=0&&S.myMeal[i]){S.myMeal[i].g=g;save(S);renderCalc();}}
+function removeMy(i){S.myMeal.splice(i,1);save(S);renderCalc();}
+function clearMy(){S.myMeal=[];save(S);renderCalc();}
+/* 定番の組み合わせを名前を付けて保存・再読込 */
+function saveMeal(){
+  if(!S.myMeal.length)return;
+  const name=(prompt("この料理の名前（例：いつもの朝食）","マイ料理 "+(S.savedMeals.length+1))||"").trim();
+  if(!name)return;
+  S.savedMeals.push({name,items:JSON.parse(JSON.stringify(S.myMeal)),date:todayStr()});
+  if(S.savedMeals.length>30)S.savedMeals.shift();
+  save(S);renderCalc();toast(`「${name}」を保存しました`);}
+function loadMeal(i){const m=S.savedMeals[i];if(!m)return;
+  S.myMeal=JSON.parse(JSON.stringify(m.items));save(S);renderCalc();toast(`「${m.name}」を読み込みました`);}
+function delMeal(i){const m=S.savedMeals[i];if(!m)return;
+  if(!confirm(`「${m.name}」を削除しますか？`))return;
+  S.savedMeals.splice(i,1);save(S);renderCalc();}
+function savedMealsHTML(){
+  if(!S.savedMeals.length)return "";
+  return `<div class="card"><span class="pill">📌 保存した料理</span>
+    ${S.savedMeals.map((m,i)=>{const t=mealNutrition(m.items);
+      return `<div class="deal-row"><span>${m.name} <span class="hint">${m.items.length}品・${Math.round(t.kcal)}kcal</span></span>
+        <span><button class="mini adopt" onclick="loadMeal(${i})">読込</button>
+        <button class="mini" onclick="delMeal(${i})" style="color:var(--red)">×</button></span></div>`;}).join("")}
+    <div class="hint" style="margin-top:6px">「読込」で材料リストに展開（現在のリストは置き換え）。</div></div>`;}
+function mealNutrition(items){const t={protein:0,fat:0,carb:0,omega3:0,calcium:0,iron:0,vitD:0,kcal:0};
+  items.forEach(it=>{for(const k in t)t[k]+=(it.n[k]||0)*it.g/100;});return t;}
+function calcGap(t){const gaps=computeGaps(t);
+  if(!gaps.length)return `<div class="hint" style="margin-top:8px">主要な栄養素は1食の目安をおおむね満たしています 👍</div>`;
+  return `<div class="subhead">不足しがちな栄養</div>`+gaps.map(g=>`<div class="deal-row"><span>${g.n}</span><span class="hint">1食目安の ${Math.round(g.ratio*100)}%</span></div>`).join("");}
+function renderCalc(){
+  const meal=document.getElementById("calcMeal"),tot=document.getElementById("calcTotal");if(!meal)return;
+  if(!S.myMeal.length){meal.innerHTML=`<div class="hint">まだ材料がありません。上の検索から追加してください。</div>`;tot.innerHTML=savedMealsHTML();return;}
+  meal.innerHTML=S.myMeal.map((it,i)=>`<div class="rankrow">
+    <div class="rankmain"><div class="rankname">${it.name}</div></div>
+    <input class="pcinput" style="width:64px;flex:none" type="number" inputmode="decimal" value="${it.g}" onchange="setMyGram(${i},this.value)"><span class="hint">g</span>
+    <button class="mini" onclick="removeMy(${i})">×</button></div>`).join("")
+    +`<button class="btn-ghost" onclick="saveMeal()" style="margin-top:10px">📌 この組み合わせを保存</button>
+      <button class="link" onclick="clearMy()">すべてクリア</button>`;
+  const t=mealNutrition(S.myMeal);
+  tot.innerHTML=`<div class="card"><span class="pill">この料理の合計栄養（1食の推奨量との比較）</span>
+    ${legend([{cls:"a",label:"この料理"},{cls:"t",label:"1食目安"}])}
+    <div class="hint" style="margin-bottom:6px">エネルギー ${Math.round(t.kcal)} kcal（1食目安 約${MEAL_KCAL}kcal）</div>
+    ${pfcMeal(t)}
+    <div class="subhead">その他の栄養素（脳・生産性に効く）</div>
+    ${legend([{cls:"a",label:"この料理"},{cls:"t",label:"1食目安"}])}
+    ${otherMeal(t)}
+    ${calcGap(t)}
+    <div class="hint" style="margin-top:8px">※オメガ3は本表に無いため0表示（脂肪酸成分表が別途必要）。価格データは無いためコストは非表示。</div></div>`
+    +savedMealsHTML();
+}
+
+/* ============================================================
+   ナビ & 初期化
+============================================================ */
+/* ---- 画面履歴（← 戻るボタン＋スマホ/ブラウザの「戻る」対応） ---- */
+let currentView="home",navDepth=0;
+function updateBackBtn(){
+  const b=document.getElementById("backBtn");if(!b)return;
+  const m=document.getElementById("modal");
+  const can=navDepth>0||(m&&!m.classList.contains("hidden"));
+  b.classList.toggle("off",!can); // 戻り先がなければさらに薄く・押せない
+}
+function histPush(st){
+  if(typeof history!=="undefined"){try{history.pushState(st,"");}catch(e){}}
+  navDepth++;updateBackBtn();
+}
+function applyView(name){
+  currentView=name;
+  document.querySelectorAll("nav button").forEach(x=>x.classList.toggle("active",x.dataset.view===name));
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.getElementById("view-"+name).classList.add("active");
+  if(name==="deals")renderDealsFull();if(name==="calc")renderCalc();if(name==="data")renderRegion();
+  if(name==="stats")renderStats();if(name==="check")renderCheck();if(name==="home"){renderCatBar();renderHome();}
+  window.scrollTo(0,0);updateBackBtn();
+}
+function switchView(name){
+  if(name!==currentView)histPush({view:name});
+  applyView(name);
+}
+// ブラウザ/Androidの「戻る」：モーダルが開いていれば閉じ、そうでなければ前の画面へ
+function handlePop(e){
+  navDepth=Math.max(0,navDepth-1);
+  const st=(e&&e.state)||{view:"home"};
+  const m=document.getElementById("modal");
+  if(m&&!m.classList.contains("hidden")){m.classList.add("hidden");modalPushed=false;}
+  if(!st.modal)applyView(st.view||"home");else updateBackBtn();
+}
+if(typeof window!=="undefined")window.onpopstate=handlePop;
+try{history.replaceState({view:"home"},"");}catch(e){}
+// ヘッダーの「←」ボタン
+function goBack(){
+  const m=document.getElementById("modal");
+  if(m&&!m.classList.contains("hidden")){closeModal();return;}
+  if(navDepth>0){
+    if(typeof history!=="undefined"){try{history.back();return;}catch(e){}}
+    handlePop({state:{view:"home"}}); // history非対応環境のフォールバック
+  }
+}
+document.querySelectorAll("nav button").forEach(b=>b.onclick=()=>switchView(b.dataset.view));
+// モーダル（開くと履歴に1つ積む＝戻る操作で閉じられる）
+const modal=document.getElementById("modal");
+let modalPushed=false;
+function showModal(){
+  if(modal.classList.contains("hidden")){histPush({view:currentView,modal:true});modalPushed=true;}
+  modal.classList.remove("hidden");document.querySelector(".modal-card").scrollTop=0;updateBackBtn();
+}
+function hideModal(){ // プログラム用（履歴は操作しない）
+  modal.classList.add("hidden");modalPushed=false;updateBackBtn();
+}
+function closeModal(){ // ユーザー操作用（履歴と同期して閉じる）
+  if(modalPushed&&typeof history!=="undefined"){try{history.back();return;}catch(e){}}
+  hideModal();
+}
+document.getElementById("modalClose").onclick=closeModal;
+modal.onclick=(e)=>{if(e.target===modal)closeModal();};
+function renderAll(){renderCatBar();renderDealsFull();renderHome();renderStats();renderCalc();renderRegion();renderLed();}
+renderAll();
+loadFullDb(); // 文科省 食品成分DB（2,478食品）を非同期で読み込み（配信時のみ／file://は内蔵39食品）
+detectRegion(); // IPから都道府県をおおよそ自動推定（手動設定があれば尊重）
+// 月が変わっていたら相場を自動更新（appId＝自分のキー or 共有キーがあるとき。毎回頼まなくても最新に）
+if(effectiveAppId()&&(!S.marketData||String(S.marketData.fetchedAt||"").slice(0,7)!==todayStr().slice(0,7)))updateMarket(true);
+
+/* ============================================================
+   3D演出（ライブラリ不使用・オフライン動作。reduced-motion では全て無効）
+============================================================ */
+function MOTION_OK(){return !matchMedia("(prefers-reduced-motion: reduce)").matches;} // 関数宣言＝どこから呼んでも安全
+// 背景オーロラのスクロール視差（rAFで間引き）
+{let waiting=false;
+ addEventListener("scroll",()=>{if(waiting||!MOTION_OK())return;waiting=true;
+   requestAnimationFrame(()=>{document.documentElement.style.setProperty("--scr",window.scrollY);waiting=false;});},{passive:true});}
+// 採用時の紙吹雪（Canvas。1.4秒で自動消滅）
+function celebrate(){
+  if(!MOTION_OK())return;
+  const cv=document.createElement("canvas");
+  cv.style.cssText="position:fixed;inset:0;z-index:99;pointer-events:none";
+  cv.width=innerWidth;cv.height=innerHeight;document.body.appendChild(cv);
+  const ctx=cv.getContext("2d");
+  const COLORS=["#0d9488","#5b6cf0","#f59e0b","#34d3c0","#f97316","#60a5fa","#ec4899"];
+  const P=Array.from({length:110},()=>({
+    x:cv.width/2,y:cv.height*0.32,
+    vx:(Math.random()-.5)*11,vy:-Math.random()*10-3,
+    s:4+Math.random()*5,c:COLORS[(Math.random()*COLORS.length)|0],
+    r:Math.random()*Math.PI,vr:(Math.random()-.5)*.35}));
+  const t0=performance.now();
+  (function frame(t){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    P.forEach(p=>{p.vy+=.28;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;
+      ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.r);ctx.fillStyle=p.c;
+      ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6);ctx.restore();});
+    if(t-t0<1400)requestAnimationFrame(frame);else cv.remove();
+  })(t0);
+}
+
+if("serviceWorker"in navigator&&location.protocol.startsWith("http")){navigator.serviceWorker.register("sw.js").catch(()=>{});}
+</script>
+</body>
+</html>

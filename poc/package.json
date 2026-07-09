@@ -1,0 +1,15 @@
+{
+  "name": "poc",
+  "version": "1.0.0",
+  "description": "第2ステップで確立したアプリ「Kinto」のコア機能（栄養 × コスト × 手間ゼロの\"格上の代替\"提案）の技術検証用PoC。",
+  "main": "buildFoodDb.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  }
+}

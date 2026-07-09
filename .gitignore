@@ -1,0 +1,21 @@
+# ===== 健康データ・自己実験データは絶対にコミットしない（誠実なプライバシー設計）=====
+*.csv
+kinto_data_*.json
+data/
+exports/
+*.local.json
+
+# ===== 一時ファイル / OS / エディタ =====
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
+.env
+.env.*
+
+# ===== ビルド/キャッシュ =====
+dist/
+.cache/
+.vercel/
