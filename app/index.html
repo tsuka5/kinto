@@ -242,14 +242,14 @@
   .rsteps li::marker{color:var(--teal);font-weight:800}
   .rtip{background:rgba(13,148,136,.08);border-left:3px solid var(--teal);border-radius:0 8px 8px 0;
     padding:8px 10px;font-size:12px;line-height:1.6;margin-top:8px;color:var(--ink)}
-  /* 電光掲示板（今月安くなった食材）。アプリと同じさわやかなガラス基調。タップで詳細・触ると一時停止 */
-  .ledbar{overflow:hidden;margin:12px 14px 0;border-radius:14px;background:var(--card);
+  /* 電光掲示板（今月安くなった食材）。アプリと同じさわやかなガラス基調。
+     自動で流れる＋指でもスクロール可（JSでscrollLeftを進める方式）。タップで詳細・触ると一時停止 */
+  .ledbar{overflow-x:auto;margin:12px 14px 0;border-radius:14px;background:var(--card);
     border:1px solid rgba(13,148,136,.28);box-shadow:0 8px 20px -10px rgba(13,148,136,.4);
-    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
-  .led-track{display:inline-flex;align-items:center;white-space:nowrap;padding:8px 0;
-    animation:ledMove 45s linear infinite;will-change:transform}
-  .ledbar:hover .led-track,.ledbar:active .led-track{animation-play-state:paused}
-  @keyframes ledMove{to{transform:translateX(-50%)}}
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    -webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .ledbar::-webkit-scrollbar{display:none}
+  .led-track{display:inline-flex;align-items:center;white-space:nowrap;padding:8px 0}
   .led-head{font-size:11px;font-weight:900;color:#fff;background:var(--grad);border-radius:99px;
     padding:3px 11px;margin:0 10px;letter-spacing:.5px;white-space:nowrap}
   .led-item{font-size:13px;font-weight:800;color:var(--ink);cursor:pointer;
@@ -2035,6 +2035,37 @@ function renderLed(){
   const half=head+list.map(x=>`<span class="led-item" onclick="openFoodModal('${x.id}')">${ALL[x.id].name} ¥${S.marketData.prices[x.id]}<i>/100g</i>${x.d>0?` <b>▼${x.d}%</b>`:""}</span>`).join(`<span class="led-sep">◆</span>`)+`<span class="led-sep">◆</span>`;
   track.innerHTML=half+half; // 2周分で無限ループ
   bar.style.display="";
+  startLedFlow();
+}
+/* 自動で流れる＋指でもスクロールできる掲示板。
+   触っている間（タッチ・ドラッグ・ホイール）と直後は自動送りを止め、少し待ってから再開。 */
+let ledRAF=0,ledHoldUntil=0,ledLastTouch=0;
+function startLedFlow(){
+  const bar=document.getElementById("ledbar"),track=document.getElementById("ledTrack");
+  if(!bar||!track)return;
+  if(ledRAF&&typeof cancelAnimationFrame!=="undefined")cancelAnimationFrame(ledRAF);
+  if(bar.addEventListener&&!bar._ledBound){
+    bar._ledBound=true;
+    const hold=()=>{ledHoldUntil=Date.now()+2500;};
+    bar.addEventListener("touchstart",()=>{ledLastTouch=Date.now();hold();},{passive:true});
+    bar.addEventListener("touchmove",hold,{passive:true});
+    bar.addEventListener("pointerdown",hold,{passive:true});
+    bar.addEventListener("wheel",hold,{passive:true});
+    // マウス環境ではホバー中も停止（タッチ後の疑似mouseenterは無視）
+    bar.addEventListener("mouseenter",()=>{if(Date.now()-ledLastTouch>800)ledHoldUntil=Date.now()+9e9;});
+    bar.addEventListener("mouseleave",()=>{ledHoldUntil=Date.now()+600;});
+  }
+  if(!MOTION_OK())return; // 「動きを減らす」設定では自動送りしない（手動スクロールは可）
+  if(typeof requestAnimationFrame!=="function")return;
+  const step=()=>{
+    const halfW=track.scrollWidth/2;
+    if(halfW>0&&Date.now()>ledHoldUntil){
+      bar.scrollLeft+=0.6;
+      if(bar.scrollLeft>=halfW)bar.scrollLeft-=halfW; // 2周分の折り返しでシームレスに
+    }
+    ledRAF=requestAnimationFrame(step);
+  };
+  ledRAF=requestAnimationFrame(step);
 }
 function loadFullDb(){
   fetch("foods.full.json").then(r=>r.ok?r.json():null).then(d=>{
