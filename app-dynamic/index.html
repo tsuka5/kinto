@@ -299,18 +299,9 @@
     <div id="calcTotal"></div>
   </section>
 
-  <!-- 実績（N=1自己実験ダッシュボード） -->
-  <section id="view-stats" class="view">
-    <div class="stat-grid" style="margin-top:12px">
-      <div class="stat"><div class="num" id="stSaving">¥0</div><div class="lab">累計節約</div></div>
-      <div class="stat"><div class="num" id="stMonth">¥0</div><div class="lab">今月の節約</div></div>
-      <div class="stat"><div class="num green" id="stStreak">0</div><div class="lab">継続日数</div></div>
-      <div class="stat"><div class="num green" id="stAdopt">0</div><div class="lab">採用回数</div></div>
-    </div>
-    <div class="card" id="goalCard"></div>
-    <div class="card"><span class="pill">📊 直近7日の節約</span><div id="weekChart"></div></div>
-    <div class="card"><span class="pill">栄養の積み上げ（賢い一手による増減）</span><div id="nutriCard"></div></div>
-    <div class="card"><span class="pill">採用履歴</span><div id="histCard" style="margin-top:6px"></div></div>
+  <!-- 値動き（最近値下がり・値上がりした食材） -->
+  <section id="view-trend" class="view">
+    <div id="trendCard"></div>
   </section>
 
   <!-- データ -->
@@ -365,7 +356,7 @@
   <button data-view="check"><span class="ic">🏷️</span>安い？</button>
   <button data-view="deals"><span class="ic">💪</span>コスパ</button>
   <button data-view="calc"><span class="ic">🧮</span>料理計算</button>
-  <button data-view="stats"><span class="ic">📈</span>実績</button>
+  <button data-view="trend"><span class="ic">📉</span>値動き</button>
   <button data-view="data"><span class="ic">⚙️</span>設定</button>
 </nav>
 <div class="toast" id="toast"></div>
@@ -697,6 +688,30 @@ const NUNIT={protein:"g",omega3:"g",calcium:"mg",iron:"mg",vitD:"µg",fat:"g",ca
 const NWHY={omega3:"DHA/EPA＝脳・集中",iron:"酸素運搬＝集中持続",vitD:"気分・認知",calcium:"神経伝達",protein:"神経伝達物質の材料"};
 const PFC_KEYS=[["protein","たんぱく質 (P)","g"],["fat","脂質 (F)","g"],["carb","炭水化物 (C)","g"]];
 const OTHER_KEYS=[["omega3","オメガ3","g"],["calcium","カルシウム","mg"],["iron","鉄分","mg"],["vitD","ビタミンD","µg"]];
+/* 食材ごとの「自然な1単位」（栄養の表記・計算用）。ここに無い食材は100gあたりで表示。
+   g=その1単位のおおよその可食部グラム数（例：卵M1個=殻なし約50g、納豆1パック=約45g） */
+const UNIT={
+  egg:{u:"1個",g:50},
+  natto:{u:"1パック",g:45},
+  tofu:{u:"半丁",g:150},
+  atsuage:{u:"1枚",g:120},
+  milk:{u:"コップ1杯",g:200},
+  greek_yogurt:{u:"1個",g:100},
+  cheese:{u:"スライス1枚",g:18},
+  bread_white:{u:"6枚切り1枚",g:60},
+  bread_whole:{u:"6枚切り1枚",g:60},
+  rice_bowl:{u:"茶碗1杯",g:150},
+  pasta:{u:"1食分(ゆで)",g:240},
+  oatmeal:{u:"1食分(調理後)",g:180},
+  salmon_can:{u:"1缶",g:180},
+  saba_can:{u:"1缶",g:190},
+  tuna_can:{u:"1缶",g:70},
+  sardine_can:{u:"1缶",g:100},
+  satsumaimo:{u:"中1/2本",g:150}
+};
+function unitG(id){const u=UNIT[id];return u?u.g:100;}
+function unitLabel(id){const u=UNIT[id];return u?`${u.u}・約${u.g}g`:"100g";}
+function unitN(f,k){return (f.n[k]||0)*unitG(f.id)/100;} // その1単位に含まれる栄養量
 // 各栄養素の「100kcalあたり量」の食品中の最大値（特徴量スケール正規化に使用）
 const NMAX100={};NK.forEach(k=>{NMAX100[k]=Math.max(...FOODS.map(f=>(f.n[k]||0)*100/(f.n.kcal>0?f.n.kcal:1)),1e-9);});
 
@@ -758,7 +773,6 @@ function hash(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i)
 function todayStr(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 // 「物価」＝前年同月比（インフレ）。本来は e-Stat の前年同月平均と比較する。
 // 今はデモの確定的トレンド値（プラス寄り＝物価上昇）。e-Stat連携で実値に差し替え。
-function yoyPct(id){const f=ALL[id];if(!f||f.price==null)return 0;return (hash(id+"|yoy")%21)-4;} // -4〜+16%
 // 先月比（直近の動き）。デモ確定値。本来は e-Stat の前月平均と比較。過去比較は「参考程度」。
 function momPct(id){const f=ALL[id];if(!f||f.price==null)return 0;return (hash(id+"|mom")%13)-6;} // -6〜+6%
 // 食材ごとの懸念点（類似提案で添える）
@@ -869,10 +883,6 @@ if(S.refCustom)REF=Object.assign({},REF_DEFAULT,S.refCustom);
 recalcMealKcal();
 
 function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1800);}
-function streak(){ // 「採用した日」を習慣とし、連続日数を数える
-  const days=new Set(S.adoptions.map(a=>a.date));let n=0;const d=new Date();
-  for(;;){const ds=d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
-    if(days.has(ds)){n++;d.setDate(d.getDate()-1);}else break;}return n;}
 
 /* ============================================================
    栄養の比較バー
@@ -886,9 +896,9 @@ function cmpBlock(name,unit,rows,t){
   return `<div class="cmp"><div class="cmp-head"><span>${name}</span><span class="tgt">1食目安 ${fmtv(t,unit)}${unit}</span></div>
     ${all.map(r=>cmpRow(r.val,unit,w(r.val),r.cls)).join("")}</div>`;
 }
-// 提案カード用（origin food vs alt food vs 1食目安）。食品は100gあたり。
-function pfcCompare(o,a){return PFC_KEYS.map(([k,n,u])=>cmpBlock(n,u,[{val:o.n[k]||0,cls:"o"},{val:a.n[k]||0,cls:"a"}],mealRef(k))).join("");}
-function otherCompare(o,a){return OTHER_KEYS.map(([k,n,u])=>cmpBlock(`${NLABEL[k]}（${NWHY[k]}）`,u,[{val:o.n[k]||0,cls:"o"},{val:a.n[k]||0,cls:"a"}],mealRef(k))).join("");}
+// 提案カード用（origin food vs alt food vs 1食目安）。各食材の自然な1単位あたり（無ければ100g）。
+function pfcCompare(o,a){return PFC_KEYS.map(([k,n,u])=>cmpBlock(n,u,[{val:unitN(o,k),cls:"o"},{val:unitN(a,k),cls:"a"}],mealRef(k))).join("");}
+function otherCompare(o,a){return OTHER_KEYS.map(([k,n,u])=>cmpBlock(`${NLABEL[k]}（${NWHY[k]}）`,u,[{val:unitN(o,k),cls:"o"},{val:unitN(a,k),cls:"a"}],mealRef(k))).join("");}
 // レシピ用（この料理 vs 1食目安）
 function pfcMeal(t){return PFC_KEYS.map(([k,n,u])=>cmpBlock(n,u,[{val:t[k]||0,cls:"a"}],mealRef(k))).join("");}
 function otherMeal(t){return OTHER_KEYS.map(([k,n,u])=>cmpBlock(`${NLABEL[k]}（${NWHY[k]}）`,u,[{val:t[k]||0,cls:"a"}],mealRef(k))).join("");}
@@ -999,20 +1009,21 @@ function complementCard(rec){
    食材詳細 → 料理 → クックパッド（モーダル）
 ============================================================ */
 function cookpadLink(q){return `https://cookpad.com/search/${encodeURIComponent(q)}`;}
-// 単一食品の栄養（100gあたり）を 1食目安と比較
+// 単一食品の栄養（食材に合った単位：卵1個・納豆1パック等。無い食材は100g）を 1食目安と比較
 function foodNutritionHTML(f){
-  const kc=Math.round(f.n.kcal);
+  const ul=unitLabel(f.id);
+  const kc=Math.round(unitN(f,"kcal"));
   return `<div class="card hl" style="margin:8px 0 4px">
       <div style="display:flex;align-items:baseline;justify-content:space-between">
-        <span class="pill">🔥 カロリー（100gあたり）</span>
+        <span class="pill">🔥 カロリー（${ul}あたり）</span>
         <span style="font-size:24px;font-weight:800;color:var(--gold)">${kc}<span class="hint" style="font-size:13px;font-weight:400"> kcal</span></span></div>
-      <div style="margin-top:8px">${cmpBlock("エネルギー","kcal",[{val:f.n.kcal,cls:"a"}],MEAL_KCAL)}</div></div>
-    <div class="subhead">PFCバランス（100gあたり vs 1食目安）</div>
-    ${legend([{cls:"a",label:f.name},{cls:"t",label:"1食目安"}])}
-    ${PFC_KEYS.map(([k,n,u])=>cmpBlock(n,u,[{val:f.n[k]||0,cls:"a"}],mealRef(k))).join("")}
+      <div style="margin-top:8px">${cmpBlock("エネルギー","kcal",[{val:unitN(f,"kcal"),cls:"a"}],MEAL_KCAL)}</div></div>
+    <div class="subhead">PFCバランス（${ul}あたり vs 1食目安）</div>
+    ${legend([{cls:"a",label:`${f.name}（${ul}）`},{cls:"t",label:"1食目安"}])}
+    ${PFC_KEYS.map(([k,n,u])=>cmpBlock(n,u,[{val:unitN(f,k),cls:"a"}],mealRef(k))).join("")}
     <div class="subhead">その他の栄養素（脳・生産性に効く）</div>
-    ${legend([{cls:"a",label:f.name},{cls:"t",label:"1食目安"}])}
-    ${OTHER_KEYS.map(([k,n,u])=>cmpBlock(`${NLABEL[k]}（${NWHY[k]}）`,u,[{val:f.n[k]||0,cls:"a"}],mealRef(k))).join("")}`;
+    ${legend([{cls:"a",label:`${f.name}（${ul}）`},{cls:"t",label:"1食目安"}])}
+    ${OTHER_KEYS.map(([k,n,u])=>cmpBlock(`${NLABEL[k]}（${NWHY[k]}）`,u,[{val:unitN(f,k),cls:"a"}],mealRef(k))).join("")}`;
 }
 // この食材の「あなたの記録」（相場判定に入力した実売価格の履歴）
 function myPriceLine(id){
@@ -1180,37 +1191,21 @@ function renderDealsFull(){
         <span class="hint" style="text-align:right"><b style="color:var(--teal)">${NLABEL[nut]} ${x.v.toFixed(x.v<10?1:0)}${NUNIT[nut]}/¥100</b><br>相場 約¥${marketOf(x.f.id)}/100g</span></div>`).join("")}</div>`;
   });
   if(!html)html=`<div class="card"><div class="hint">該当する食材がありません。</div></div>`;
-  // 下部：安くなっている食材（e-Stat実データがあれば実値、無ければデモの暫定値）
-  const trendList=(arr,kind)=>arr.length?arr.map(x=>`<div class="deal-row tap" data-id="${x.f.id}">
-      <span>${x.f.name}</span><span style="color:var(--teal);font-weight:700">${kind} ${x.p}%</span></div>`).join(""):`<div class="hint">該当なし</div>`;
-  if(S.marketData){
-    const cheapReal=FOODS.filter(match).filter(f=>momDrop(f.id)>0).map(f=>({f,p:-momDrop(f.id)})).sort((a,b)=>a.p-b.p).slice(0,10);
-    html+=`<div class="card"><span class="pill">📉 ${S.marketData.month} 安くなった食材（e-Stat実データ）</span>
-      <div class="hint" style="margin:4px 0 6px">${S.marketData.area}の実売価格。前回データ（初回は内蔵目安）との比較。</div>
-      ${trendList(cheapReal,"")}</div>`;
-  }else{
-    const cheapMom=FOODS.filter(match).filter(f=>momPct(f.id)<0).map(f=>({f,p:momPct(f.id)})).sort((a,b)=>a.p-b.p).slice(0,8);
-    const cheapYoy=FOODS.filter(match).filter(f=>yoyPct(f.id)<0).map(f=>({f,p:yoyPct(f.id)})).sort((a,b)=>a.p-b.p).slice(0,8);
-    const estatLink=`<b style="color:var(--teal);cursor:pointer" onclick="goToSetting('estatCard')">API設定でe-Stat連携すると実値化 ›</b>`;
-    html+=`<div class="card"><span class="pill">📉 先月より安くなっている食材</span>
-      <div class="hint" style="margin:4px 0 6px">価格が下がり傾向のもの。※暫定値（${estatLink}）</div>
-      ${trendList(cheapMom,"先月比")}</div>`;
-    html+=`<div class="card"><span class="pill">📉 前年より安くなっている食材</span>
-      <div class="hint" style="margin:4px 0 6px">前年同月より安いもの。※暫定値（${estatLink}）</div>
-      ${trendList(cheapYoy,"前年比")}</div>`;
-  }
+  // 値下がり・値上がりは専用の「値動き」タブへ移動
+  html+=`<div class="card"><div class="hint">📉 最近<b>値下がり・値上がりした食材</b>は <b style="color:var(--teal);cursor:pointer" onclick="switchView('trend')">値動きタブ ›</b> で見られます。</div></div>`;
   el.innerHTML=html;
   el.querySelectorAll(".deal-row.tap").forEach(c=>c.onclick=()=>openFoodModal(c.dataset.id));
 }
 
 /* ============================================================
    選んだ食材の栄養カード（ランキングの前に表示。決定ボタン付き）
-   食材詳細モーダルと同じ「100gあたり vs 1食でとりたい目安量」のバー表示。
+   食材詳細モーダルと同じ「自然な1単位あたり vs 1食でとりたい目安量」のバー表示。
 ============================================================ */
 function nutriBalCardHTML(pick,withBtn){
+  const ul=unitLabel(pick.id);
   return `<div class="card" id="nutriBalCard">
-    <span class="pill">🧬 ${pick.name} の栄養（100gあたり）</span>
-    <div class="hint" style="margin:2px 0 0">バーは<b>1食でとりたい目安量（1日の目安÷食数${MEALS_N!==3||S.refCustom?"・設定タブでカスタマイズ中":""}）</b>と比べた量。灰色が目安、緑がこの食材100g分です。</div>
+    <span class="pill">🧬 ${pick.name} の栄養（${ul}あたり）</span>
+    <div class="hint" style="margin:2px 0 0">バーは<b>1食でとりたい目安量（1日の目安÷食数${MEALS_N!==3||S.refCustom?"・設定タブでカスタマイズ中":""}）</b>と比べた量。灰色が目安、緑がこの食材${ul}分です。</div>
     ${foodNutritionHTML(pick)}
     ${withBtn?`<button class="btn-adopt" style="width:100%;margin-top:12px" onclick="adoptSwap('${pick.id}','${pick.id}',0)">🛒 ${pick.name} にする（決定）</button>
     <div class="hint" style="text-align:center;margin-top:6px">↓ 下の候補（安い乗り換え先・類似食材）も見てから決められます</div>`:""}
@@ -1325,7 +1320,7 @@ function adoptSwap(originId,altId,saving){
   S.decidedPick=originId; // 決定直後は「◯◯に決定！」画面を表示（選び直すと解除）
   save(S);toast(saving>0?`乗り換え！ −¥${saving} 積み上がり`:`${a.name}に決定！`);
   celebrate(); // 紙吹雪
-  renderHome();renderStats();
+  renderHome();
   // 決定したら「◯◯に決定！」カードが見える位置へ（レシピはそのすぐ下）
   const dc=document.getElementById("decidedCard");
   if(dc)dc.scrollIntoView({behavior:MOTION_OK()?"smooth":"auto",block:"start"});
@@ -1338,64 +1333,47 @@ function undoTodayAdoption(originId){
     const a=S.adoptions[i];
     if(a.date===todayStr()&&a.originId===originId){
       S.adoptions.splice(i,1);S.decidedPick=null;save(S);
-      toast("取り消しました");renderHome();renderStats();return;
+      toast("取り消しました");renderHome();return;
     }
   }
 }
-function deleteAdoptionAt(i){if(i<0||i>=S.adoptions.length)return;
-  S.adoptions.splice(i,1);save(S);toast("削除しました");renderStats();renderHome();}
 
 /* ============================================================
-   実績（N=1自己実験ダッシュボード）
+   値動き（最近値下がり・値上がりした食材の専用ページ）
+   e-Stat実データがあれば前回データ比、無ければデモの暫定トレンド値。
 ============================================================ */
-function monthSavings(){const ym=todayStr().slice(0,7);
-  return S.adoptions.filter(a=>a.date.startsWith(ym)).reduce((s,a)=>s+a.saving,0);}
-function setGoal(){const v=parseInt(document.getElementById("goalInput").value,10);
-  S.goal=(v>0)?v:null;save(S);renderStats();if(S.goal)toast("目標を設定しました");}
-function goalHTML(){
-  const m=monthSavings();
-  if(!S.goal)return `<span class="pill">🎯 月間節約目標</span>
-    <div class="hint" style="margin:4px 0 8px">目標額を決めると、今月の進捗が見えます。</div>
-    <div class="pcrow"><input class="pcinput" id="goalInput" type="number" inputmode="numeric" min="100" placeholder="例：3000（円/月）">
-    <button class="btn-adopt" style="flex:none;padding:12px 18px" onclick="setGoal()">設定</button></div>`;
-  const r=Math.min(1,m/S.goal),pct=Math.round(r*100);
-  return `<span class="pill">🎯 月間節約目標</span>
-    <div style="display:flex;justify-content:space-between;align-items:baseline;margin:6px 0 4px">
-      <span style="font-size:20px;font-weight:900;color:var(--gold)">¥${m.toLocaleString()} <span class="hint" style="font-weight:400">/ ¥${S.goal.toLocaleString()}</span></span>
-      <b style="color:${r>=1?"var(--teal)":"var(--ink)"}">${pct}%${r>=1?" 達成🎉":""}</b></div>
-    <div class="tr" style="height:12px;border-radius:99px;overflow:hidden;background:var(--card2)"><div class="fl a" style="width:${pct}%;height:100%;border-radius:99px"></div></div>
-    <button class="link" onclick="S.goal=null;save(S);renderStats()">目標を変更する</button>`;
-}
-function weekChartHTML(){
-  const days=[];const d=new Date();
-  for(let i=6;i>=0;i--){const x=new Date(d);x.setDate(d.getDate()-i);
-    const ds=x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0");
-    days.push({ds,dow:"日月火水木金土"[x.getDay()],v:S.adoptions.filter(a=>a.date===ds).reduce((s,a)=>s+a.saving,0)});}
-  const max=Math.max(...days.map(x=>x.v),1);
-  return `<div class="wk">${days.map((x,i)=>`<div class="col">
-      ${x.v?`<span class="v">¥${x.v}</span>`:""}
-      <div class="bar" style="height:${Math.max(3,x.v/max*100)}%;animation-delay:${i*0.05}s;${x.v?"":"opacity:.25"}"></div>
-      <span class="d">${x.dow}</span></div>`).join("")}</div>`;
-}
-function renderStats(){
-  if(!document.getElementById("stSaving"))return;
-  document.getElementById("stSaving").textContent="¥"+S.adoptions.reduce((a,b)=>a+b.saving,0).toLocaleString();
-  document.getElementById("stMonth").textContent="¥"+monthSavings().toLocaleString();
-  document.getElementById("stStreak").textContent=streak()+"日";
-  document.getElementById("stAdopt").textContent=S.adoptions.length;
-  document.getElementById("goalCard").innerHTML=goalHTML();
-  document.getElementById("weekChart").innerHTML=weekChartHTML();
-  const sums={};NK.forEach(k=>sums[k]=0);
-  S.adoptions.forEach(a=>NK.forEach(k=>sums[k]+=(a.delta&&a.delta[k])||0));
-  document.getElementById("nutriCard").innerHTML=NK.map(k=>{const v=sums[k];const sg=v>=0?"+":"";
-    return `<div class="nutri-row"><span>${NLABEL[k]} <span class="hint">${NWHY[k]||""}</span></span><span class="val">${sg}${v.toFixed(1)} ${NUNIT[k]}</span></div>`;
-  }).join("")+`<div class="hint" style="margin-top:8px">※「よく買う食品」より、賢い一手でどれだけ栄養が増減したかの累計（100gあたり比較）</div>`;
-  const h=document.getElementById("histCard");
-  if(!S.adoptions.length){h.innerHTML=`<div class="hint">まだ採用した一手はありません。「今日の一手」から始めましょう。</div>`;return;}
-  h.innerHTML=S.adoptions.map((a,idx)=>({a,idx})).reverse().slice(0,30).map(({a,idx})=>
-    `<div class="deal-row"><span>${a.date}　${a.originName===a.altName?`<b style="color:var(--teal)">${a.altName}</b>`:`${a.originName}→<b style="color:var(--teal)">${a.altName}</b>`}</span>
-     <span class="hint">−¥${a.saving} <span style="color:var(--red);cursor:pointer;font-weight:800;margin-left:10px;font-size:16px" onclick="deleteAdoptionAt(${idx})">×</span></span></div>`).join("")
-    +(S.adoptions.length>30?`<div class="hint" style="margin-top:6px">※直近30件を表示（全${S.adoptions.length}件はCSV/JSONで）</div>`:"");
+function renderTrend(){
+  const el=document.getElementById("trendCard");if(!el)return;
+  const row=(id,d,up)=>`<div class="deal-row tap" data-id="${id}">
+    <span>${ALL[id].name}</span>
+    <span style="text-align:right"><b style="color:${up?"var(--red)":"var(--teal)"};font-size:15px">${up?"▲":"▼"}${Math.abs(d)}%</b><br>
+    <span class="hint">相場 ¥${marketOf(id)}/100g ›</span></span></div>`;
+  let html="";
+  if(S.marketData){
+    const moved=FOODS.map(f=>({id:f.id,d:momDrop(f.id)}));
+    const down=moved.filter(x=>x.d>0).sort((a,b)=>b.d-a.d);
+    const up=moved.filter(x=>x.d<0).sort((a,b)=>a.d-b.d);
+    const flat=moved.length-down.length-up.length;
+    html+=`<div class="card"><span class="pill">📉 ${S.marketData.month} 値下がりした食材</span>
+      <div class="hint" style="margin:4px 0 6px">${S.marketData.area}の実売価格（e-Stat）。前回データ（初回は内蔵の目安）との比較。<b>今が買いどき</b>。タップで詳細へ。</div>
+      ${down.length?down.map(x=>row(x.id,x.d,false)).join(""):`<div class="hint">今回のデータでは値下がりした食材はありません。</div>`}</div>`;
+    html+=`<div class="card"><span class="pill">📈 値上がりした食材</span>
+      <div class="hint" style="margin:4px 0 6px">高くなっているもの。タップして詳細から<b>安い代替食材</b>を探せます。</div>
+      ${up.length?up.map(x=>row(x.id,x.d,true)).join(""):`<div class="hint">値上がりした食材はありません。</div>`}</div>`;
+    if(flat>0)html+=`<div class="hint" style="margin:2px 6px">ほか${flat}品目は変わらず。相場は月が変わると自動で更新されます。</div>`;
+  }else{
+    const estatLink=`<b style="color:var(--teal);cursor:pointer" onclick="goToSetting('estatCard')">API設定でe-Stat連携 ›</b>`;
+    const down=FOODS.filter(f=>momPct(f.id)<0).map(f=>({id:f.id,d:momPct(f.id)})).sort((a,b)=>a.d-b.d);
+    const up=FOODS.filter(f=>momPct(f.id)>0).map(f=>({id:f.id,d:momPct(f.id)})).sort((a,b)=>b.d-a.d);
+    html+=`<div class="card"><span class="pill">📉 先月より安くなっている食材</span>
+      <div class="hint" style="margin:4px 0 6px">※今は<b>暫定のデモ値</b>です。${estatLink}すると毎月の実売価格から本物の値動きになります。</div>
+      ${down.length?down.map(x=>row(x.id,x.d,false)).join(""):`<div class="hint">該当なし</div>`}</div>`;
+    html+=`<div class="card"><span class="pill">📈 先月より高くなっている食材</span>
+      <div class="hint" style="margin:4px 0 6px">値上がり傾向のもの。タップして詳細から<b>安い代替食材</b>を探せます。※暫定値</div>
+      ${up.length?up.map(x=>row(x.id,x.d,true)).join(""):`<div class="hint">該当なし</div>`}</div>`;
+  }
+  el.innerHTML=html;
+  el.querySelectorAll(".deal-row.tap").forEach(c=>c.onclick=()=>openFoodModal(c.dataset.id));
 }
 
 /* ============================================================
@@ -1889,7 +1867,7 @@ function loadFullDb(){
     if(d&&d.foods){FULLDB=d.foods;const note=document.getElementById("calcNote");
       if(note)note.textContent=`全${d.count}食品から検索（出典:日本食品標準成分表(八訂)・文部科学省）。クックパッド等のレシピの材料を入力すると栄養を計算します。`;
       const n=reconcileFoodsWithDb(); // 今日の一手/お買い得の栄養も八訂値に
-      renderHome();renderDealsFull();renderStats();
+      renderHome();renderDealsFull();renderTrend();
       console&&console.log&&console.log("八訂で更新した食材数:",n);}
   }).catch(()=>{/* file://等で読めない時は内蔵39食品＋手当て栄養で動作 */});
 }
@@ -1970,7 +1948,7 @@ function applyView(name){
   document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
   document.getElementById("view-"+name).classList.add("active");
   if(name==="deals")renderDealsFull();if(name==="calc")renderCalc();if(name==="data")renderRegion();
-  if(name==="stats")renderStats();if(name==="check")renderCheck();if(name==="home"){renderCatBar();renderHome();}
+  if(name==="trend")renderTrend();if(name==="check")renderCheck();if(name==="home"){renderCatBar();renderHome();}
   window.scrollTo(0,0);updateBackBtn();
 }
 function switchView(name){
@@ -2038,7 +2016,7 @@ if(document.addEventListener){
   document.addEventListener("webkitfullscreenchange",updateFsBtn);
 }
 updateFsBtn();
-function renderAll(){renderCatBar();renderDealsFull();renderHome();renderStats();renderCalc();renderRegion();renderLed();}
+function renderAll(){renderCatBar();renderDealsFull();renderHome();renderTrend();renderCalc();renderRegion();renderLed();}
 renderAll();
 loadFullDb(); // 文科省 食品成分DB（2,478食品）を非同期で読み込み（配信時のみ／file://は内蔵39食品）
 detectRegion(); // IPから都道府県をおおよそ自動推定（手動設定があれば尊重）
