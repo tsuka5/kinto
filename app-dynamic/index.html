@@ -56,6 +56,21 @@
   .fsfab:hover{opacity:1;border-color:rgba(45,212,191,.6);color:#7df3e3}
   .fsfab:active{transform:scale(.9)}
   .fsfab.on{background:var(--grad);color:#04131a;opacity:.95}
+  /* はじめてのチュートリアル（初回起動時のライブツアー） */
+  .tut{position:fixed;inset:0;z-index:60;background:rgba(3,6,14,.55);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+    display:flex;align-items:flex-end;justify-content:center;padding:0 14px 100px}
+  .tut.hidden{display:none}
+  .tut-card{background:var(--card2);border:1px solid rgba(45,212,191,.35);border-radius:20px;max-width:480px;width:100%;
+    padding:18px 18px 16px;box-shadow:0 18px 50px -10px rgba(0,0,0,.8),0 0 24px -6px rgba(45,212,191,.25);animation:tutIn .35s var(--spring) backwards}
+  @keyframes tutIn{from{opacity:0;transform:translateY(24px)}}
+  .tut-emoji{font-size:38px;line-height:1}
+  .tut-title{font-size:19px;font-weight:900;margin:8px 0 4px;color:var(--ink)}
+  .tut-body{font-size:13px;color:var(--sub);line-height:1.8}
+  .tut-body b{color:var(--teal)}
+  .tut-dots{display:flex;gap:6px;justify-content:center;margin:14px 0 12px}
+  .tut-dot{width:8px;height:8px;border-radius:50%;background:rgba(148,163,184,.3);transition:transform .2s,background .2s}
+  .tut-dot.on{background:var(--teal);transform:scale(1.25);box-shadow:0 0 8px rgba(45,212,191,.7)}
+  .tut-nav{display:flex;gap:8px}
   /* PFC入力（%とgの2段。片方を入れるともう片方が自動計算） */
   .refunit{display:flex;align-items:center;gap:4px;margin-top:6px}
   .refunit input{flex:1;min-width:0;text-align:center;font-size:16px;font-weight:800}
@@ -321,6 +336,11 @@
       <div class="hint" id="aiKeyStatus" style="margin-top:6px"></div>
     </div>
     <div class="card">
+      <div class="qlabel">📖 使い方</div>
+      <div class="hint">はじめての方向けのチュートリアル（各タブの説明）をもう一度見られます。</div>
+      <button class="btn-ghost" onclick="showTutorial(0)">📖 チュートリアルを見る</button>
+    </div>
+    <div class="card">
       <div class="qlabel">記録のリセット</div>
       <div class="hint">すべての記録を消去します（元に戻せません）。</div>
       <button class="btn-ghost" id="resetBtn" style="color:var(--red)">すべての記録を削除</button>
@@ -336,6 +356,7 @@
   <button data-view="trend"><span class="ic">📉</span>値動き</button>
   <button data-view="data"><span class="ic">⚙️</span>設定</button>
 </nav>
+<div class="tut hidden" id="tutorial"><div class="tut-card" id="tutCard"></div></div>
 <div class="toast" id="toast"></div>
 <div class="modal hidden" id="modal"><div class="modal-card"><button class="modal-close" id="modalClose">×</button><div id="modalBody"></div></div></div>
 
@@ -952,6 +973,7 @@ function withDefaults(s){
   s.refPresets=s.refPresets||[];  // 名前付きで保存した目安設定 {name,ref,meals,date}
   s.mealsPerDay=s.mealsPerDay||3; // 1日の食数
   s.decidedPick=s.decidedPick||null; // 「◯◯に決定！」画面を出す対象（選び直すと解除。履歴は実績に残る）
+  s.tutorialDone=s.tutorialDone||false; // 初回チュートリアルを見終わったか
   return s;}
 let S=withDefaults(load());
 save(S);
@@ -2030,8 +2052,53 @@ if(document.addEventListener){
   document.addEventListener("webkitfullscreenchange",updateFsBtn);
 }
 updateFsBtn();
+/* ============================================================
+   はじめてのチュートリアル（初回起動時に自動表示。設定からも再表示可）
+   各ステップで説明中のタブを実際に背後に表示する「ライブツアー」形式。
+============================================================ */
+const TUT_STEPS=[
+  {view:"home",emoji:"👋",title:"ようこそ、Kintoへ",
+   body:"Kintoは<b>「安く賢く健康的に」</b>を助けるアプリです。食材の<b>相場</b>を知って、<b>安くて栄養のある選び方</b>ができるようになります。記録はすべて<b>この端末の中だけ</b>に保存されます。"},
+  {view:"home",emoji:"🍱",title:"① 今日の一手",
+   body:"上の<b>カテゴリ</b>を選ぶか検索して、<b>今日買おうと思っている食材</b>をタップ。その食材の栄養バランスと、<b>もっと安く栄養がとれる候補</b>がランキングで出ます。「◯◯にする（決定）」まで進むと、<b>その食材で作れるレシピ</b>も表示されます。"},
+  {view:"check",emoji:"🏷️",title:"② 安い？（スーパーで使う）",
+   body:"店頭で値札を見たら、食材を選んで<b>値段と内容量（g）</b>をそのまま入力。相場と比べて<b>「安い！」「相場どおり」「高い」</b>を即判定します。安ければそのまま「これに決定」もできます。"},
+  {view:"deals",emoji:"💪",title:"③ コスパ",
+   body:"<b>金額あたりの栄養素</b>が多い順のランキングです。カテゴリごとに大事な栄養素で見られます（野菜は<b>ビタミンC・食物繊維</b>など）。栄養素名のチップをタップすると切り替えられます。"},
+  {view:"trend",emoji:"📉",title:"④ 値動き",
+   body:"最近<b>値下がりした食材（＝今が買いどき）</b>と<b>値上がりした食材</b>の一覧です。値上がりしたものはタップすると、詳細から<b>安い代替食材</b>を探せます。"},
+  {view:"data",emoji:"⚙️",title:"⑤ 設定",
+   body:"<b>1日の目標カロリー・PFCバランス・食数</b>を自分に合わせて設定できます（アプリ全体の「1食の目安」に反映）。地域や相場の自動更新（e-Stat）、AIレシピ検索もここから。<br>また、画面<b>左上の「←」でいつでも前の画面に戻れ</b>、<b>右上の「⛶」で全画面表示</b>にできます。それでは、はじめましょう！"}
+];
+let tutIdx=0;
+function showTutorial(i){tutIdx=i||0;renderTut();document.getElementById("tutorial").classList.remove("hidden");}
+function renderTut(){
+  const s=TUT_STEPS[tutIdx];if(!s)return;
+  applyView(s.view); // 説明しているタブを実際に背後に表示（履歴は積まない）
+  const last=tutIdx>=TUT_STEPS.length-1;
+  document.getElementById("tutCard").innerHTML=`
+    <div class="tut-emoji">${s.emoji}</div>
+    <div class="tut-title">${s.title}</div>
+    <div class="tut-body">${s.body}</div>
+    <div class="tut-dots">${TUT_STEPS.map((_,i)=>`<span class="tut-dot ${i===tutIdx?"on":""}"></span>`).join("")}</div>
+    <div class="tut-nav">
+      ${tutIdx>0
+        ?`<button class="btn-ghost" style="flex:1;margin-top:0" onclick="tutPrev()">← 前へ</button>`
+        :`<button class="btn-ghost" style="flex:1;margin-top:0" onclick="tutFinish()">スキップ</button>`}
+      <button class="btn-adopt" style="flex:2;margin-top:0" onclick="${last?"tutFinish()":"tutNext()"}">${last?"はじめる 🚀":"次へ →"}</button>
+    </div>`;
+}
+function tutNext(){if(tutIdx<TUT_STEPS.length-1){tutIdx++;renderTut();}}
+function tutPrev(){if(tutIdx>0){tutIdx--;renderTut();}}
+function tutFinish(){
+  S.tutorialDone=true;save(S);
+  document.getElementById("tutorial").classList.add("hidden");
+  applyView("home");
+}
+
 function renderAll(){renderCatBar();renderDealsFull();renderHome();renderTrend();renderRegion();renderLed();}
 renderAll();
+if(!S.tutorialDone)setTimeout(()=>showTutorial(0),400); // 初回起動時に自動表示
 loadFullDb(); // 文科省 食品成分DB（2,478食品）を非同期で読み込み（配信時のみ／file://は内蔵39食品）
 detectRegion(); // IPから都道府県をおおよそ自動推定（手動設定があれば尊重）
 // 月が変わっていたら相場を自動更新（appId＝自分のキー or 共有キーがあるとき。毎回頼まなくても最新に）
