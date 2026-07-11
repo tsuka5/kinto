@@ -322,9 +322,9 @@
     <div class="card" id="refCard"></div>
     <div class="card" id="estatCard">
       <div class="qlabel">📡 相場データの自動更新（e-Stat 実データ）</div>
-      <div class="hint">政府統計「小売物価統計調査」から<b>今月の実売価格</b>を取得して相場を更新します。無料の appId を一度設定すれば、以後は<b>月が変わるたびに自動更新</b>され、値下がりした食材が上の電光掲示板に流れます。<br>
-      appId の取得（無料・数分）：<a href="https://www.e-stat.go.jp/api/" target="_blank" rel="noopener" style="color:var(--teal)">e-Stat API</a> でユーザー登録 → appId 発行 → 下に貼り付け。</div>
-      <input class="pcinput" id="estatAppId" placeholder="e-Stat appId を貼り付け" style="margin-top:8px">
+      <div class="hint">政府統計「小売物価統計調査」から<b>今月の実売価格</b>を取得して相場を更新します。<b>設定は不要</b>（アプリ内蔵の共有キーで動きます）。<b>月が変わるたびに自動更新</b>され、値下がりした食材が上の電光掲示板と「値動き」タブに反映されます。<br>
+      自分の appId を使いたい場合のみ：<a href="https://www.e-stat.go.jp/api/" target="_blank" rel="noopener" style="color:var(--teal)">e-Stat API</a> で発行 → 下に貼り付け（共有キーより優先されます）。</div>
+      <input class="pcinput" id="estatAppId" placeholder="（任意）自分の e-Stat appId" style="margin-top:8px">
       <button class="btn-adopt" id="mkUpdateBtn" style="width:100%;margin-top:8px">📡 今月の相場に更新</button>
       <div class="hint" id="mkStatus" style="margin-top:8px"></div>
     </div>
@@ -1706,10 +1706,10 @@ const ESTAT_BASE="https://api.e-stat.go.jp/rest/3.0/app/json";
 const ESTAT_ID="0003421913"; // 小売物価統計調査（動向編）主要品目の月別小売価格
 // 開発者の共有appId。ここに1つ入れておくと、利用者は各自で取得しなくても自動更新が使える。
 // （appIdはブラウザのリクエストに載る公開情報。レート消費と利用責任は登録者に集約される点に注意）
-const ESTAT_SHARED_APP_ID="";
+const ESTAT_SHARED_APP_ID="81cd29176bf71967242fea2a58faefd755c8f37b";
 function effectiveAppId(){return (S.estatAppId||"").trim()||ESTAT_SHARED_APP_ID;}
 // 都道府県 → 小売物価統計の調査市（県庁所在市）。IP判定した地域の実価格を取りに行く。
-const PREF_CAPITAL={北海道:"札幌市",青森県:"青森市",岩手県:"盛岡市",宮城県:"仙台市",秋田県:"秋田市",山形県:"山形市",福島県:"福島市",茨城県:"水戸市",栃木県:"宇都宮市",群馬県:"前橋市",埼玉県:"さいたま市",千葉県:"千葉市",東京都:"東京都区部",神奈川県:"横浜市",新潟県:"新潟市",富山県:"富山市",石川県:"金沢市",福井県:"福井市",山梨県:"甲府市",長野県:"長野市",岐阜県:"岐阜市",静岡県:"静岡市",愛知県:"名古屋市",三重県:"津市",滋賀県:"大津市",京都府:"京都市",大阪府:"大阪市",兵庫県:"神戸市",奈良県:"奈良市",和歌山県:"和歌山市",鳥取県:"鳥取市",島根県:"松江市",岡山県:"岡山市",広島県:"広島市",山口県:"山口市",徳島県:"徳島市",香川県:"高松市",愛媛県:"松山市",高知県:"高知市",福岡県:"福岡市",佐賀県:"佐賀市",長崎県:"長崎市",熊本県:"熊本市",大分県:"大分市",宮崎県:"宮崎市",鹿児島県:"鹿児島市",沖縄県:"那覇市"};
+const PREF_CAPITAL={北海道:"札幌市",青森県:"青森市",岩手県:"盛岡市",宮城県:"仙台市",秋田県:"秋田市",山形県:"山形市",福島県:"福島市",茨城県:"水戸市",栃木県:"宇都宮市",群馬県:"前橋市",埼玉県:"さいたま市",千葉県:"千葉市",東京都:"特別区部",神奈川県:"横浜市",新潟県:"新潟市",富山県:"富山市",石川県:"金沢市",福井県:"福井市",山梨県:"甲府市",長野県:"長野市",岐阜県:"岐阜市",静岡県:"静岡市",愛知県:"名古屋市",三重県:"津市",滋賀県:"大津市",京都府:"京都市",大阪府:"大阪市",兵庫県:"神戸市",奈良県:"奈良市",和歌山県:"和歌山市",鳥取県:"鳥取市",島根県:"松江市",岡山県:"岡山市",広島県:"広島市",山口県:"山口市",徳島県:"徳島市",香川県:"高松市",愛媛県:"松山市",高知県:"高知市",福岡県:"福岡市",佐賀県:"佐賀市",長崎県:"長崎市",熊本県:"熊本市",大分県:"大分市",宮崎県:"宮崎市",鹿児島県:"鹿児島市",沖縄県:"那覇市"};
 // 品目名トークン → 食材ID の対応。g=販売単位のグラム数（¥/100g換算用）、f=補正係数。
 // 単位換算は目安（例:鶏卵1パック≒600g、米は5kg×炊飯増2.2倍）。異常値は基準の0.25〜4倍でガード。
 const ESTAT_MAP={
@@ -1723,7 +1723,7 @@ const ESTAT_MAP={
   milk:{t:[["牛乳"]],g:1000},
   bread_white:{t:[["食パン"]],g:1000},
   rice_bowl:{t:[["うるち米"],["米"]],g:11000}, // 5kg×炊飯後2.2倍
-  tofu:{t:[["豆腐"]],g:300},
+  tofu:{t:[["豆腐"]],g:1000}, // 調査単位は1kg
   spinach_raw:{t:[["ほうれんそう"]],g:1000},
   broccoli_raw:{t:[["ブロッコリー"]],g:1000},
   satsumaimo:{t:[["さつまいも"]],g:1000},
@@ -1734,8 +1734,8 @@ const ESTAT_MAP={
   hakusai:{t:[["はくさい"]],g:1000},
   daikon:{t:[["だいこん"]],g:1000},
   kabocha:{t:[["かぼちゃ"]],g:1000},
-  piman:{t:[["ピーマン"]],g:100},
-  moyashi:{t:[["もやし"]],g:200}
+  piman:{t:[["ピーマン"]],g:1000}, // 調査単位は1kg
+  moyashi:{t:[["もやし"]],g:1000} // 調査単位は1kg
 };
 const asArr=x=>Array.isArray(x)?x:(x==null?[]:[x]);
 function mkStatusMsg(t){const el=document.getElementById("mkStatus");if(el)el.innerHTML=t;}
@@ -1754,7 +1754,8 @@ async function updateMarket(silent){
     const latest=times[times.length-1];
     const areas=asArr((classes.find(c=>c["@id"]==="area")||{}).CLASS).map(c=>({code:c["@code"],name:c["@name"]}));
     const capital=PREF_CAPITAL[regionLabel()]||null;
-    const area=(capital&&areas.find(a=>a.name.includes(capital)))||areas.find(a=>a.name.includes("全国"))||areas.find(a=>a.name.includes("東京都区部"))||areas[0]||null;
+    // 東京は調査上「特別区部」。全国系列は無いので最後は特別区部→先頭都市にフォールバック
+    const area=(capital&&areas.find(a=>a.name.includes(capital)))||areas.find(a=>a.name.includes("特別区部"))||areas[0]||null;
     // ② 最新月×地域の全品目価格を取得
     let q=`${ESTAT_BASE}/getStatsData?appId=${encodeURIComponent(appId)}&statsDataId=${ESTAT_ID}&cdTime=${latest.code}&limit=5000`;
     if(area)q+=`&cdArea=${area.code}`;
@@ -1762,11 +1763,15 @@ async function updateMarket(silent){
     const dr=data&&data.GET_STATS_DATA;
     if(!dr||String(dr.RESULT.STATUS)!=="0")throw new Error((dr&&dr.RESULT&&dr.RESULT.ERROR_MSG)||"データを取得できません");
     const sd=dr.STATISTICAL_DATA;
-    const catObj=asArr(sd.CLASS_INF.CLASS_OBJ).find(c=>c["@id"].startsWith("cat"));
-    const catDict={};asArr(catObj&&catObj.CLASS).forEach(c=>catDict[c["@code"]]=c["@name"]);
+    // 品目（銘柄）の次元＝cat系のうちクラス数が最大のもの（cat01は「データの種別」1件なので誤爆しないように）
+    const catObjs=asArr(sd.CLASS_INF.CLASS_OBJ).filter(c=>String(c["@id"]).startsWith("cat"));
+    const catObj=catObjs.sort((a,b)=>asArr(b.CLASS).length-asArr(a.CLASS).length)[0];
+    if(!catObj)throw new Error("品目分類が見つかりません");
+    const catKey="@"+catObj["@id"];
+    const catDict={};asArr(catObj.CLASS).forEach(c=>catDict[c["@code"]]=c["@name"]);
     const rows=asArr(sd.DATA_INF.VALUE);
     const byName=[];// [品目名, 価格]
-    rows.forEach(r=>{const key=Object.keys(r).find(k=>/^@cat/.test(k));const nm=key?catDict[r[key]]:null;
+    rows.forEach(r=>{const nm=catDict[r[catKey]];
       const v=parseFloat(String(r["$"]).replace(/,/g,""));if(nm&&isFinite(v)&&v>0)byName.push([nm,v]);});
     if(!byName.length)throw new Error("価格データが空です（statsDataIdの見直しが必要かも）");
     // ③ 品目名トークンで食材に対応づけ、¥/100gに換算
