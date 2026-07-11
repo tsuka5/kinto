@@ -1,7 +1,7 @@
 // Kinto PWA Service Worker — オフラインでも開けるよう最小キャッシュ
 // 方針: HTML はネットワーク優先（デプロイ更新が届く）、静的アセットはキャッシュ優先。
 // デプロイで内容を変えたら CACHE の版番号を上げると旧キャッシュが破棄される。
-const CACHE = "kinto-neon-v1";
+const CACHE = "kinto-neon-v2";
 const ASSETS = ["./", "./index.html", "./manifest.webmanifest", "./icon.svg", "./foods.full.json"];
 
 self.addEventListener("install", (e) => {

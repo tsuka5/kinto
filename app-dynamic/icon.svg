@@ -1,7 +1,29 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="112" fill="#0b1220"/>
-  <circle cx="256" cy="256" r="150" fill="none" stroke="#14b8a6" stroke-width="28"/>
-  <path d="M196 256 q60 -90 120 0 q-60 90 -120 0 z" fill="#f5c451"/>
-  <circle cx="256" cy="256" r="26" fill="#0b1220"/>
-  <text x="256" y="430" font-family="Arial, sans-serif" font-size="84" font-weight="bold" fill="#e8eef7" text-anchor="middle">K</text>
+  <defs>
+    <linearGradient id="ng" x1="120" y1="380" x2="460" y2="90" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#2dd4bf"/>
+      <stop offset=".38" stop-color="#38bdf8"/>
+      <stop offset=".72" stop-color="#a78bfa"/>
+      <stop offset="1" stop-color="#f472b6"/>
+    </linearGradient>
+    <radialGradient id="aura" cx="30%" cy="20%" r="90%">
+      <stop offset="0" stop-color="#2dd4bf" stop-opacity=".28"/>
+      <stop offset=".7" stop-color="#2dd4bf" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="#070b14"/>
+  <rect width="512" height="512" rx="112" fill="url(#aura)"/>
+  <!-- ネオンの気泡 -->
+  <circle cx="96" cy="132" r="15" fill="#2dd4bf" opacity=".3"/>
+  <circle cx="138" cy="86" r="9" fill="#38bdf8" opacity=".28"/>
+  <circle cx="424" cy="416" r="13" fill="#a78bfa" opacity=".3"/>
+  <!-- K（ネオングラデーションのストローク） -->
+  <g stroke="url(#ng)" stroke-width="52" stroke-linecap="round" fill="none">
+    <path d="M172 148 V 372"/>
+    <path d="M330 158 L 188 268"/>
+    <path d="M214 250 L 336 372"/>
+  </g>
+  <!-- Kの腕先から伸びる若葉 -->
+  <path d="M342 146 Q382 72 458 88 Q456 166 382 174 Q350 170 342 146 Z" fill="#2dd4bf"/>
+  <path d="M352 152 Q398 128 446 100" stroke="#070b14" stroke-width="9" fill="none" stroke-linecap="round"/>
 </svg>
