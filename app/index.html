@@ -22,8 +22,10 @@
   html,body{margin:0;padding:0;color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
     font-feature-settings:"palt";}
-  /* +1px: ページを常にスクロール可能にして、モバイルブラウザのURLバーが自動で隠れるようにする */
-  body{background:var(--bg);padding-bottom:104px;max-width:540px;margin:0 auto;min-height:calc(100vh + 1px)}
+  /* +1px: ページを常にスクロール可能にして、モバイルブラウザのURLバーが自動で隠れるようにする。
+     safe-area: PWA/全画面時にヘッダーがノッチ・ステータスバーの下に隠れないよう余白を確保 */
+  body{background:var(--bg);padding-bottom:104px;max-width:540px;margin:0 auto;min-height:calc(100vh + 1px);
+    padding-top:env(safe-area-inset-top);padding-bottom:calc(104px + env(safe-area-inset-bottom))}
   /* 背景オーロラ（ゆっくり漂う） */
   body::before,body::after{content:"";position:fixed;z-index:-1;border-radius:50%;filter:blur(72px);opacity:.5;pointer-events:none}
   body::before{width:430px;height:430px;top:calc(-140px + var(--scr,0)*0.06px);left:-130px;background:radial-gradient(circle,#8ed4fb,transparent 65%);animation:drift1 19s ease-in-out infinite alternate}
@@ -39,7 +41,7 @@
     background:radial-gradient(150px 150px at 88% -30%,rgba(255,255,255,.45),transparent 70%)}
   @keyframes gradShift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
   /* 左上に常駐する、うっすらした戻るボタン（スクロールしても追従） */
-  .backfab{position:fixed;top:22px;left:22px;z-index:40;width:42px;height:42px;border-radius:50%;padding:0;
+  .backfab{position:fixed;top:22px;top:calc(22px + env(safe-area-inset-top));left:22px;z-index:40;width:42px;height:42px;border-radius:50%;padding:0;
     background:rgba(255,255,255,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
     border:1px solid rgba(15,23,42,.14);color:#3b4a5e;font-size:19px;font-weight:800;
     box-shadow:0 4px 14px -6px rgba(20,40,80,.3);opacity:.6;transition:opacity .25s,transform .15s var(--spring)}
@@ -47,7 +49,7 @@
   .backfab:active{transform:scale(.9)}
   .backfab.off{opacity:.18;pointer-events:none}
   /* 右上に常駐する全画面ボタン（ブラウザのURLバーを消してフル表示） */
-  .fsfab{position:fixed;top:22px;right:22px;z-index:40;width:42px;height:42px;border-radius:50%;padding:0;
+  .fsfab{position:fixed;top:22px;top:calc(22px + env(safe-area-inset-top));right:22px;z-index:40;width:42px;height:42px;border-radius:50%;padding:0;
     background:rgba(255,255,255,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
     border:1px solid rgba(15,23,42,.14);color:#3b4a5e;font-size:17px;font-weight:800;
     box-shadow:0 4px 14px -6px rgba(20,40,80,.3);opacity:.6;transition:opacity .25s,transform .15s var(--spring)}
@@ -161,7 +163,7 @@
   .mini.adopt{background:var(--grad);background-size:220% auto;color:#fff;box-shadow:0 5px 12px -5px rgba(13,148,136,.6)}
 
   /* フローティングナビ */
-  nav{position:fixed;bottom:12px;left:12px;right:12px;max-width:516px;margin:0 auto;display:flex;gap:4px;
+  nav{position:fixed;bottom:12px;bottom:calc(12px + env(safe-area-inset-bottom));left:12px;right:12px;max-width:516px;margin:0 auto;display:flex;gap:4px;
     background:rgba(255,255,255,.82);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
     border:1px solid rgba(255,255,255,.75);border-radius:24px;padding:8px;
     box-shadow:0 14px 34px -14px rgba(15,23,42,.35)}
@@ -240,19 +242,21 @@
   .rsteps li::marker{color:var(--teal);font-weight:800}
   .rtip{background:rgba(13,148,136,.08);border-left:3px solid var(--teal);border-radius:0 8px 8px 0;
     padding:8px 10px;font-size:12px;line-height:1.6;margin-top:8px;color:var(--ink)}
-  /* 電光掲示板（今月安くなった食材。LED風・タップで詳細・触ると一時停止） */
-  .ledbar{overflow:hidden;margin:10px 14px 0;border-radius:12px;background:#0b0e07;border:1px solid #2c3520;
-    box-shadow:inset 0 2px 14px rgba(0,0,0,.85),0 2px 10px rgba(0,0,0,.25)}
-  .led-track{display:inline-flex;align-items:center;white-space:nowrap;padding:9px 0;
+  /* 電光掲示板（今月安くなった食材）。アプリと同じさわやかなガラス基調。タップで詳細・触ると一時停止 */
+  .ledbar{overflow:hidden;margin:12px 14px 0;border-radius:14px;background:var(--card);
+    border:1px solid rgba(13,148,136,.28);box-shadow:0 8px 20px -10px rgba(13,148,136,.4);
+    backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+  .led-track{display:inline-flex;align-items:center;white-space:nowrap;padding:8px 0;
     animation:ledMove 45s linear infinite;will-change:transform}
   .ledbar:hover .led-track,.ledbar:active .led-track{animation-play-state:paused}
   @keyframes ledMove{to{transform:translateX(-50%)}}
-  .led-head{font-size:12px;font-weight:900;color:#7df3e3;text-shadow:0 0 10px rgba(45,212,191,.9);padding:0 12px;letter-spacing:1px}
-  .led-item{font-size:13px;font-weight:800;color:#ffcf40;text-shadow:0 0 9px rgba(255,180,0,.85);cursor:pointer;
-    padding:0 10px;letter-spacing:.5px;font-variant-numeric:tabular-nums}
-  .led-item i{font-style:normal;font-size:10px;opacity:.75}
-  .led-item b{color:#5dff7e;text-shadow:0 0 9px rgba(70,255,130,.9)}
-  .led-sep{color:#414d2e;font-size:8px}
+  .led-head{font-size:11px;font-weight:900;color:#fff;background:var(--grad);border-radius:99px;
+    padding:3px 11px;margin:0 10px;letter-spacing:.5px;white-space:nowrap}
+  .led-item{font-size:13px;font-weight:800;color:var(--ink);cursor:pointer;
+    padding:0 10px;letter-spacing:.3px;font-variant-numeric:tabular-nums}
+  .led-item i{font-style:normal;font-size:10px;color:var(--sub);font-weight:600}
+  .led-item b{color:var(--teal)}
+  .led-sep{color:rgba(13,148,136,.35);font-size:8px}
   /* 動きを減らす設定を尊重 */
   @media (prefers-reduced-motion:reduce){
     *,*::before,*::after{animation:none!important;transition:none!important}
