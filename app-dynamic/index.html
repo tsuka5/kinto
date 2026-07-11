@@ -22,7 +22,8 @@
   html,body{margin:0;padding:0;color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
     font-feature-settings:"palt";}
-  body{background:var(--bg);padding-bottom:108px;max-width:540px;margin:0 auto;min-height:100vh}
+  /* +1px: ページを常にスクロール可能にして、モバイルブラウザのURLバーが自動で隠れるようにする */
+  body{background:var(--bg);padding-bottom:108px;max-width:540px;margin:0 auto;min-height:calc(100vh + 1px)}
   /* ネオンオーロラ（深宇宙の光。スクロール視差つき） */
   body::before,body::after{content:"";position:fixed;z-index:-1;border-radius:50%;filter:blur(90px);opacity:.5;pointer-events:none}
   body::before{width:460px;height:460px;top:calc(-160px + var(--scr,0)*0.07px);left:-140px;background:radial-gradient(circle,rgba(20,184,166,.55),transparent 65%);animation:drift1 17s ease-in-out infinite alternate}
@@ -47,6 +48,18 @@
   .backfab:hover{opacity:1;border-color:rgba(45,212,191,.6);color:#7df3e3}
   .backfab:active{transform:scale(.9)}
   .backfab.off{opacity:.15;pointer-events:none}
+  /* 右上に常駐する全画面ボタン（ブラウザのURLバーを消してフル表示） */
+  .fsfab{position:fixed;top:22px;right:22px;z-index:40;width:42px;height:42px;border-radius:50%;padding:0;
+    background:rgba(16,24,42,.6);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+    border:1px solid rgba(148,163,184,.4);color:#c7d4e8;font-size:17px;font-weight:800;
+    box-shadow:0 4px 16px -6px rgba(0,0,0,.6);opacity:.6;transition:opacity .25s,transform .15s var(--spring)}
+  .fsfab:hover{opacity:1;border-color:rgba(45,212,191,.6);color:#7df3e3}
+  .fsfab:active{transform:scale(.9)}
+  .fsfab.on{background:var(--grad);color:#04131a;opacity:.95}
+  /* PFC入力（%とgの2段。片方を入れるともう片方が自動計算） */
+  .refunit{display:flex;align-items:center;gap:4px;margin-top:6px}
+  .refunit input{flex:1;min-width:0;text-align:center;font-size:16px;font-weight:800}
+  .refunit span{font-size:12px;color:var(--sub);width:14px;flex:none}
   header h1{font-size:27px;margin:0;letter-spacing:1px;font-weight:900;
     background:var(--grad);background-size:300% auto;animation:gradShift 6s linear infinite;
     -webkit-background-clip:text;background-clip:text;color:transparent}
@@ -245,6 +258,7 @@
 <body>
 <canvas id="fx" aria-hidden="true"></canvas>
 <button class="backfab off" id="backBtn" onclick="goBack()" aria-label="前の画面に戻る">←</button>
+<button class="fsfab" id="fsBtn" onclick="toggleFullscreen()" aria-label="全画面表示にする">⛶</button>
 <header>
   <div style="padding-left:44px"><h1>Kin<span>to</span></h1><div class="sub">安く賢く健康的に</div></div>
 </header>
@@ -1515,24 +1529,66 @@ function refPreview(){
   el.innerHTML=r?refAutoText(r.ref,r.meals)
     :`<span style="color:var(--red)">${sum!==100?`PFCの合計を100%にしてください（現在 ${sum}%）`:"カロリー（800〜6000）と比率を正しく入力してください"}</span>`;
 }
+/* ---- PFCの%⇄g双方向入力 ----
+   %を入れたらgが、gを入れたら%が自動計算。
+   直近に編集した2要素を固定し、残り1要素は合計100%になるよう自動で埋める。 */
+const REF_KCAL_PER_G={p:4,f:9,c:4};
+let refEditOrder=[]; // 直近に編集したPFC（最大2つ）
+function refReadKcal(){
+  const v=parseFloat((document.getElementById("ref_kcal")||{}).value);
+  return (v>=800&&v<=6000)?v:null;
+}
+function refSync(m,kind){
+  const setV=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v;};
+  const num=id=>parseFloat((document.getElementById(id)||{}).value);
+  const kcal=refReadKcal();
+  if(kcal){
+    if(kind==="g"){const g=num("ref_"+m+"g");if(g>0)setV("ref_"+m,Math.round(g*REF_KCAL_PER_G[m]/kcal*1000)/10);}
+    else{const p=num("ref_"+m);if(p>0)setV("ref_"+m+"g",Math.round(kcal*p/100/REF_KCAL_PER_G[m]));}
+  }
+  refEditOrder=refEditOrder.filter(x=>x!==m);refEditOrder.push(m);
+  if(refEditOrder.length>2)refEditOrder=refEditOrder.slice(-2);
+  const auto=["c","f","p"].find(x=>!refEditOrder.includes(x)); // 編集していない要素（炭水化物優先）が残りを吸収
+  if(auto&&auto!==m){
+    const others=["p","f","c"].filter(x=>x!==auto);
+    const rest=Math.round((100-others.reduce((s,x)=>s+(num("ref_"+x)||0),0))*10)/10;
+    if(rest>0){setV("ref_"+auto,rest);if(kcal)setV("ref_"+auto+"g",Math.round(kcal*rest/100/REF_KCAL_PER_G[auto]));}
+  }
+  refPreview();
+}
+// カロリー変更時：比率(%)は維持し、g表示だけ新カロリーで再計算
+function refSyncKcal(){
+  const kcal=refReadKcal();
+  if(kcal)["p","f","c"].forEach(m=>{
+    const p=parseFloat((document.getElementById("ref_"+m)||{}).value);
+    const el=document.getElementById("ref_"+m+"g");
+    if(el&&p>0)el.value=Math.round(kcal*p/100/REF_KCAL_PER_G[m]);
+  });
+  refPreview();
+}
 function renderRefCard(){
   const el=document.getElementById("refCard");if(!el)return;
+  refEditOrder=[]; // 開き直したら「どれを自動調整するか」もリセット
   const m=refToMeta(REF);
-  const pct=(id,label,val)=>`<div style="flex:1;min-width:28%">
-      <input class="pcinput" id="${id}" type="number" inputmode="numeric" min="1" max="98" step="1" value="${val}" oninput="refPreview()" style="font-size:18px;font-weight:800;text-align:center">
-      <div class="hint" style="text-align:center;margin-top:2px">${label}（%）</div></div>`;
+  const grams={p:REF.protein,f:REF.fat,c:REF.carb};
+  const macro=(k,label,val)=>`<div style="flex:1;min-width:28%">
+      <div class="hint" style="text-align:center;font-weight:700">${label}</div>
+      <div class="refunit"><input class="pcinput" id="ref_${k}" type="number" inputmode="decimal" min="1" max="98" step="0.1" value="${val}" oninput="refSync('${k}','pct')"><span>%</span></div>
+      <div class="refunit"><input class="pcinput" id="ref_${k}g" type="number" inputmode="numeric" min="1" step="1" value="${grams[k]}" oninput="refSync('${k}','g')"><span>g</span></div>
+    </div>`;
   const presets=S.refPresets.map((p,i)=>{const pm=refToMeta(p.ref);
     return `<div class="deal-row"><span>📌 ${p.name} <span class="hint">${pm.kcal}kcal・P${pm.p}/F${pm.f}/C${pm.c}%・${p.meals||3}食</span></span>
       <span><button class="mini adopt" onclick="refLoadPreset(${i})">適用</button>
       <button class="mini" onclick="refDeletePreset(${i})" style="color:var(--red)">×</button></span></div>`;}).join("");
   el.innerHTML=`<div class="qlabel">🍽 1日の目標とPFCバランス</div>
-    <div class="hint">①1日の目標カロリー → ②そのカロリーをとる<b>PFC比率（合計100%）</b> → ③1日の食数、の順に設定。今日の一手などの<b>1食の目安＝1日の目安÷食数</b>で表示されます。<br>
+    <div class="hint">①1日の目標カロリー → ②<b>PFCバランス</b> → ③1日の食数、の順に設定。今日の一手などの<b>1食の目安＝1日の目安÷食数</b>で表示されます。<br>
     現在：1食 約<b style="color:var(--ink)">${MEAL_KCAL}kcal</b>×${MEALS_N}食 ／ ${S.refCustom?`<b style="color:var(--teal)">カスタム設定を適用中</b>`:"標準設定（成人の目安）"}</div>
     <div class="qlabel" style="margin-top:12px">① 1日の目標カロリー</div>
-    <input class="pcinput" id="ref_kcal" type="number" inputmode="numeric" min="800" max="6000" step="10" value="${m.kcal}" oninput="refPreview()" style="font-size:20px;font-weight:800;text-align:center">
+    <input class="pcinput" id="ref_kcal" type="number" inputmode="numeric" min="800" max="6000" step="10" value="${m.kcal}" oninput="refSyncKcal()" style="font-size:20px;font-weight:800;text-align:center">
     <div class="qlabel" style="margin-top:12px">② PFCバランス（合計100%）</div>
+    <div class="hint" style="margin-top:2px"><b>%でもgでも</b>入力OK（片方はもう片方から自動計算）。2つの栄養素を入力すると、残り1つは合計100%になるよう自動で埋まります。</div>
     <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:6px">
-      ${pct("ref_p","たんぱく質",m.p)}${pct("ref_f","脂質",m.f)}${pct("ref_c","炭水化物",m.c)}
+      ${macro("p","たんぱく質",m.p)}${macro("f","脂質",m.f)}${macro("c","炭水化物",m.c)}
     </div>
     <div class="qlabel" style="margin-top:12px">③ 1日の食数</div>
     <select class="pcinput" id="ref_meals" onchange="refPreview()" style="width:100%">
@@ -1957,6 +2013,31 @@ function closeModal(){ // ユーザー操作用（履歴と同期して閉じる
 }
 document.getElementById("modalClose").onclick=closeModal;
 modal.onclick=(e)=>{if(e.target===modal)closeModal();};
+/* ---- 全画面表示（ブラウザのURLバーを消す）。インストール済みPWA(standalone)では不要なので非表示 ---- */
+function fsSupported(){const d=document.documentElement;return !!(d&&(d.requestFullscreen||d.webkitRequestFullscreen));}
+function isStandalone(){try{return (typeof matchMedia==="function"&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true;}catch(e){return false;}}
+function fsCurrent(){return document.fullscreenElement||document.webkitFullscreenElement||null;}
+function toggleFullscreen(){
+  if(!fsSupported()){ // iPhoneのSafariなどFullscreen API非対応
+    toast("このブラウザは全画面に非対応です。共有→「ホーム画面に追加」でURLバーなしのアプリとして使えます");return;
+  }
+  try{
+    if(fsCurrent())(document.exitFullscreen||document.webkitExitFullscreen).call(document);
+    else{const d=document.documentElement;(d.requestFullscreen||d.webkitRequestFullscreen).call(d);}
+  }catch(e){toast("全画面に切り替えられませんでした");}
+}
+function updateFsBtn(){
+  const b=document.getElementById("fsBtn");if(!b)return;
+  if(isStandalone()){if(b.style)b.style.display="none";return;} // アプリとして起動中はバー自体が無い
+  const on=!!fsCurrent();
+  b.classList.toggle("on",on);
+  if(b.setAttribute)b.setAttribute("aria-label",on?"全画面をやめる":"全画面表示にする");
+}
+if(document.addEventListener){
+  document.addEventListener("fullscreenchange",updateFsBtn);
+  document.addEventListener("webkitfullscreenchange",updateFsBtn);
+}
+updateFsBtn();
 function renderAll(){renderCatBar();renderDealsFull();renderHome();renderStats();renderCalc();renderRegion();renderLed();}
 renderAll();
 loadFullDb(); // 文科省 食品成分DB（2,478食品）を非同期で読み込み（配信時のみ／file://は内蔵39食品）
