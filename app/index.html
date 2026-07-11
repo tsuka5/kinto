@@ -1251,14 +1251,10 @@ function renderHome(){
   const alts=suggest(pick.id,{topN:5,sameCat:!S.showOtherCat});
   // 候補行（安い候補・類似候補で共用）。saving負=相場は選択食材より高い。
   const rowHTML=(f,pct,saving,i)=>{
-    const cheapPct=Math.min(99,Math.round(saving/pP*100));
     const cheaper=saving>0;
-    // 高い側は%だと極端な数字になるので倍率で表示（例:×16.7）
-    const priceVal=cheaper?`−${cheapPct}%`:(saving===0?"±0":`×${(marketOf(f.id)/pP).toFixed(1)}`);
     return `<div class="rankrow">
       <div class="rankno">${i+1}</div>
       <div class="rankmain"><div class="rankname">${f.name} <span class="hint" style="font-weight:400">¥${pP} → <b style="color:var(--gold)">¥${marketOf(f.id)}</b>/100g</span></div>
-        <div class="rkm"><span class="rkm-lab">💰 相場より</span><div class="rkm-tr"><div class="rkm-fl gold" style="width:${Math.max(0,cheapPct)}%"></div></div><b class="rkm-val" style="color:${cheaper?"var(--gold)":"var(--red)"}">${priceVal}</b></div>
         <div class="rkm"><span class="rkm-lab">🧬 栄養マッチ</span><div class="rkm-tr"><div class="rkm-fl teal" style="width:${pct}%"></div></div><b class="rkm-val" style="color:var(--teal)">${pct}%</b></div>
         <div class="hint">${cheaper?`100gあたり <b style="color:var(--gold)">¥${saving}おトク</b>`:(saving===0?"相場はほぼ同じ":`相場は¥${-saving}高め`)}・栄養は量も加味して${pct>=80?"ほぼ同等":pct>=60?"おおむね近い":"やや異なる"}</div></div>
       <div class="rankact"><button class="mini" onclick="viewFood('${f.id}')">詳細</button>
