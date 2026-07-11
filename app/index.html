@@ -333,65 +333,65 @@
 ============================================================ */
 const FOODS = [
   // --- 魚 ---
-  {id:"salmon_raw",name:"サーモン(生)",cat:"fish",price:480,effort:4,n:{protein:22.3,fat:12.8,carb:0.1,omega3:2.1,calcium:14,iron:0.5,vitD:32.0,kcal:204}},
-  {id:"salmon_can",name:"鮭水煮缶",cat:"fish",price:160,effort:1,n:{protein:21.0,fat:8.5,carb:0.1,omega3:1.9,calcium:190,iron:0.4,vitD:8.0,kcal:170}},
-  {id:"saba_can",name:"さば水煮缶",cat:"fish",price:130,effort:1,n:{protein:20.9,fat:10.7,carb:0.2,omega3:2.6,calcium:260,iron:1.6,vitD:11.0,kcal:190}},
-  {id:"tuna_can",name:"ツナ缶(油漬)",cat:"fish",price:150,effort:1,n:{protein:17.7,fat:21.7,carb:0.1,omega3:1.5,calcium:4,iron:0.5,vitD:2.0,kcal:265}},
-  {id:"sardine_can",name:"いわし缶(味付)",cat:"fish",price:130,effort:1,n:{protein:20.4,fat:11.9,carb:5.7,omega3:2.8,calcium:370,iron:2.6,vitD:6.0,kcal:200}},
-  {id:"maguro",name:"まぐろ赤身(生)",cat:"fish",price:520,effort:3,n:{protein:26.4,fat:1.4,carb:0.1,omega3:0.1,calcium:5,iron:1.1,vitD:5.0,kcal:125}},
+  {id:"salmon_raw",name:"サーモン(生)",cat:"fish",price:480,effort:4,n:{protein:22.3,fat:12.8,carb:0.1,omega3:2.1,calcium:14,iron:0.5,vitD:32.0,fiber:0,vitC:1,vitA:14,folate:9,kcal:204}},
+  {id:"salmon_can",name:"鮭水煮缶",cat:"fish",price:160,effort:1,n:{protein:21.0,fat:8.5,carb:0.1,omega3:1.9,calcium:190,iron:0.4,vitD:8.0,fiber:0,vitC:0,vitA:4,folate:10,kcal:170}},
+  {id:"saba_can",name:"さば水煮缶",cat:"fish",price:130,effort:1,n:{protein:20.9,fat:10.7,carb:0.2,omega3:2.6,calcium:260,iron:1.6,vitD:11.0,fiber:0,vitC:0,vitA:9,folate:12,kcal:190}},
+  {id:"tuna_can",name:"ツナ缶(油漬)",cat:"fish",price:150,effort:1,n:{protein:17.7,fat:21.7,carb:0.1,omega3:1.5,calcium:4,iron:0.5,vitD:2.0,fiber:0,vitC:0,vitA:8,folate:3,kcal:265}},
+  {id:"sardine_can",name:"いわし缶(味付)",cat:"fish",price:130,effort:1,n:{protein:20.4,fat:11.9,carb:5.7,omega3:2.8,calcium:370,iron:2.6,vitD:6.0,fiber:0,vitC:0,vitA:25,folate:10,kcal:200}},
+  {id:"maguro",name:"まぐろ赤身(生)",cat:"fish",price:520,effort:3,n:{protein:26.4,fat:1.4,carb:0.1,omega3:0.1,calcium:5,iron:1.1,vitD:5.0,fiber:0,vitC:2,vitA:83,folate:8,kcal:125}},
   // --- 肉 ---
-  {id:"beef_loin",name:"牛ロース(生)",cat:"meat",price:580,effort:3,n:{protein:16.5,fat:26.4,carb:0.3,omega3:0.1,calcium:4,iron:1.2,vitD:0.0,kcal:318}},
-  {id:"pork_loin",name:"豚ロース(生)",cat:"meat",price:230,effort:3,n:{protein:19.3,fat:19.2,carb:0.2,omega3:0.1,calcium:4,iron:0.3,vitD:0.1,kcal:248}},
-  {id:"chicken_breast",name:"鶏むね肉(皮なし)",cat:"meat",price:90,effort:3,n:{protein:23.3,fat:1.9,carb:0.1,omega3:0.1,calcium:4,iron:0.3,vitD:0.1,kcal:113}},
-  {id:"chicken_thigh",name:"鶏もも肉(皮なし)",cat:"meat",price:120,effort:3,n:{protein:19.0,fat:5.0,carb:0.0,omega3:0.1,calcium:5,iron:0.6,vitD:0.2,kcal:127}},
+  {id:"beef_loin",name:"牛ロース(生)",cat:"meat",price:580,effort:3,n:{protein:16.5,fat:26.4,carb:0.3,omega3:0.1,calcium:4,iron:1.2,vitD:0.0,fiber:0,vitC:1,vitA:10,folate:6,kcal:318}},
+  {id:"pork_loin",name:"豚ロース(生)",cat:"meat",price:230,effort:3,n:{protein:19.3,fat:19.2,carb:0.2,omega3:0.1,calcium:4,iron:0.3,vitD:0.1,fiber:0,vitC:1,vitA:6,folate:1,kcal:248}},
+  {id:"chicken_breast",name:"鶏むね肉(皮なし)",cat:"meat",price:90,effort:3,n:{protein:23.3,fat:1.9,carb:0.1,omega3:0.1,calcium:4,iron:0.3,vitD:0.1,fiber:0,vitC:3,vitA:9,folate:12,kcal:113}},
+  {id:"chicken_thigh",name:"鶏もも肉(皮なし)",cat:"meat",price:120,effort:3,n:{protein:19.0,fat:5.0,carb:0.0,omega3:0.1,calcium:5,iron:0.6,vitD:0.2,fiber:0,vitC:3,vitA:16,folate:10,kcal:127}},
   // --- 卵 ---
-  {id:"egg",name:"鶏卵",cat:"egg",price:30,effort:1,n:{protein:12.2,fat:10.2,carb:0.3,omega3:0.1,calcium:46,iron:1.5,vitD:3.8,kcal:142}},
+  {id:"egg",name:"鶏卵",cat:"egg",price:30,effort:1,n:{protein:12.2,fat:10.2,carb:0.3,omega3:0.1,calcium:46,iron:1.5,vitD:3.8,fiber:0,vitC:0,vitA:210,folate:49,kcal:142}},
   // --- 大豆 ---
-  {id:"tofu",name:"絹ごし豆腐",cat:"soy",price:30,effort:1,n:{protein:5.3,fat:3.5,carb:2.0,omega3:0.2,calcium:75,iron:1.2,vitD:0.0,kcal:56}},
-  {id:"natto",name:"納豆",cat:"soy",price:80,effort:1,n:{protein:16.5,fat:10.0,carb:12.1,omega3:0.7,calcium:90,iron:3.3,vitD:0.0,kcal:190}},
-  {id:"atsuage",name:"厚揚げ",cat:"soy",price:50,effort:1,n:{protein:10.7,fat:11.3,carb:0.9,omega3:0.5,calcium:240,iron:2.6,vitD:0.0,kcal:143}},
+  {id:"tofu",name:"絹ごし豆腐",cat:"soy",price:30,effort:1,n:{protein:5.3,fat:3.5,carb:2.0,omega3:0.2,calcium:75,iron:1.2,vitD:0.0,fiber:0.9,vitC:0,vitA:0,folate:12,kcal:56}},
+  {id:"natto",name:"納豆",cat:"soy",price:80,effort:1,n:{protein:16.5,fat:10.0,carb:12.1,omega3:0.7,calcium:90,iron:3.3,vitD:0.0,fiber:6.7,vitC:0,vitA:0,folate:120,kcal:190}},
+  {id:"atsuage",name:"厚揚げ",cat:"soy",price:50,effort:1,n:{protein:10.7,fat:11.3,carb:0.9,omega3:0.5,calcium:240,iron:2.6,vitD:0.0,fiber:0.8,vitC:0,vitA:0,folate:23,kcal:143}},
   // --- 乳製品 ---
-  {id:"greek_yogurt",name:"ギリシャヨーグルト",cat:"dairy",price:120,effort:1,n:{protein:10.0,fat:5.0,carb:4.0,omega3:0.1,calcium:110,iron:0.0,vitD:0.0,kcal:100}},
-  {id:"milk",name:"牛乳",cat:"dairy",price:25,effort:1,n:{protein:3.3,fat:3.8,carb:4.8,omega3:0.0,calcium:110,iron:0.0,vitD:0.3,kcal:67}},
-  {id:"cheese",name:"プロセスチーズ",cat:"dairy",price:140,effort:1,n:{protein:22.7,fat:26.0,carb:1.3,omega3:0.3,calcium:630,iron:0.3,vitD:0.0,kcal:339}},
+  {id:"greek_yogurt",name:"ギリシャヨーグルト",cat:"dairy",price:120,effort:1,n:{protein:10.0,fat:5.0,carb:4.0,omega3:0.1,calcium:110,iron:0.0,vitD:0.0,fiber:0,vitC:0,vitA:5,folate:11,kcal:100}},
+  {id:"milk",name:"牛乳",cat:"dairy",price:25,effort:1,n:{protein:3.3,fat:3.8,carb:4.8,omega3:0.0,calcium:110,iron:0.0,vitD:0.3,fiber:0,vitC:1,vitA:38,folate:5,kcal:67}},
+  {id:"cheese",name:"プロセスチーズ",cat:"dairy",price:140,effort:1,n:{protein:22.7,fat:26.0,carb:1.3,omega3:0.3,calcium:630,iron:0.3,vitD:0.0,fiber:0,vitC:0,vitA:260,folate:27,kcal:339}},
   // --- 野菜 ---
-  {id:"spinach_raw",name:"ほうれん草(生)",cat:"veg",price:120,effort:3,n:{protein:2.2,fat:0.4,carb:3.1,omega3:0.0,calcium:49,iron:2.0,vitD:0.0,kcal:20}},
-  {id:"spinach_frz",name:"冷凍ほうれん草",cat:"veg",price:60,effort:1,n:{protein:2.9,fat:0.3,carb:3.4,omega3:0.0,calcium:130,iron:1.2,vitD:0.0,kcal:22}},
-  {id:"broccoli_raw",name:"ブロッコリー(生)",cat:"veg",price:130,effort:3,n:{protein:5.4,fat:0.6,carb:6.6,omega3:0.1,calcium:50,iron:1.3,vitD:0.0,kcal:37}},
-  {id:"broccoli_frz",name:"冷凍ブロッコリー",cat:"veg",price:70,effort:1,n:{protein:3.9,fat:0.4,carb:5.2,omega3:0.0,calcium:38,iron:1.0,vitD:0.0,kcal:30}},
-  {id:"komatsuna",name:"小松菜(生)",cat:"veg",price:90,effort:3,n:{protein:1.5,fat:0.2,carb:2.4,omega3:0.0,calcium:170,iron:2.8,vitD:0.0,kcal:13}},
-  {id:"moyashi",name:"もやし",cat:"veg",price:15,effort:1,n:{protein:1.7,fat:0.1,carb:2.6,omega3:0.0,calcium:10,iron:0.2,vitD:0.0,kcal:15}},
-  {id:"onion",name:"玉ねぎ",cat:"veg",price:30,effort:2,n:{protein:1.0,fat:0.1,carb:8.4,omega3:0.0,calcium:21,iron:0.3,vitD:0.0,kcal:33}},
-  {id:"cabbage",name:"キャベツ",cat:"veg",price:20,effort:2,n:{protein:1.3,fat:0.2,carb:5.2,omega3:0.0,calcium:43,iron:0.3,vitD:0.0,kcal:23}},
-  {id:"carrot",name:"にんじん",cat:"veg",price:25,effort:2,n:{protein:0.7,fat:0.2,carb:9.3,omega3:0.0,calcium:28,iron:0.2,vitD:0.0,kcal:35}},
-  {id:"tomato",name:"トマト",cat:"veg",price:50,effort:1,n:{protein:0.7,fat:0.1,carb:4.7,omega3:0.0,calcium:7,iron:0.2,vitD:0.0,kcal:20}},
-  {id:"hakusai",name:"白菜",cat:"veg",price:20,effort:2,n:{protein:0.8,fat:0.1,carb:3.2,omega3:0.0,calcium:43,iron:0.3,vitD:0.0,kcal:13}},
-  {id:"piman",name:"ピーマン",cat:"veg",price:60,effort:2,n:{protein:0.9,fat:0.2,carb:5.1,omega3:0.0,calcium:11,iron:0.4,vitD:0.0,kcal:20}},
-  {id:"kabocha",name:"かぼちゃ",cat:"veg",price:40,effort:3,n:{protein:1.9,fat:0.3,carb:20.6,omega3:0.0,calcium:15,iron:0.5,vitD:0.0,kcal:78}},
-  {id:"daikon",name:"大根",cat:"veg",price:18,effort:2,n:{protein:0.5,fat:0.1,carb:4.1,omega3:0.0,calcium:24,iron:0.2,vitD:0.0,kcal:15}},
-  {id:"maitake",name:"まいたけ",cat:"veg",price:90,effort:1,n:{protein:2.0,fat:0.5,carb:4.4,omega3:0.0,calcium:1,iron:0.2,vitD:4.9,kcal:22}},
+  {id:"spinach_raw",name:"ほうれん草(生)",cat:"veg",price:120,effort:3,n:{protein:2.2,fat:0.4,carb:3.1,omega3:0.0,calcium:49,iron:2.0,vitD:0.0,fiber:2.8,vitC:35,vitA:350,folate:210,kcal:20}},
+  {id:"spinach_frz",name:"冷凍ほうれん草",cat:"veg",price:60,effort:1,n:{protein:2.9,fat:0.3,carb:3.4,omega3:0.0,calcium:130,iron:1.2,vitD:0.0,fiber:3.3,vitC:19,vitA:340,folate:120,kcal:22}},
+  {id:"broccoli_raw",name:"ブロッコリー(生)",cat:"veg",price:130,effort:3,n:{protein:5.4,fat:0.6,carb:6.6,omega3:0.1,calcium:50,iron:1.3,vitD:0.0,fiber:5.1,vitC:140,vitA:75,folate:220,kcal:37}},
+  {id:"broccoli_frz",name:"冷凍ブロッコリー",cat:"veg",price:70,effort:1,n:{protein:3.9,fat:0.4,carb:5.2,omega3:0.0,calcium:38,iron:1.0,vitD:0.0,fiber:4.3,vitC:55,vitA:67,folate:120,kcal:30}},
+  {id:"komatsuna",name:"小松菜(生)",cat:"veg",price:90,effort:3,n:{protein:1.5,fat:0.2,carb:2.4,omega3:0.0,calcium:170,iron:2.8,vitD:0.0,fiber:1.9,vitC:39,vitA:260,folate:110,kcal:13}},
+  {id:"moyashi",name:"もやし",cat:"veg",price:15,effort:1,n:{protein:1.7,fat:0.1,carb:2.6,omega3:0.0,calcium:10,iron:0.2,vitD:0.0,fiber:1.3,vitC:8,vitA:0,folate:41,kcal:15}},
+  {id:"onion",name:"玉ねぎ",cat:"veg",price:30,effort:2,n:{protein:1.0,fat:0.1,carb:8.4,omega3:0.0,calcium:21,iron:0.3,vitD:0.0,fiber:1.5,vitC:7,vitA:0,folate:15,kcal:33}},
+  {id:"cabbage",name:"キャベツ",cat:"veg",price:20,effort:2,n:{protein:1.3,fat:0.2,carb:5.2,omega3:0.0,calcium:43,iron:0.3,vitD:0.0,fiber:1.8,vitC:41,vitA:4,folate:78,kcal:23}},
+  {id:"carrot",name:"にんじん",cat:"veg",price:25,effort:2,n:{protein:0.7,fat:0.2,carb:9.3,omega3:0.0,calcium:28,iron:0.2,vitD:0.0,fiber:2.8,vitC:6,vitA:720,folate:21,kcal:35}},
+  {id:"tomato",name:"トマト",cat:"veg",price:50,effort:1,n:{protein:0.7,fat:0.1,carb:4.7,omega3:0.0,calcium:7,iron:0.2,vitD:0.0,fiber:1.0,vitC:15,vitA:45,folate:22,kcal:20}},
+  {id:"hakusai",name:"白菜",cat:"veg",price:20,effort:2,n:{protein:0.8,fat:0.1,carb:3.2,omega3:0.0,calcium:43,iron:0.3,vitD:0.0,fiber:1.3,vitC:19,vitA:8,folate:61,kcal:13}},
+  {id:"piman",name:"ピーマン",cat:"veg",price:60,effort:2,n:{protein:0.9,fat:0.2,carb:5.1,omega3:0.0,calcium:11,iron:0.4,vitD:0.0,fiber:2.3,vitC:76,vitA:33,folate:26,kcal:20}},
+  {id:"kabocha",name:"かぼちゃ",cat:"veg",price:40,effort:3,n:{protein:1.9,fat:0.3,carb:20.6,omega3:0.0,calcium:15,iron:0.5,vitD:0.0,fiber:3.5,vitC:43,vitA:330,folate:42,kcal:78}},
+  {id:"daikon",name:"大根",cat:"veg",price:18,effort:2,n:{protein:0.5,fat:0.1,carb:4.1,omega3:0.0,calcium:24,iron:0.2,vitD:0.0,fiber:1.4,vitC:12,vitA:0,folate:34,kcal:15}},
+  {id:"maitake",name:"まいたけ",cat:"veg",price:90,effort:1,n:{protein:2.0,fat:0.5,carb:4.4,omega3:0.0,calcium:1,iron:0.2,vitD:4.9,fiber:3.5,vitC:0,vitA:0,folate:53,kcal:22}},
   // --- 炭水化物系（主食。可食部=食べる状態100gあたり）---
-  {id:"rice_bowl",name:"白米ごはん",cat:"carb",price:35,effort:2,n:{protein:2.5,fat:0.3,carb:37.1,omega3:0.0,calcium:3,iron:0.1,vitD:0.0,kcal:156}},
-  {id:"oatmeal",name:"オートミール(調理)",cat:"carb",price:70,effort:1,n:{protein:2.4,fat:1.4,carb:12.0,omega3:0.0,calcium:8,iron:0.9,vitD:0.0,kcal:65}},
-  {id:"bread_white",name:"食パン",cat:"carb",price:60,effort:1,n:{protein:8.9,fat:4.1,carb:46.4,omega3:0.0,calcium:22,iron:0.5,vitD:0.0,kcal:248}},
-  {id:"bread_whole",name:"全粒粉パン",cat:"carb",price:90,effort:1,n:{protein:7.9,fat:5.0,carb:47.0,omega3:0.1,calcium:23,iron:1.3,vitD:0.0,kcal:251}},
-  {id:"pasta",name:"パスタ(ゆで)",cat:"carb",price:50,effort:2,n:{protein:5.2,fat:0.9,carb:28.0,omega3:0.0,calcium:8,iron:0.5,vitD:0.0,kcal:150}},
-  {id:"satsumaimo",name:"さつまいも",cat:"carb",price:55,effort:2,n:{protein:1.2,fat:0.2,carb:31.9,omega3:0.0,calcium:36,iron:0.5,vitD:0.0,kcal:126}}
+  {id:"rice_bowl",name:"白米ごはん",cat:"carb",price:35,effort:2,n:{protein:2.5,fat:0.3,carb:37.1,omega3:0.0,calcium:3,iron:0.1,vitD:0.0,fiber:1.5,vitC:0,vitA:0,folate:3,kcal:156}},
+  {id:"oatmeal",name:"オートミール(調理)",cat:"carb",price:70,effort:1,n:{protein:2.4,fat:1.4,carb:12.0,omega3:0.0,calcium:8,iron:0.9,vitD:0.0,fiber:1.6,vitC:0,vitA:0,folate:4,kcal:65}},
+  {id:"bread_white",name:"食パン",cat:"carb",price:60,effort:1,n:{protein:8.9,fat:4.1,carb:46.4,omega3:0.0,calcium:22,iron:0.5,vitD:0.0,fiber:4.2,vitC:0,vitA:0,folate:30,kcal:248}},
+  {id:"bread_whole",name:"全粒粉パン",cat:"carb",price:90,effort:1,n:{protein:7.9,fat:5.0,carb:47.0,omega3:0.1,calcium:23,iron:1.3,vitD:0.0,fiber:4.5,vitC:0,vitA:0,folate:49,kcal:251}},
+  {id:"pasta",name:"パスタ(ゆで)",cat:"carb",price:50,effort:2,n:{protein:5.2,fat:0.9,carb:28.0,omega3:0.0,calcium:8,iron:0.5,vitD:0.0,fiber:3.0,vitC:0,vitA:0,folate:4,kcal:150}},
+  {id:"satsumaimo",name:"さつまいも",cat:"carb",price:55,effort:2,n:{protein:1.2,fat:0.2,carb:31.9,omega3:0.0,calcium:36,iron:0.5,vitD:0.0,fiber:2.2,vitC:29,vitA:2,folate:49,kcal:126}}
 ];
 
 /* レシピの副材料（栄養計算＋コスト計算。100gあたり。priceは円/100g） */
 const PANTRY = {
-  rice:{name:"ご飯",price:35,n:{protein:2.5,fat:0.3,carb:37.1,omega3:0,calcium:3,iron:0.1,vitD:0,kcal:156}},
-  bread:{name:"食パン",price:60,n:{protein:8.9,fat:4.1,carb:46.4,omega3:0,calcium:22,iron:0.5,vitD:0,kcal:248}},
-  onion:{name:"玉ねぎ",price:30,n:{protein:1.0,fat:0.1,carb:8.4,omega3:0,calcium:21,iron:0.3,vitD:0,kcal:33}},
-  oil:{name:"油",price:40,n:{protein:0,fat:100,carb:0,omega3:6.8,calcium:0,iron:0,vitD:0,kcal:921}},
-  soy:{name:"醤油",price:40,n:{protein:7.7,fat:0,carb:7.9,omega3:0,calcium:29,iron:1.7,vitD:0,kcal:71}},
-  miso:{name:"味噌",price:50,n:{protein:12.5,fat:6.0,carb:21.9,omega3:0,calcium:100,iron:4.0,vitD:0,kcal:192}},
-  negi:{name:"長ねぎ",price:60,n:{protein:1.4,fat:0.1,carb:8.3,omega3:0,calcium:36,iron:0.3,vitD:0,kcal:35}},
-  carrot:{name:"にんじん",price:25,n:{protein:0.7,fat:0.2,carb:9.3,omega3:0,calcium:28,iron:0.2,vitD:0,kcal:35}},
-  tomato:{name:"トマト",price:50,n:{protein:0.7,fat:0.1,carb:4.7,omega3:0,calcium:7,iron:0.2,vitD:0,kcal:20}},
-  cabbage:{name:"キャベツ",price:20,n:{protein:1.3,fat:0.2,carb:5.2,omega3:0,calcium:43,iron:0.3,vitD:0,kcal:23}},
-  mayo:{name:"マヨネーズ",price:30,n:{protein:1.4,fat:75.0,carb:3.6,omega3:3.0,calcium:8,iron:0.3,vitD:0,kcal:700}}
+  rice:{name:"ご飯",price:35,n:{protein:2.5,fat:0.3,carb:37.1,omega3:0,calcium:3,iron:0.1,vitD:0,fiber:1.5,vitC:0,vitA:0,folate:3,kcal:156}},
+  bread:{name:"食パン",price:60,n:{protein:8.9,fat:4.1,carb:46.4,omega3:0,calcium:22,iron:0.5,vitD:0,fiber:4.2,vitC:0,vitA:0,folate:30,kcal:248}},
+  onion:{name:"玉ねぎ",price:30,n:{protein:1.0,fat:0.1,carb:8.4,omega3:0,calcium:21,iron:0.3,vitD:0,fiber:1.5,vitC:7,vitA:0,folate:15,kcal:33}},
+  oil:{name:"油",price:40,n:{protein:0,fat:100,carb:0,omega3:6.8,calcium:0,iron:0,vitD:0,fiber:0,vitC:0,vitA:0,folate:0,kcal:921}},
+  soy:{name:"醤油",price:40,n:{protein:7.7,fat:0,carb:7.9,omega3:0,calcium:29,iron:1.7,vitD:0,fiber:0,vitC:0,vitA:0,folate:33,kcal:71}},
+  miso:{name:"味噌",price:50,n:{protein:12.5,fat:6.0,carb:21.9,omega3:0,calcium:100,iron:4.0,vitD:0,fiber:4.9,vitC:0,vitA:0,folate:68,kcal:192}},
+  negi:{name:"長ねぎ",price:60,n:{protein:1.4,fat:0.1,carb:8.3,omega3:0,calcium:36,iron:0.3,vitD:0,fiber:2.5,vitC:14,vitA:7,folate:72,kcal:35}},
+  carrot:{name:"にんじん",price:25,n:{protein:0.7,fat:0.2,carb:9.3,omega3:0,calcium:28,iron:0.2,vitD:0,fiber:2.8,vitC:6,vitA:720,folate:21,kcal:35}},
+  tomato:{name:"トマト",price:50,n:{protein:0.7,fat:0.1,carb:4.7,omega3:0,calcium:7,iron:0.2,vitD:0,fiber:1.0,vitC:15,vitA:45,folate:22,kcal:20}},
+  cabbage:{name:"キャベツ",price:20,n:{protein:1.3,fat:0.2,carb:5.2,omega3:0,calcium:43,iron:0.3,vitD:0,fiber:1.8,vitC:41,vitA:4,folate:78,kcal:23}},
+  mayo:{name:"マヨネーズ",price:30,n:{protein:1.4,fat:75.0,carb:3.6,omega3:3.0,calcium:8,iron:0.3,vitD:0,fiber:0,vitC:0,vitA:24,folate:1,kcal:700}}
 };
 // FOODS優先（玉ねぎ等はFOODSに昇格済み。PANTRYの同idはレシピ用の別名として残すがFOODS側を使う）
 const ALL = {}; FOODS.forEach(f=>ALL[f.id]=f); Object.keys(PANTRY).forEach(k=>{if(!ALL[k])ALL[k]={id:k,...PANTRY[k]};});
@@ -658,7 +658,9 @@ function stepsText(rec){return stepsList(rec).join(" → ");}
 function timeLabel(rec){return rec.time?`⏱ 約${rec.time}分`:"";}
 
 /* 1日の摂取目安（割合表示用の基準）。設定タブでカスタマイズ可能（1食の目安＝この1/3） */
-const REF_DEFAULT={protein:65,fat:60,carb:320,omega3:2.0,iron:7.5,vitD:8.5,calcium:700};
+const REF_DEFAULT={protein:65,fat:60,carb:320,omega3:2.0,iron:7.5,vitD:8.5,calcium:700,
+  // ↓は表示・判定用の固定目安（設定UIには出さない。deriveFromKcalに含めないためカスタム設定時もこの値を維持）
+  fiber:21,vitC:100,vitA:850,folate:240};
 const REF_MICROS=[["omega3","オメガ3","g"],["calcium","カルシウム","mg"],["iron","鉄分","mg"],["vitD","ビタミンD","µg"]];
 const REF_DEFAULT_KCAL=REF_DEFAULT.protein*4+REF_DEFAULT.fat*9+REF_DEFAULT.carb*4; // 標準の1日エネルギー(2080kcal)
 // カロミル方式：①1日の目標カロリー → ②PFC比率(%) からグラム数を導出。
@@ -718,10 +720,25 @@ function foodRole(f){for(const r in ROLES)if(ROLES[r].cats.includes(f.cat))retur
 function roleFoods(keys){return FOODS.filter(f=>keys.includes(foodRole(f)));}
 
 /* 評価・比較に使う栄養素 */
-const NK=["protein","omega3","calcium","iron","vitD"];
-const NLABEL={protein:"たんぱく質",omega3:"オメガ3",calcium:"カルシウム",iron:"鉄分",vitD:"ビタミンD",fat:"脂質",carb:"炭水化物"};
-const NUNIT={protein:"g",omega3:"g",calcium:"mg",iron:"mg",vitD:"µg",fat:"g",carb:"g"};
-const NWHY={omega3:"DHA/EPA＝脳・集中",iron:"酸素運搬＝集中持続",vitD:"気分・認知",calcium:"神経伝達",protein:"神経伝達物質の材料"};
+const NK=["protein","omega3","calcium","iron","vitD"]; // カテゴリ不明時のフォールバック軸
+const NLABEL={protein:"たんぱく質",omega3:"オメガ3",calcium:"カルシウム",iron:"鉄分",vitD:"ビタミンD",fat:"脂質",carb:"炭水化物",
+  fiber:"食物繊維",vitC:"ビタミンC",vitA:"ビタミンA",folate:"葉酸"};
+const NUNIT={protein:"g",omega3:"g",calcium:"mg",iron:"mg",vitD:"µg",fat:"g",carb:"g",
+  fiber:"g",vitC:"mg",vitA:"µg",folate:"µg"};
+const NWHY={omega3:"DHA/EPA＝脳・集中",iron:"酸素運搬＝集中持続",vitD:"気分・認知",calcium:"神経伝達",protein:"神経伝達物質の材料",
+  fiber:"腸内環境・血糖の安定",vitC:"抗酸化・ストレス耐性",vitA:"皮膚・粘膜・目",folate:"造血・細胞の再生"};
+/* カテゴリごとに重視する栄養軸（栄養マッチ・詳細バー・根拠文・コスパで使用）。
+   野菜はビタミン・食物繊維が本領なので軸を別にする（たんぱく質軸で評価すると見当外れになる） */
+const ROLE_NK={
+  main:["protein","omega3","iron","vitD","calcium"],
+  veg:["vitC","vitA","fiber","folate","iron","calcium"],
+  carb:["carb","fiber","protein"],
+  dairy:["calcium","protein","vitD"]
+};
+const ALLNK=["protein","omega3","calcium","iron","vitD","fiber","vitC","vitA","folate","carb"];
+function nkOf(f){const r=foodRole(f);return (r&&ROLE_NK[r])||NK;}
+// 詳細バーの「その他の栄養素」＝そのカテゴリの軸からPFCを除いたもの
+function otherKeysOf(f){return nkOf(f).filter(k=>k!=="protein"&&k!=="fat"&&k!=="carb").map(k=>[k,NLABEL[k],NUNIT[k]]);}
 const PFC_KEYS=[["protein","たんぱく質 (P)","g"],["fat","脂質 (F)","g"],["carb","炭水化物 (C)","g"]];
 const OTHER_KEYS=[["omega3","オメガ3","g"],["calcium","カルシウム","mg"],["iron","鉄分","mg"],["vitD","ビタミンD","µg"]];
 /* 食材ごとの「自然な1単位」（栄養の表記・計算用）。ここに無い食材は100gあたりで表示。
@@ -755,7 +772,7 @@ function unitG(id){const u=UNIT[id];return u?u.g:100;}
 function unitLabel(id){const u=UNIT[id];return u?`${u.u}・約${u.g}g`:"100g";}
 function unitN(f,k){return (f.n[k]||0)*unitG(f.id)/100;} // その1単位に含まれる栄養量
 // 各栄養素の「100kcalあたり量」の食品中の最大値（特徴量スケール正規化に使用）
-const NMAX100={};NK.forEach(k=>{NMAX100[k]=Math.max(...FOODS.map(f=>(f.n[k]||0)*100/(f.n.kcal>0?f.n.kcal:1)),1e-9);});
+const NMAX100={};ALLNK.forEach(k=>{NMAX100[k]=Math.max(...FOODS.map(f=>(f.n[k]||0)*100/(f.n.kcal>0?f.n.kcal:1)),1e-9);});
 
 /* ============================================================
    検索（ひらがな・カタカナ・漢字のどれでもヒット）
@@ -857,7 +874,7 @@ function recipeCost(rec){return Math.round(rec.ing.reduce((s,i)=>s+marketOf(i.id
 // ① 100kcalあたりに正規化（食品の「エネルギー密度の差」を排除し、栄養の質を比較）
 // ② 各栄養素を食品中の最大値で割り 0–1 に正規化（g/mg/µg の単位・桁差を排除し、各栄養素を対等に扱う）
 //    →これをしないと数値の大きいカルシウム(mg)だけが類似度を支配してしまう
-function nutriVec(f){const k=f.n.kcal>0?f.n.kcal:1;return NK.map(x=>((f.n[x]||0)*100/k)/NMAX100[x]);}
+function nutriVec(f,keys){const k=f.n.kcal>0?f.n.kcal:1;return (keys||NK).map(x=>((f.n[x]||0)*100/k)/NMAX100[x]);}
 // コサイン類似度：2食品の「栄養バランス（方向）」の近さを 0–1 で測る（非負ベクトルなので0–1に収まる）
 function cosine(a,b){let d=0,na=0,nb=0;for(let i=0;i<a.length;i++){d+=a[i]*b[i];na+=a[i]*a[i];nb+=b[i]*b[i];}return(na&&nb)?d/(Math.sqrt(na)*Math.sqrt(nb)):0;}
 /* 栄養マッチ度 = 方向（コサイン）× 量のカバー率。
@@ -865,17 +882,18 @@ function cosine(a,b){let d=0,na=0,nb=0;for(let i=0;i<a.length;i++){d+=a[i]*b[i];
    cov: 元食品が1食目安に対して意味のある量（5%以上）を持つ栄養素について、
         候補が100gあたりでどれだけの量をカバーするか（重み=元食品の寄与度、上限100%）を掛け合わせる。 */
 function nutriMatch(o,c){
-  const cos=cosine(nutriVec(o),nutriVec(c));
+  const keys=nkOf(o); // 元食品のカテゴリの軸で比較（野菜はビタミン・繊維軸）
+  const cos=cosine(nutriVec(o,keys),nutriVec(c,keys));
   let ws=0,acc=0;
-  NK.forEach(k=>{const need=mealRef(k),w=Math.min((o.n[k]||0)/need,1);
+  keys.forEach(k=>{const need=mealRef(k),w=Math.min((o.n[k]||0)/need,1);
     if(w<0.05)return; // 元食品にほぼ含まれない栄養素はカバー対象にしない
     ws+=w;acc+=w*Math.min((c.n[k]||0)/(o.n[k]||1e-9),1);});
   const cov=ws>0?acc/ws:0;
   return{cos,cov,pct:Math.round(cos*cov*100)};
 }
 function rationale(o,c){
-  const ups=[],downs=[];const note={calcium:"缶詰は骨ごと/冷凍は損失が少ないため"};
-  for(const k of["calcium","iron","omega3","protein","vitD"]){
+  const ups=[],downs=[];const note={calcium:"缶詰は骨ごと/冷凍は損失が少ないため",vitC:"生食・短時間加熱なら残りやすい"};
+  for(const k of nkOf(o)){
     const a=o.n[k]||0,b=c.n[k]||0,need=mealRef(k);
     // 「増えた」は候補側が1食目安の15%以上を持つ時だけ主張（微量同士の「2倍」は無意味）
     if(b>=need*0.15&&(a===0||b/a>=1.3))ups.push(`${NLABEL[k]}が${a===0?"新たにとれ":"約"+(b/a).toFixed(1)+"倍"}${note[k]?`（${note[k]}）`:""}`);
@@ -1057,10 +1075,13 @@ function complementCard(rec){
    食材詳細 → 料理 → クックパッド（モーダル）
 ============================================================ */
 function cookpadLink(q){return `https://cookpad.com/search/${encodeURIComponent(q)}`;}
-// 単一食品の栄養（食材に合った単位：卵1個・納豆1パック等。無い食材は100g）を 1食目安と比較
+// 単一食品の栄養（食材に合った単位：卵1個・納豆1パック等。無い食材は100g）を 1食目安と比較。
+// 「その他の栄養素」はカテゴリの重要軸（野菜=ビタミンC/A・食物繊維・葉酸など）に切替。
 function foodNutritionHTML(f){
   const ul=unitLabel(f.id);
   const kc=Math.round(unitN(f,"kcal"));
+  const role=foodRole(f);
+  const otherHead=role==="veg"?"その他の栄養素（ビタミン・食物繊維＝野菜の本領）":"その他の栄養素（脳・生産性に効く）";
   return `<div class="card hl" style="margin:8px 0 4px">
       <div style="display:flex;align-items:baseline;justify-content:space-between">
         <span class="pill">🔥 カロリー（${ul}あたり）</span>
@@ -1069,9 +1090,9 @@ function foodNutritionHTML(f){
     <div class="subhead">PFCバランス（${ul}あたり vs 1食目安）</div>
     ${legend([{cls:"a",label:`${f.name}（${ul}）`},{cls:"t",label:"1食目安"}])}
     ${PFC_KEYS.map(([k,n,u])=>cmpBlock(n,u,[{val:unitN(f,k),cls:"a"}],mealRef(k))).join("")}
-    <div class="subhead">その他の栄養素（脳・生産性に効く）</div>
+    <div class="subhead">${otherHead}</div>
     ${legend([{cls:"a",label:`${f.name}（${ul}）`},{cls:"t",label:"1食目安"}])}
-    ${OTHER_KEYS.map(([k,n,u])=>cmpBlock(`${NLABEL[k]}（${NWHY[k]}）`,u,[{val:unitN(f,k),cls:"a"}],mealRef(k))).join("")}`;
+    ${otherKeysOf(f).map(([k,n,u])=>cmpBlock(`${NLABEL[k]}（${NWHY[k]}）`,u,[{val:unitN(f,k),cls:"a"}],mealRef(k))).join("")}`;
 }
 // この食材の「あなたの記録」（相場判定に入力した実売価格の履歴）
 function myPriceLine(id){
@@ -1215,9 +1236,14 @@ function chkAdopt(){
 /* ============================================================
    今日のお買い得
 ============================================================ */
-// 金額あたり栄養素：選べる栄養素と、カテゴリ別デフォルト
-const COSPA_NUTS=["protein","carb","fat","calcium","iron","vitD","omega3"];
-const DEF_NUT={main:"protein",veg:"iron",carb:"carb",dairy:"calcium"};
+// 金額あたり栄養素：カテゴリごとに重要な栄養素だけを選択肢に出す（野菜はビタミン・繊維中心）
+const COSPA_NUTS_ROLE={
+  main:["protein","omega3","iron","vitD","calcium","fat"],
+  veg:["vitC","vitA","fiber","folate","iron","calcium"],
+  carb:["carb","fiber","protein"],
+  dairy:["calcium","protein","vitD","fat"]
+};
+const DEF_NUT={main:"protein",veg:"vitC",carb:"carb",dairy:"calcium"};
 function cospaVal(f,nut){const mk=marketOf(f.id);return mk>0?(f.n[nut]||0)/mk*100:0;} // 栄養量/¥100
 function setCospaNut(r,nut){S.cospaNut[r]=nut;save(S);renderDealsFull();}
 function renderDealsFull(){
@@ -1229,9 +1255,10 @@ function renderDealsFull(){
   Object.keys(ROLES).forEach(r=>{
     const foods=roleFoods([r]).filter(match);
     if(!foods.length)return;
-    const nut=S.cospaNut[r]||DEF_NUT[r];
+    const nuts=COSPA_NUTS_ROLE[r]||["protein"];
+    const nut=nuts.includes(S.cospaNut[r])?S.cospaNut[r]:DEF_NUT[r]; // 旧設定が軸に無ければデフォルトへ
     const sorted=foods.map(f=>({f,v:cospaVal(f,nut)})).sort((a,b)=>b.v-a.v);
-    const chips=COSPA_NUTS.map(k=>`<span class="chip ${nut===k?"on":""}" onclick="setCospaNut('${r}','${k}')">${NLABEL[k]}</span>`).join("");
+    const chips=nuts.map(k=>`<span class="chip ${nut===k?"on":""}" onclick="setCospaNut('${r}','${k}')">${NLABEL[k]}</span>`).join("");
     html+=`<div class="card"><span class="pill">${ROLES[r].short}</span>
       <div class="hint" style="margin:4px 0 4px">金額あたりの<b>${NLABEL[nut]}</b>が多い順（相場：${regionLabel()}）。栄養素はタップで切替：</div>
       <div class="chips" style="margin-bottom:8px">${chips}</div>
@@ -1469,8 +1496,8 @@ function reconcileFoodsWithDb(){
   if(!FULLDB)return;let n=0;
   for(const id in FDB_MAP){const f=ALL[id];if(!f)continue;const toks=FDB_MAP[id];
     const hit=FULLDB.find(x=>toks.every(t=>x.name.includes(t)));
-    if(hit){["protein","fat","carb","calcium","iron","vitD","kcal"].forEach(k=>{if(hit.n[k]!=null)f.n[k]=hit.n[k];});f._fdb=hit.name;n++;}}
-  NK.forEach(k=>{NMAX100[k]=Math.max(...FOODS.map(x=>(x.n[k]||0)*100/(x.n.kcal>0?x.n.kcal:1)),1e-9);});
+    if(hit){["protein","fat","carb","calcium","iron","vitD","fiber","vitC","vitA","folate","kcal"].forEach(k=>{if(hit.n[k]!=null)f.n[k]=hit.n[k];});f._fdb=hit.name;n++;}}
+  ALLNK.forEach(k=>{NMAX100[k]=Math.max(...FOODS.map(x=>(x.n[k]||0)*100/(x.n.kcal>0?x.n.kcal:1)),1e-9);});
   return n;
 }
 /* ============================================================
