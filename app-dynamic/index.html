@@ -1410,8 +1410,8 @@ function cookpadLink(q){return `https://cookpad.com/search/${encodeURIComponent(
    景品表示法・ステマ規制対応: リンクには必ず「広告」表記を付ける。
 ============================================================ */
 const AFF={
-  amazonTag:"",  // Amazonアソシエイトのトラッキングタグ（例:"kinto0a-22"）
-  rakutenAfl:""  // 楽天アフィリエイトのリンクID（hb.afl.rakuten.co.jp/hgc/【この部分】/...）
+  amazonTag:"",  // Amazonアソシエイトのトラッキングタグ（例:"kinto0a-22"）※審査通過後に設定
+  rakutenAfl:"55b7aa4e.7a7cb602.55b7aa4f.1b3d4f69"  // 楽天アフィリエイトのリンクID
 };
 function affRakuten(url){ // 楽天系URLをアフィリエイトリンク化（ID未設定なら素のURL）
   return AFF.rakutenAfl?`https://hb.afl.rakuten.co.jp/hgc/${encodeURIComponent(AFF.rakutenAfl)}/?pc=${encodeURIComponent(url)}&m=${encodeURIComponent(url)}`:url;
