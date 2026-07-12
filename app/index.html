@@ -74,6 +74,8 @@
   .tut-nav{display:flex;gap:8px}
   /* ピッカー内サブカテゴリの小見出し */
   .chipgrp-lab{font-size:11px;font-weight:800;color:var(--teal-d);margin:10px 2px 4px;letter-spacing:.3px}
+  /* 広告表記ラベル（ステマ規制対応） */
+  .pr-tag{font-size:9px;font-weight:700;color:var(--sub);border:1px solid var(--line);border-radius:6px;padding:1px 5px;vertical-align:1px}
   /* PFC入力（%とgの2段。片方を入れるともう片方が自動計算） */
   .refunit{display:flex;align-items:center;gap:4px;margin-top:6px}
   .refunit input{flex:1;min-width:0;text-align:center;font-size:16px;font-weight:800}
@@ -330,6 +332,10 @@
       APIキーは <a href="https://platform.claude.com/" target="_blank" rel="noopener" style="color:var(--teal)">Claude Platform</a> で発行。<b>キーはこの端末にのみ保存</b>され、api.anthropic.com 以外には送信されません。利用料はキーの持ち主に課金されます（1回あたり数円〜数十円目安）。</div>
       <input class="pcinput" id="aiKeyInput" type="password" placeholder="sk-ant-... を貼り付け" style="margin-top:8px">
       <div class="hint" id="aiKeyStatus" style="margin-top:6px"></div>
+    </div>
+    <div class="card">
+      <div class="qlabel">📢 広告について</div>
+      <div class="hint">食材詳細や「安い？」の<b>「ネットの価格も見る」等の外部ショップリンクにはアフィリエイト広告を含みます</b>。リンク経由で購入があった場合、開発者に紹介料が入ることがあります（購入価格は変わりません）。表示はすべて「広告」と明記しています。</div>
     </div>
     <div class="card">
       <div class="qlabel">📖 使い方</div>
@@ -1389,6 +1395,49 @@ function complementCard(rec){
    食材詳細 → 料理 → クックパッド（モーダル）
 ============================================================ */
 function cookpadLink(q){return `https://cookpad.com/search/${encodeURIComponent(q)}`;}
+
+/* ============================================================
+   ショッピングリンク（アフィリエイト広告）
+   「店頭が高い→ネットと比較」「日持ち品→まとめ買い」というユーザーの得になる文脈でのみ表示。
+   IDは開発者が取得してここに設定（未設定でも通常リンクとして動作し、設定すると紹介料が入る）。
+   景品表示法・ステマ規制対応: リンクには必ず「広告」表記を付ける。
+============================================================ */
+const AFF={
+  amazonTag:"",  // Amazonアソシエイトのトラッキングタグ（例:"kinto0a-22"）
+  rakutenAfl:""  // 楽天アフィリエイトのリンクID（hb.afl.rakuten.co.jp/hgc/【この部分】/...）
+};
+function affRakuten(url){ // 楽天系URLをアフィリエイトリンク化（ID未設定なら素のURL）
+  return AFF.rakutenAfl?`https://hb.afl.rakuten.co.jp/hgc/${encodeURIComponent(AFF.rakutenAfl)}/?pc=${encodeURIComponent(url)}&m=${encodeURIComponent(url)}`:url;
+}
+function affAmazon(kw){
+  return `https://www.amazon.co.jp/s?k=${encodeURIComponent(kw)}&i=grocery${AFF.amazonTag?`&tag=${encodeURIComponent(AFF.amazonTag)}`:""}`;
+}
+// 検索キーワード（()内の状態表記を除去。ネット検索で引っかかりやすい言い換えは上書き）
+const SHOP_KW={rice_bowl:"米 5kg",salmon_can:"鮭 水煮缶",saba_can:"さば缶 水煮",tuna_can:"ツナ缶",sardine_can:"いわし缶",
+  soba:"そば 乾麺",udon:"うどん",pasta:"パスタ 1kg",oatmeal:"オートミール",bread_whole:"全粒粉パン",
+  beef_imported:"牛肩ロース",mince_mix:"合いびき肉",chicken_breast_skin:"鶏むね肉",chicken_thigh_skin:"鶏もも肉"};
+function shopKeyword(id){const f=ALL[id];return SHOP_KW[id]||(f?f.name.replace(/[（(].*?[）)]/g,"").trim():"");}
+// 日持ちする＝ネットのまとめ買いが本当に得な食材（缶詰・乾物・米など）
+const SHELF_IDS=new Set(["salmon_can","saba_can","tuna_can","sardine_can","chikuwa","pasta","oatmeal","soba","rice_bowl","bread_whole","natto"]);
+function shopLinksHTML(id){
+  const f=ALL[id];if(!f||!f.cat)return "";
+  const kw=shopKeyword(id);
+  const shelf=SHELF_IDS.has(id);
+  const netsuper=affRakuten(`https://sm.rakuten.co.jp/search?keyword=${encodeURIComponent(kw)}`);
+  const ichiba=affRakuten(`https://search.rakuten.co.jp/search/mall/${encodeURIComponent(kw)}/`);
+  return `<div class="card">
+    <span class="pill">🛒 ネットの価格も見る <span class="pr-tag">広告</span></span>
+    <div class="hint" style="margin:4px 0 6px">${shelf
+      ?`缶詰・乾物は日持ちするので、相場より安い時の<b>まとめ買いが効きます</b>。上の相場（¥${marketOf(id)}/100g）と比べてみてください。`
+      :`店頭で高いと感じたら比較を。重い物・かさばる物は<b>ネットスーパー配達</b>が便利です。`}</div>
+    <div style="display:flex;gap:8px">
+      ${shelf
+        ?`<a class="btn-ghost" style="flex:1;margin-top:0;text-align:center;text-decoration:none" href="${ichiba}" target="_blank" rel="noopener sponsored">楽天市場で見る</a>
+           <a class="btn-ghost" style="flex:1;margin-top:0;text-align:center;text-decoration:none" href="${affAmazon(kw)}" target="_blank" rel="noopener sponsored">Amazonで見る</a>`
+        :`<a class="btn-ghost" style="flex:1;margin-top:0;text-align:center;text-decoration:none" href="${netsuper}" target="_blank" rel="noopener sponsored">楽天西友ネットスーパー</a>
+           <a class="btn-ghost" style="flex:1;margin-top:0;text-align:center;text-decoration:none" href="${affAmazon(kw)}" target="_blank" rel="noopener sponsored">Amazonで見る</a>`}
+    </div></div>`;
+}
 // 単一食品の栄養（食材に合った単位：卵1個・納豆1パック等。無い食材は100g）を 1食目安と比較。
 // 「その他の栄養素」はカテゴリの重要軸（野菜=ビタミンC/A・食物繊維・葉酸など）に切替。
 function foodNutritionHTML(f){
@@ -1425,6 +1474,7 @@ function openFoodModal(id){
       ${myPriceLine(id)}
       <div class="hint" style="margin-top:6px">※相場は暫定の目安。店頭での判定は「🏷️ 安い？」タブでどうぞ。</div>
     </div>
+    ${shopLinksHTML(id)}
     ${foodNutritionHTML(f)}
     <button class="btn-adopt" style="width:100%;margin-top:14px" onclick="modalAdopt('${id}')">🛒 ${f.name} にする（決定）</button>
     <button class="btn-ghost" id="toRecipe" style="width:100%;margin-top:8px">🍳 この食材を使った料理を見る</button>
@@ -1524,10 +1574,12 @@ function chkJudge(){
   else if(ratio<1.1){cls="mid";head="⚪ 相場どおり";sub="普段の値段です。必要なら買ってOK。";}
   else{cls="ng";head="🔴 相場より高い";sub="急ぎでなければ見送りや代替も検討を。";}
   tutEvent("check");
+  // 「高い」判定の時だけ、ネット価格との比較リンクを出す（本当に役立つ瞬間だけ広告を出す方針）
+  const altLink=cls==="ng"?`<a class="link" href="${affRakuten(`https://sm.rakuten.co.jp/search?keyword=${encodeURIComponent(shopKeyword(chkSel))}`)}" target="_blank" rel="noopener sponsored" style="display:block;text-decoration:none">🛒 ネットスーパーの価格も見てみる <span class="pr-tag">広告</span></a>`:"";
   v.innerHTML=`<div class="chk-verdict ${cls}">
       <div class="big">${head}</div>
       <div style="font-weight:800;margin-top:2px">相場比 ${diff>=0?"+":""}${diff}%</div>
-      <div class="hint" style="margin-top:4px">100gあたり <b style="color:var(--ink)">¥${Math.round(per)}</b> ／ 相場 ¥${ref}/100g ・ ${sub}</div></div>
+      <div class="hint" style="margin-top:4px">100gあたり <b style="color:var(--ink)">¥${Math.round(per)}</b> ／ 相場 ¥${ref}/100g ・ ${sub}</div>${altLink}</div>
     <button class="btn-adopt" style="width:100%;margin-top:10px" onclick="chkAdopt()">🛒 これに決定（今日の一手に記録）</button>
     <div style="display:flex;gap:8px;margin-top:8px">
       <button class="btn-ghost" style="flex:1;margin-top:0" onclick="chkRecord()">📒 価格だけ記録</button>
