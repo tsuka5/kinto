@@ -57,12 +57,12 @@
   .fsfab:hover{opacity:1;border-color:rgba(45,212,191,.6);color:#7df3e3}
   .fsfab:active{transform:scale(.9)}
   .fsfab.on{background:var(--grad);color:#04131a;opacity:.95}
-  /* はじめてのチュートリアル（初回起動時のライブツアー） */
-  .tut{position:fixed;inset:0;z-index:60;background:rgba(3,6,14,.55);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+  /* はじめてのチュートリアル（初回起動時のライブツアー）。背面のアプリはそのまま操作できる */
+  .tut{position:fixed;inset:0;z-index:60;pointer-events:none;
     display:flex;align-items:flex-end;justify-content:center;padding:0 14px 100px}
   .tut.hidden{display:none}
-  .tut-card{background:var(--card2);border:1px solid rgba(45,212,191,.35);border-radius:20px;max-width:480px;width:100%;
-    padding:18px 18px 16px;box-shadow:0 18px 50px -10px rgba(0,0,0,.8),0 0 24px -6px rgba(45,212,191,.25);animation:tutIn .35s var(--spring) backwards}
+  .tut-card{pointer-events:auto;background:var(--card2);border:1.5px solid rgba(45,212,191,.45);border-radius:20px;max-width:480px;width:100%;
+    padding:16px 18px 14px;box-shadow:0 18px 50px -10px rgba(0,0,0,.8),0 0 24px -6px rgba(45,212,191,.25);animation:tutIn .35s var(--spring) backwards}
   @keyframes tutIn{from{opacity:0;transform:translateY(24px)}}
   .tut-emoji{font-size:38px;line-height:1}
   .tut-title{font-size:19px;font-weight:900;margin:8px 0 4px;color:var(--ink)}
@@ -74,6 +74,12 @@
   .tut-nav{display:flex;gap:8px}
   /* ピッカー内サブカテゴリの小見出し */
   .chipgrp-lab{font-size:11px;font-weight:800;color:var(--teal);margin:10px 2px 4px;letter-spacing:.3px}
+  /* 月別相場チャート（値動き→食材タップで表示） */
+  .pchart{display:flex;align-items:flex-end;gap:3px;height:150px;padding:6px 2px 0}
+  .pc-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0}
+  .pc-bar{width:100%;border-radius:4px 4px 0 0;background:var(--grad);min-height:4px;box-shadow:0 0 8px rgba(45,212,191,.4)}
+  .pc-v{font-size:9px;color:var(--sub);margin-bottom:2px;font-variant-numeric:tabular-nums}
+  .pc-m{font-size:9px;color:var(--sub);margin-top:3px;white-space:nowrap}
   /* PFC入力（%とgの2段。片方を入れるともう片方が自動計算） */
   .refunit{display:flex;align-items:center;gap:4px;margin-top:6px}
   .refunit input{flex:1;min-width:0;text-align:center;font-size:16px;font-weight:800}
@@ -1250,7 +1256,8 @@ function withDefaults(s){
   s.priceLog=s.priceLog||[];      // 相場判定に入力した実売価格の記録
   s.goal=s.goal||null;            // 月間節約目標（円）
   s.estatAppId=s.estatAppId||null;// e-Stat API の appId（相場の自動更新に使用）
-  s.marketData=s.marketData||null;// e-Stat から取得した今月の相場 {month,prices,prev,fetchedAt}
+  s.marketData=s.marketData||null;// e-Stat から取得した今月の相場 {month,timeCode,area,areaCode,prices,codes,prev,fetchedAt}
+  s.marketMeta=s.marketMeta||null;// 直近13か月の時点コード（値動きの月選択・月別チャート用）
   s.aiKey=s.aiKey||null;          // Claude API キー（AIレシピ検索に使用。この端末にのみ保存）
   s.aiUses=s.aiUses||{date:"",count:0}; // AIレシピ検索の当日利用回数
   s.aiRecipes=s.aiRecipes||[];    // AIで探した人気レシピの蓄積 {food,name,time,ingredients,steps,tip,source,date}
@@ -1528,6 +1535,7 @@ function chkJudge(){
   if(ratio<=0.9){cls="ok";head="🟢 安い！買いです";sub="相場より下。今日の一手にどうぞ。";}
   else if(ratio<1.1){cls="mid";head="⚪ 相場どおり";sub="普段の値段です。必要なら買ってOK。";}
   else{cls="ng";head="🔴 相場より高い";sub="急ぎでなければ見送りや代替も検討を。";}
+  tutEvent("check");
   v.innerHTML=`<div class="chk-verdict ${cls}">
       <div class="big">${head}</div>
       <div style="font-weight:800;margin-top:2px">相場比 ${diff>=0?"+":""}${diff}%</div>
@@ -1573,7 +1581,7 @@ const COSPA_NUTS_ROLE={
 };
 const DEF_NUT={main:"protein",veg:"vitC",carb:"carb",dairy:"calcium",fruit:"vitC"};
 function cospaVal(f,nut){const mk=marketOf(f.id);return mk>0?(f.n[nut]||0)/mk*100:0;} // 栄養量/¥100
-function setCospaNut(r,nut){S.cospaNut[r]=nut;save(S);renderDealsFull();}
+function setCospaNut(r,nut){S.cospaNut[r]=nut;save(S);renderDealsFull();tutEvent("cospa");}
 function renderDealsFull(){
   const el=document.getElementById("dealsFull");if(!el)return;
   const q=((document.getElementById("cospaSearch")||{}).value||"").trim();
@@ -1727,6 +1735,7 @@ function setPick(id){
   S.decidedPick=null; // 選び直したら決定済み画面は解除し、通常フロー（栄養＋ランキング）を表示
   save(S);
   renderCatBar();renderHome();
+  tutEvent("pick");
   // 選んだら栄養バランス（採用済みなら「◯◯に決定！」）が見える位置へ自動スクロール
   const t=document.getElementById("nutriBalCard")||document.getElementById("decidedCard")||document.getElementById("rankCard");
   if(t)t.scrollIntoView({behavior:MOTION_OK()?"smooth":"auto",block:"start"});
@@ -1761,27 +1770,54 @@ function undoTodayAdoption(originId){
    値動き（最近値下がり・値上がりした食材の専用ページ）
    e-Stat実データがあれば前回データ比、無ければデモの暫定トレンド値。
 ============================================================ */
-function renderTrend(){
-  const el=document.getElementById("trendCard");if(!el)return;
-  const row=(id,d,up)=>`<div class="deal-row tap" data-id="${id}">
+const TREND_CACHE={}; // 月別価格のメモリキャッシュ（timeCode → prices）
+let trendMonthSel=null; // 選択中の月コード（null＝最新）
+function trendRowHTML(id,d,up,price){
+  return `<div class="deal-row tap" data-id="${id}">
     <span>${ALL[id].name}</span>
     <span style="text-align:right"><b style="color:${up?"var(--red)":"var(--teal)"};font-size:15px">${up?"▲":"▼"}${Math.abs(d)}%</b><br>
-    <span class="hint">相場 ¥${marketOf(id)}/100g ›</span></span></div>`;
+    <span class="hint">¥${price}/100g 📈</span></span></div>`;
+}
+function trendMonthSelectHTML(){
+  if(!S.marketData||!S.marketMeta||!(S.marketMeta.times||[]).length)return "";
+  const cur=trendMonthSel||S.marketData.timeCode;
+  const opts=[...S.marketMeta.times].reverse().map(t=>`<option value="${t.code}" ${t.code===cur?"selected":""}>${t.name}</option>`).join("");
+  return `<div class="card"><span class="pill">🗓 表示する月</span>
+    <select class="pcinput" id="trendMonth" onchange="trendPickMonth(this.value)" style="width:100%;margin-top:6px">${opts}</select>
+    <div class="hint" style="margin-top:4px">過去の月を選ぶと、その月の<b>前月比の値動き</b>が見られます。食材をタップすると<b>月別の価格チャート</b>。</div></div>`;
+}
+function trendListsHTML(monthName,cur,prevP,note){
+  // cur/prevP: {id:¥/100g}。前月比で値下がり/値上がりに振り分け
+  const moved=Object.keys(cur).filter(id=>ALL[id]&&prevP[id]>0)
+    .map(id=>({id,d:Math.round((prevP[id]-cur[id])/prevP[id]*100),p:cur[id]}));
+  const down=moved.filter(x=>x.d>0).sort((a,b)=>b.d-a.d);
+  const up=moved.filter(x=>x.d<0).sort((a,b)=>a.d-b.d);
+  const flat=moved.length-down.length-up.length;
+  let html=`<div class="card"><span class="pill">📉 ${monthName} 値下がりした食材</span>
+    <div class="hint" style="margin:4px 0 6px">${note}<b>今が買いどき</b>。タップで月別チャートへ。</div>
+    ${down.length?down.map(x=>trendRowHTML(x.id,x.d,false,x.p)).join(""):`<div class="hint">値下がりした食材はありません。</div>`}</div>`;
+  html+=`<div class="card"><span class="pill">📈 値上がりした食材</span>
+    <div class="hint" style="margin:4px 0 6px">高くなっているもの。チャートで推移を確認して買いどきを判断。</div>
+    ${up.length?up.map(x=>trendRowHTML(x.id,x.d,true,x.p)).join(""):`<div class="hint">値上がりした食材はありません。</div>`}</div>`;
+  if(flat>0)html+=`<div class="hint" style="margin:2px 6px">ほか${flat}品目はほぼ変わらず。</div>`;
+  return html;
+}
+function bindTrendRows(el){el.querySelectorAll(".deal-row.tap").forEach(c=>c.onclick=()=>openTrendChart(c.dataset.id));}
+function renderTrend(){
+  const el=document.getElementById("trendCard");if(!el)return;
   let html="";
   if(S.marketData){
-    const moved=FOODS.map(f=>({id:f.id,d:momDrop(f.id)}));
-    const down=moved.filter(x=>x.d>0).sort((a,b)=>b.d-a.d);
-    const up=moved.filter(x=>x.d<0).sort((a,b)=>a.d-b.d);
-    const flat=moved.length-down.length-up.length;
-    html+=`<div class="card"><span class="pill">📉 ${S.marketData.month} 値下がりした食材</span>
-      <div class="hint" style="margin:4px 0 6px">${S.marketData.area}の実売価格（e-Stat）。前回データ（初回は内蔵の目安）との比較。<b>今が買いどき</b>。タップで詳細へ。</div>
-      ${down.length?down.map(x=>row(x.id,x.d,false)).join(""):`<div class="hint">今回のデータでは値下がりした食材はありません。</div>`}</div>`;
-    html+=`<div class="card"><span class="pill">📈 値上がりした食材</span>
-      <div class="hint" style="margin:4px 0 6px">高くなっているもの。タップして詳細から<b>安い代替食材</b>を探せます。</div>
-      ${up.length?up.map(x=>row(x.id,x.d,true)).join(""):`<div class="hint">値上がりした食材はありません。</div>`}</div>`;
-    if(flat>0)html+=`<div class="hint" style="margin:2px 6px">ほか${flat}品目は変わらず。相場は月が変わると自動で更新されます。</div>`;
+    if(trendMonthSel&&trendMonthSel!==S.marketData.timeCode){trendPickMonth(trendMonthSel);return;} // 過去月を選択中なら非同期表示
+    html+=trendMonthSelectHTML();
+    const cur=S.marketData.prices;
+    const prevP={};Object.keys(cur).forEach(id=>{const p=(S.marketData.prev&&S.marketData.prev[id]!=null)?S.marketData.prev[id]:baselineOf(id);if(p>0)prevP[id]=p;});
+    html+=trendListsHTML(S.marketData.month,cur,prevP,`${S.marketData.area}の実売価格（e-Stat）。前回データ（初回は内蔵の目安）との比較。`);
   }else{
     const estatLink=`<b style="color:var(--teal);cursor:pointer" onclick="goToSetting('estatCard')">API設定でe-Stat連携 ›</b>`;
+    const row=(id,d,up)=>`<div class="deal-row tap" data-id="${id}">
+      <span>${ALL[id].name}</span>
+      <span style="text-align:right"><b style="color:${up?"var(--red)":"var(--teal)"};font-size:15px">${up?"▲":"▼"}${Math.abs(d)}%</b><br>
+      <span class="hint">相場 ¥${marketOf(id)}/100g ›</span></span></div>`;
     const down=FOODS.filter(f=>momPct(f.id)<0).map(f=>({id:f.id,d:momPct(f.id)})).sort((a,b)=>a.d-b.d);
     const up=FOODS.filter(f=>momPct(f.id)>0).map(f=>({id:f.id,d:momPct(f.id)})).sort((a,b)=>b.d-a.d);
     html+=`<div class="card"><span class="pill">📉 先月より安くなっている食材</span>
@@ -1790,9 +1826,84 @@ function renderTrend(){
     html+=`<div class="card"><span class="pill">📈 先月より高くなっている食材</span>
       <div class="hint" style="margin:4px 0 6px">値上がり傾向のもの。タップして詳細から<b>安い代替食材</b>を探せます。※暫定値</div>
       ${up.length?up.map(x=>row(x.id,x.d,true)).join(""):`<div class="hint">該当なし</div>`}</div>`;
+    el.innerHTML=html;
+    el.querySelectorAll(".deal-row.tap").forEach(c=>c.onclick=()=>openFoodModal(c.dataset.id));
+    return;
   }
   el.innerHTML=html;
-  el.querySelectorAll(".deal-row.tap").forEach(c=>c.onclick=()=>openFoodModal(c.dataset.id));
+  bindTrendRows(el);
+}
+// 過去月の値動きを表示（その月と前月の実データを取得して前月比を計算）
+async function trendMonthPrices(code){
+  if(TREND_CACHE[code])return TREND_CACHE[code];
+  const byName=await estatFetchMonth(effectiveAppId(),code,S.marketData.areaCode);
+  const p=estatMapPrices(byName).prices;
+  TREND_CACHE[code]=p;return p;
+}
+async function trendPickMonth(code){
+  const el=document.getElementById("trendCard");if(!el||!S.marketData)return;
+  if(code===S.marketData.timeCode){trendMonthSel=null;renderTrend();return;}
+  trendMonthSel=code;
+  const times=(S.marketMeta&&S.marketMeta.times)||[];
+  const i=times.findIndex(t=>t.code===code);
+  const monthName=i>=0?times[i].name:code;
+  el.innerHTML=trendMonthSelectHTML()+`<div class="card"><div class="hint">📡 ${monthName}のデータを取得中…</div></div>`;
+  try{
+    if(!effectiveAppId())throw new Error("appIdがありません");
+    const cur=await trendMonthPrices(code);
+    if(trendMonthSel!==code)return; // 取得中に別の月へ切り替えられた
+    const prevP=i>0?await trendMonthPrices(times[i-1].code):{};
+    if(trendMonthSel!==code)return;
+    const note=i>0?`${S.marketData.area}の実売価格（e-Stat）。${times[i-1].name}との比較。`:`${S.marketData.area}の実売価格（e-Stat）。`;
+    el.innerHTML=trendMonthSelectHTML()+trendListsHTML(monthName,cur,prevP,note);
+    bindTrendRows(el);
+  }catch(e){
+    el.innerHTML=trendMonthSelectHTML()+`<div class="card"><div class="hint">⚠ ${monthName}のデータを取得できませんでした：${e.message}</div></div>`;
+  }
+}
+// 食材の月別価格チャート（直近12か月・¥/100g換算）
+async function openTrendChart(id){
+  const f=ALL[id];if(!f)return;
+  const md=S.marketData;
+  if(!md||!md.codes||!md.codes[id]){openFoodModal(id);return;} // 実データの無い食材は従来の詳細へ
+  document.getElementById("modalBody").innerHTML=`<div style="font-size:20px;font-weight:800">📈 ${f.name} の月別相場</div>
+    <div class="hint" style="margin-top:10px">📡 e-Statから月別データを取得中…</div>`;
+  showModal();
+  try{
+    const appId=effectiveAppId();
+    const times=(S.marketMeta&&S.marketMeta.times)||[];
+    let q=`${ESTAT_BASE}/getStatsData?appId=${encodeURIComponent(appId)}&statsDataId=${ESTAT_ID}&cdCat02=${md.codes[id]}&limit=300`;
+    if(md.areaCode)q+=`&cdArea=${md.areaCode}`;
+    if(times.length)q+=`&cdTimeFrom=${times[0].code}`;
+    const data=await(await fetch(q)).json();
+    const dr=data&&data.GET_STATS_DATA;
+    if(!dr||String(dr.RESULT.STATUS)!=="0")throw new Error((dr&&dr.RESULT&&dr.RESULT.ERROR_MSG)||"取得できません");
+    const sd=dr.STATISTICAL_DATA;
+    const timeObj=asArr(sd.CLASS_INF.CLASS_OBJ).find(c=>c["@id"]==="time");
+    const tDict={};asArr(timeObj&&timeObj.CLASS).forEach(c=>tDict[c["@code"]]=c["@name"]);
+    const m=ESTAT_MAP[id];
+    const pts=asArr(sd.DATA_INF.VALUE)
+      .map(r=>({code:r["@time"],m:tDict[r["@time"]]||r["@time"],v:parseFloat(String(r["$"]).replace(/,/g,""))}))
+      .filter(p=>isFinite(p.v)&&p.v>0).sort((a,b)=>a.code<b.code?-1:1).slice(-12)
+      .map(p=>({...p,per:Math.round(p.v/m.g*100*(m.f||1))}));
+    if(!pts.length)throw new Error("この食材の月別データがありません");
+    const max=Math.max(...pts.map(p=>p.per));
+    const avg=Math.round(pts.reduce((s,p)=>s+p.per,0)/pts.length);
+    const lo=Math.min(...pts.map(p=>p.per));
+    const short=n=>{const mm=String(n).match(/(\d+)月/);return mm?mm[1]+"月":n;};
+    document.getElementById("modalBody").innerHTML=`
+      <div style="font-size:20px;font-weight:800">📈 ${f.name} の月別相場</div>
+      <div class="hint" style="margin:2px 0 8px">${md.area}・¥/100g換算（e-Stat 小売物価統計）。直近${pts.length}か月。</div>
+      <div class="card hl"><div class="pchart">${pts.map(p=>`<div class="pc-col">
+        <span class="pc-v">${p.per}</span><div class="pc-bar" style="height:${Math.max(6,p.per/max*100)}%;${p.per===lo?"filter:brightness(1.15)":""}"></div><span class="pc-m">${short(p.m)}</span></div>`).join("")}</div></div>
+      <div class="hint" style="margin-top:6px">直近 <b style="color:var(--ink)">¥${pts[pts.length-1].per}</b> ／ 12か月平均 ¥${avg} ／ 最安 <b style="color:var(--teal)">¥${lo}</b>
+      ${pts[pts.length-1].per<=avg?`・<b style="color:var(--teal)">平均より安い＝買いどき</b>`:`・平均より高め`}</div>
+      <button class="btn-ghost" style="width:100%;margin-top:10px" onclick="openFoodModal('${id}')">🍽 ${f.name} の詳細（栄養・レシピ）を見る</button>`;
+  }catch(e){
+    document.getElementById("modalBody").innerHTML=`<div style="font-size:20px;font-weight:800">📈 ${f.name} の月別相場</div>
+      <div class="hint" style="margin-top:10px">⚠ 月別データを取得できませんでした：${e.message}</div>
+      <button class="btn-ghost" style="width:100%;margin-top:10px" onclick="openFoodModal('${id}')">食材の詳細を見る</button>`;
+  }
 }
 
 /* ============================================================
@@ -2093,6 +2204,37 @@ const ESTAT_MAP={
 };
 const asArr=x=>Array.isArray(x)?x:(x==null?[]:[x]);
 function mkStatusMsg(t){const el=document.getElementById("mkStatus");if(el)el.innerHTML=t;}
+// 指定月×地域の全品目 [品目名, 価格, 品目コード] を取得（外食品目は除外）
+async function estatFetchMonth(appId,timeCode,areaCode){
+  let q=`${ESTAT_BASE}/getStatsData?appId=${encodeURIComponent(appId)}&statsDataId=${ESTAT_ID}&cdTime=${timeCode}&limit=5000`;
+  if(areaCode)q+=`&cdArea=${areaCode}`;
+  const data=await(await fetch(q)).json();
+  const dr=data&&data.GET_STATS_DATA;
+  if(!dr||String(dr.RESULT.STATUS)!=="0")throw new Error((dr&&dr.RESULT&&dr.RESULT.ERROR_MSG)||"データを取得できません");
+  const sd=dr.STATISTICAL_DATA;
+  // 品目（銘柄）の次元＝cat系のうちクラス数が最大のもの（cat01は「データの種別」1件なので誤爆しないように）
+  const catObjs=asArr(sd.CLASS_INF.CLASS_OBJ).filter(c=>String(c["@id"]).startsWith("cat"));
+  const catObj=catObjs.sort((a,b)=>asArr(b.CLASS).length-asArr(a.CLASS).length)[0];
+  if(!catObj)throw new Error("品目分類が見つかりません");
+  const catKey="@"+catObj["@id"];
+  const catDict={};asArr(catObj.CLASS).forEach(c=>catDict[c["@code"]]=c["@name"]);
+  const byName=[];
+  asArr(sd.DATA_INF.VALUE).forEach(r=>{const code=r[catKey],nm=catDict[code];
+    const v=parseFloat(String(r["$"]).replace(/,/g,""));if(nm&&!nm.includes("外食")&&isFinite(v)&&v>0)byName.push([nm,v,code]);});
+  return byName;
+}
+// 品目名トークンで食材に対応づけ、¥/100gに換算（codes=品目コードは月別チャート用）
+function estatMapPrices(byName){
+  const prices={},codes={};
+  for(const id in ESTAT_MAP){const m=ESTAT_MAP[id];let hit=null;
+    for(const toks of m.t){hit=byName.find(([nm])=>toks.every(t=>nm.includes(t)));if(hit)break;}
+    if(!hit)continue;
+    const per100=Math.round(hit[1]/m.g*100*(m.f||1));
+    const base=baselineOf(id);
+    if(base>0&&(per100<base*0.25||per100>base*4))continue; // 単位ずれ等の異常値ガード
+    prices[id]=per100;codes[id]=hit[2];}
+  return {prices,codes};
+}
 async function updateMarket(silent){
   const appId=effectiveAppId();
   if(!appId){if(!silent){mkStatusMsg("⚠ 先に e-Stat の appId（無料）を入力してください。");toast("appIdが未設定です");}return;}
@@ -2110,39 +2252,17 @@ async function updateMarket(silent){
     const capital=PREF_CAPITAL[regionLabel()]||null;
     // 東京は調査上「特別区部」。全国系列は無いので最後は特別区部→先頭都市にフォールバック
     const area=(capital&&areas.find(a=>a.name.includes(capital)))||areas.find(a=>a.name.includes("特別区部"))||areas[0]||null;
-    // ② 最新月×地域の全品目価格を取得
-    let q=`${ESTAT_BASE}/getStatsData?appId=${encodeURIComponent(appId)}&statsDataId=${ESTAT_ID}&cdTime=${latest.code}&limit=5000`;
-    if(area)q+=`&cdArea=${area.code}`;
-    const data=await(await fetch(q)).json();
-    const dr=data&&data.GET_STATS_DATA;
-    if(!dr||String(dr.RESULT.STATUS)!=="0")throw new Error((dr&&dr.RESULT&&dr.RESULT.ERROR_MSG)||"データを取得できません");
-    const sd=dr.STATISTICAL_DATA;
-    // 品目（銘柄）の次元＝cat系のうちクラス数が最大のもの（cat01は「データの種別」1件なので誤爆しないように）
-    const catObjs=asArr(sd.CLASS_INF.CLASS_OBJ).filter(c=>String(c["@id"]).startsWith("cat"));
-    const catObj=catObjs.sort((a,b)=>asArr(b.CLASS).length-asArr(a.CLASS).length)[0];
-    if(!catObj)throw new Error("品目分類が見つかりません");
-    const catKey="@"+catObj["@id"];
-    const catDict={};asArr(catObj.CLASS).forEach(c=>catDict[c["@code"]]=c["@name"]);
-    const rows=asArr(sd.DATA_INF.VALUE);
-    const byName=[];// [品目名, 価格]（外食品目は食材相場ではないので除外）
-    rows.forEach(r=>{const nm=catDict[r[catKey]];
-      const v=parseFloat(String(r["$"]).replace(/,/g,""));if(nm&&!nm.includes("外食")&&isFinite(v)&&v>0)byName.push([nm,v]);});
+    // ② 最新月×地域の全品目価格を取得 → ③ 食材に対応づけ
+    const byName=await estatFetchMonth(appId,latest.code,area?area.code:null);
     if(!byName.length)throw new Error("価格データが空です（statsDataIdの見直しが必要かも）");
-    // ③ 品目名トークンで食材に対応づけ、¥/100gに換算
-    const prices={};
-    for(const id in ESTAT_MAP){const m=ESTAT_MAP[id];let hit=null;
-      for(const toks of m.t){hit=byName.find(([nm])=>toks.every(t=>nm.includes(t)));if(hit)break;}
-      if(!hit)continue;
-      const per100=Math.round(hit[1]/m.g*100*(m.f||1));
-      const base=baselineOf(id);
-      if(base>0&&(per100<base*0.25||per100>base*4))continue; // 単位ずれ等の異常値ガード
-      prices[id]=per100;}
+    const {prices,codes}=estatMapPrices(byName);
     const n=Object.keys(prices).length;
     if(!n)throw new Error("品目の対応づけに失敗しました（調査品目が変わった可能性）");
     // ④ 前回値（同月の再取得なら前回のprevを維持＝値下がり表示が消えないように）
     const sameMonth=S.marketData&&S.marketData.month===latest.name;
     const prev=sameMonth?(S.marketData.prev||{}):Object.fromEntries(Object.keys(prices).map(id=>[id,marketOf(id)]));
-    S.marketData={month:latest.name,area:area?area.name:"全国",prices,prev,fetchedAt:todayStr()};
+    S.marketData={month:latest.name,timeCode:latest.code,area:area?area.name:"全国",areaCode:area?area.code:null,prices,codes,prev,fetchedAt:todayStr()};
+    S.marketMeta={times:times.slice(-13)}; // 月選択・チャート用に直近13か月の時点コードを保持
     save(S);
     renderAll();
     mkStatusMsg(`✅ ${latest.name}・${S.marketData.area}の実売価格に更新しました（${n}品目）。`);
@@ -2453,19 +2573,24 @@ updateFsBtn();
    はじめてのチュートリアル（初回起動時に自動表示。設定からも再表示可）
    各ステップで説明中のタブを実際に背後に表示する「ライブツアー」形式。
 ============================================================ */
+/* カードの背面はそのまま操作可能。tryの操作を実際にやると自動で次のステップへ進む（waitFor） */
 const TUT_STEPS=[
   {view:"home",emoji:"👋",title:"ようこそ、Kintoへ",
-   body:"Kintoは<b>「安く賢く健康的に」</b>を助けるアプリです。食材の<b>相場</b>を知って、<b>安くて栄養のある選び方</b>ができるようになります。記録はすべて<b>この端末の中だけ</b>に保存されます。"},
-  {view:"home",emoji:"🍱",title:"① 今日の一手",
-   body:"上の<b>カテゴリ</b>を選ぶか検索して、<b>今日買おうと思っている食材</b>をタップ。その食材の栄養バランスと、<b>もっと安く栄養がとれる候補</b>がランキングで出ます。「◯◯にする（決定）」まで進むと、<b>その食材で作れるレシピ</b>も表示されます。"},
-  {view:"check",emoji:"🏷️",title:"② 安い？（スーパーで使う）",
-   body:"店頭で値札を見たら、食材を選んで<b>値段と内容量（g）</b>をそのまま入力。相場と比べて<b>「安い！」「相場どおり」「高い」</b>を即判定します。安ければそのまま「これに決定」もできます。"},
-  {view:"deals",emoji:"💪",title:"③ コスパ",
-   body:"<b>金額あたりの栄養素</b>が多い順のランキングです。カテゴリごとに大事な栄養素で見られます（野菜は<b>ビタミンC・食物繊維</b>など）。栄養素名のチップをタップすると切り替えられます。"},
+   body:"Kintoは<b>「安く賢く健康的に」</b>を助けるアプリです。食材の<b>相場</b>を知って、<b>安くて栄養のある選び方</b>ができるようになります。記録はすべて<b>この端末の中だけ</b>に保存されます。<br>このガイドの後ろの画面は<b>実際に触りながら</b>進められます。"},
+  {view:"home",emoji:"🍱",title:"① 今日の一手",waitFor:"pick",
+   body:"買おうと思っている食材を選ぶと、栄養バランスと<b>もっと安く栄養がとれる候補</b>がランキングで出ます。「◯◯にする（決定）」まで進むと<b>レシピ</b>も出ます。",
+   try:"上の🥚🍖カテゴリを選んで、食材をどれか1つタップしてみましょう"},
+  {view:"check",emoji:"🏷️",title:"② 安い？（スーパーで使う）",waitFor:"check",
+   body:"店頭で値札を見たら、食材を選んで<b>値段と内容量（g）</b>を入力するだけ。相場と比べて<b>「安い！」「相場どおり」「高い」</b>を即判定します。",
+   try:"食材をどれか選んで、試しに「298円・350g」のように入れてみましょう"},
+  {view:"deals",emoji:"💪",title:"③ コスパ",waitFor:"cospa",
+   body:"<b>金額あたりの栄養素</b>が多い順のランキング。カテゴリごとに大事な栄養素で見られます（野菜は<b>ビタミンC・食物繊維</b>など）。",
+   try:"栄養素のチップ（たんぱく質・鉄分など）をタップして切り替えてみましょう"},
   {view:"trend",emoji:"📉",title:"④ 値動き",
-   body:"最近<b>値下がりした食材（＝今が買いどき）</b>と<b>値上がりした食材</b>の一覧です。値上がりしたものはタップすると、詳細から<b>安い代替食材</b>を探せます。"},
+   body:"最近<b>値下がりした食材（＝今が買いどき）</b>と<b>値上がりした食材</b>の一覧。月を切り替えて過去の値動きも見られます。",
+   try:"気になる食材をタップすると、<b>月別の価格チャート</b>が開きます"},
   {view:"data",emoji:"⚙️",title:"⑤ 設定",
-   body:"<b>1日の目標カロリー・PFCバランス・食数</b>を自分に合わせて設定できます（アプリ全体の「1食の目安」に反映）。地域や相場の自動更新（e-Stat）、AIレシピ検索もここから。<br>また、画面<b>左上の「←」でいつでも前の画面に戻れ</b>、<b>右上の「⛶」で全画面表示</b>にできます。それでは、はじめましょう！"}
+   body:"<b>1日の目標カロリー・PFC・食数</b>を自分に合わせられます（「1食の目安」に反映）。地域・相場の自動更新・AIレシピもここから。<br><b>左上「←」で前の画面へ、右上「⛶」で全画面</b>。それでは、はじめましょう！"}
 ];
 let tutIdx=0;
 function showTutorial(i){tutIdx=i||0;renderTut();document.getElementById("tutorial").classList.remove("hidden");}
@@ -2474,9 +2599,9 @@ function renderTut(){
   applyView(s.view); // 説明しているタブを実際に背後に表示（履歴は積まない）
   const last=tutIdx>=TUT_STEPS.length-1;
   document.getElementById("tutCard").innerHTML=`
-    <div class="tut-emoji">${s.emoji}</div>
-    <div class="tut-title">${s.title}</div>
-    <div class="tut-body">${s.body}</div>
+    <div style="display:flex;align-items:center;gap:10px"><span class="tut-emoji">${s.emoji}</span><span class="tut-title" style="margin:0">${s.title}</span></div>
+    <div class="tut-body" style="margin-top:6px">${s.body}</div>
+    ${s.try?`<div class="tut-body" style="margin-top:6px;color:var(--teal-d)"><b>👉 やってみよう：</b>${s.try}${s.waitFor?"（できたら自動で次へ進みます）":""}</div>`:""}
     <div class="tut-dots">${TUT_STEPS.map((_,i)=>`<span class="tut-dot ${i===tutIdx?"on":""}"></span>`).join("")}</div>
     <div class="tut-nav">
       ${tutIdx>0
@@ -2492,6 +2617,16 @@ function tutFinish(){
   document.getElementById("tutorial").classList.add("hidden");
   applyView("home");
 }
+// アプリ側の操作フック：チュートリアル中に「やってみよう」の操作が実際に行われたら次へ
+function tutEvent(k){
+  const t=document.getElementById("tutorial");
+  if(!t||t.classList.contains("hidden"))return;
+  const s=TUT_STEPS[tutIdx];
+  if(s&&s.waitFor===k){
+    toast("👍 その調子！次に進みます");
+    setTimeout(()=>{const tt=document.getElementById("tutorial");if(tt&&!tt.classList.contains("hidden"))tutNext();},900);
+  }
+}
 
 function renderAll(){renderCatBar();renderDealsFull();renderHome();renderTrend();renderRegion();renderLed();}
 renderAll();
@@ -2499,7 +2634,8 @@ if(!S.tutorialDone)setTimeout(()=>showTutorial(0),400); // 初回起動時に自
 loadFullDb(); // 文科省 食品成分DB（2,478食品）を非同期で読み込み（配信時のみ／file://は内蔵39食品）
 detectRegion(); // IPから都道府県をおおよそ自動推定（手動設定があれば尊重）
 // 月が変わっていたら相場を自動更新（appId＝自分のキー or 共有キーがあるとき。毎回頼まなくても最新に）
-if(effectiveAppId()&&(!S.marketData||String(S.marketData.fetchedAt||"").slice(0,7)!==todayStr().slice(0,7)))updateMarket(true);
+// codes（月別チャート用の品目コード）が無い旧データも取り直す
+if(effectiveAppId()&&(!S.marketData||!S.marketData.codes||String(S.marketData.fetchedAt||"").slice(0,7)!==todayStr().slice(0,7)))updateMarket(true);
 
 /* ============================================================
    3D演出（ライブラリ不使用・オフライン動作。reduced-motion では全て無効）
