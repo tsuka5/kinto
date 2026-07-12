@@ -969,10 +969,10 @@ function baselineOf(id){return MARKET[id]!=null?MARKET[id]:(ALL[id]?ALL[id].pric
 function marketOf(id){ // 優先度: e-Stat実データ > 内蔵の目安 > 通常価格
   if(S.marketData&&S.marketData.prices&&S.marketData.prices[id]!=null)return S.marketData.prices[id];
   return baselineOf(id);}
-// 今月の値下がり率（%。正=前回データ（無ければ内蔵目安）より安くなった）
+// 今月の値下がり率（%。正=前月の実データより安くなった。実データ同士の比較のみ＝内蔵目安とは比べない）
 function momDrop(id){
   if(!S.marketData||!S.marketData.prices||S.marketData.prices[id]==null)return 0;
-  const prev=(S.marketData.prev&&S.marketData.prev[id]!=null)?S.marketData.prev[id]:baselineOf(id);
+  const prev=S.marketData.prev&&S.marketData.prev[id];
   if(!(prev>0))return 0;
   return Math.round((prev-S.marketData.prices[id])/prev*100);}
 
@@ -1793,7 +1793,7 @@ function trendListsHTML(monthName,cur,prevP,note){
   html+=`<div class="card"><span class="pill">📈 値上がりした食材</span>
     <div class="hint" style="margin:4px 0 6px">高くなっているもの。チャートで推移を確認して買いどきを判断。</div>
     ${up.length?up.map(x=>trendRowHTML(x.id,x.d,true,x.p)).join(""):`<div class="hint">値上がりした食材はありません。</div>`}</div>`;
-  if(flat>0)html+=`<div class="hint" style="margin:2px 6px">ほか${flat}品目はほぼ変わらず。</div>`;
+  if(flat>0)html+=`<div class="hint" style="margin:2px 6px">ほか${flat}品目はほぼ変わらず（前月データの無い品目を含む）。</div>`;
   return html;
 }
 function bindTrendRows(el){el.querySelectorAll(".deal-row.tap").forEach(c=>c.onclick=()=>openTrendChart(c.dataset.id));}
@@ -1804,8 +1804,8 @@ function renderTrend(){
     if(trendMonthSel&&trendMonthSel!==S.marketData.timeCode){trendPickMonth(trendMonthSel);return;} // 過去月を選択中なら非同期表示
     html+=trendMonthSelectHTML();
     const cur=S.marketData.prices;
-    const prevP={};Object.keys(cur).forEach(id=>{const p=(S.marketData.prev&&S.marketData.prev[id]!=null)?S.marketData.prev[id]:baselineOf(id);if(p>0)prevP[id]=p;});
-    html+=trendListsHTML(S.marketData.month,cur,prevP,`${S.marketData.area}の実売価格（e-Stat）。前回データ（初回は内蔵の目安）との比較。`);
+    const prevP=S.marketData.prev||{}; // 前月の実データ。実データ同士の比較のみ（内蔵目安とは比べない）
+    html+=trendListsHTML(S.marketData.month,cur,prevP,`${S.marketData.area}の実売価格（e-Stat）。<b>${S.marketData.prevMonth||"前月"}の実売価格</b>との比較。`);
   }else{
     const estatLink=`<b style="color:var(--teal);cursor:pointer" onclick="goToSetting('estatCard')">API設定でe-Stat連携 ›</b>`;
     const row=(id,d,up)=>`<div class="deal-row tap" data-id="${id}">
@@ -2267,10 +2267,15 @@ async function updateMarket(silent){
     const {prices,codes}=estatMapPrices(byName);
     const n=Object.keys(prices).length;
     if(!n)throw new Error("品目の対応づけに失敗しました（調査品目が変わった可能性）");
-    // ④ 前回値（同月の再取得なら前回のprevを維持＝値下がり表示が消えないように）
-    const sameMonth=S.marketData&&S.marketData.month===latest.name;
-    const prev=sameMonth?(S.marketData.prev||{}):Object.fromEntries(Object.keys(prices).map(id=>[id,marketOf(id)]));
-    S.marketData={month:latest.name,timeCode:latest.code,area:area?area.name:"全国",areaCode:area?area.code:null,prices,codes,prev,fetchedAt:todayStr()};
+    // ④ 前月の実データも取得して比較の基準にする（内蔵目安との比較では値動き%がでたらめになるため）
+    const prevTime=times.length>1?times[times.length-2]:null;
+    let prev={};
+    if(prevTime){
+      try{prev=estatMapPrices(await estatFetchMonth(appId,prevTime.code,area?area.code:null)).prices;}
+      catch(e){prev={};/* 前月が取れなくても最新価格だけで動作（値動き%は非表示になる） */}
+    }
+    S.marketData={month:latest.name,timeCode:latest.code,area:area?area.name:"全国",areaCode:area?area.code:null,
+      prices,codes,prev,prevMonth:prevTime?prevTime.name:null,fetchedAt:todayStr()};
     S.marketMeta={times:times.slice(-13)}; // 月選択・チャート用に直近13か月の時点コードを保持
     save(S);
     renderAll();
@@ -2643,8 +2648,8 @@ if(!S.tutorialDone)setTimeout(()=>showTutorial(0),400); // 初回起動時に自
 loadFullDb(); // 文科省 食品成分DB（2,478食品）を非同期で読み込み（配信時のみ／file://は内蔵39食品）
 detectRegion(); // IPから都道府県をおおよそ自動推定（手動設定があれば尊重）
 // 月が変わっていたら相場を自動更新（appId＝自分のキー or 共有キーがあるとき。毎回頼まなくても最新に）
-// codes（月別チャート用の品目コード）が無い旧データも取り直す
-if(effectiveAppId()&&(!S.marketData||!S.marketData.codes||String(S.marketData.fetchedAt||"").slice(0,7)!==todayStr().slice(0,7)))updateMarket(true);
+// codes（月別チャート用）やprevMonth（前月実データ比較）が無い旧データも取り直す
+if(effectiveAppId()&&(!S.marketData||!S.marketData.codes||!S.marketData.prevMonth||String(S.marketData.fetchedAt||"").slice(0,7)!==todayStr().slice(0,7)))updateMarket(true);
 
 /* ============================================================
    3D演出（ライブラリ不使用・オフライン動作。reduced-motion では全て無効）
