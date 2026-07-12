@@ -1,0 +1,2 @@
+# Cloudflare Pages: ルートアクセスをアプリ本体へ転送（vercel.jsonと同等）
+/ /app/ 302

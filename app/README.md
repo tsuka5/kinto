@@ -34,18 +34,18 @@
 - 初回は画面上部の**提案カテゴリ**チップを選ぶ。すると「今日の一手」が提案されます。
 - ※ ファイルを直接開く方式（file://）ではPWA（ホーム画面追加）は無効。下記デプロイ後に有効になります。
 
-## スマホで毎日使う（推奨：Vercelで公開）
-**重要：公開しても健康データは出ません。** 公開されるのはアプリのコードだけで、計測データはあなたのスマホのブラウザ内に保存されます。
+## 公開URL（本番：Cloudflare Pages）
+**https://kinto-f5c.pages.dev/** （無料枠で商用利用可のため、アフィリエイト開始に伴いVercelから移行。2026-07-12）
+スマホでこのURLを開き、ブラウザメニューから**「ホーム画面に追加」**するとアプリとして毎日起動できる（PWA）。
+**重要：公開しても健康データは出ません。** 公開されるのはアプリのコードだけで、計測データは各利用者の端末内に保存されます。
 
-### 手順（GitHub + Vercel）
-1. この `app/` フォルダだけを、**Private** のGitHubリポジトリにpush（戦略ドキュメントとはリポジトリを分ける）。
-2. [vercel.com](https://vercel.com) にGitHubでログイン → "Add New Project" → 当該リポジトリを選択。
-3. Framework Preset は **"Other"**（ビルド不要の静的サイト）。Root Directory は `app`（リポジトリ直下にappだけ置いた場合は不要）。
-4. Deploy → 発行されたURLをスマホで開く。
-5. スマホのブラウザメニューから **「ホーム画面に追加」** → アプリのように毎日起動できる（PWA）。
+### デプロイ手順（開発者用）
+- 初回のみ: `npx wrangler login`
+- 更新時: 配信物（`app/`・`app-dynamic/`・`_redirects`）をまとめたディレクトリを `npx wrangler pages deploy <dir> --project-name kinto --branch main` でアップロード
+- ルート→`/app/` の転送は `_redirects`（Cloudflare）と `vercel.json`（Vercel・旧URL用に併存）で定義
 
 ### 代替デプロイ先
-- **Cloudflare Pages / Netlify** … Vercelとほぼ同等。静的サイトとしてそのまま公開可。
+- **Vercel** … 旧本番。静的サイトとしてそのまま動く（無料枠は商用不可の点に注意）。
 - **GitHub Pages** … 最小構成。Settings → Pages で公開。
 
 ## 自己実験のコツ（N=1）
