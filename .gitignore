@@ -19,3 +19,6 @@ Thumbs.db
 dist/
 .cache/
 .vercel/
+
+# Cloudflare wrangler のローカルキャッシュ
+.wrangler/
