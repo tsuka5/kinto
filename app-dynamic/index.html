@@ -74,12 +74,6 @@
   .tut-nav{display:flex;gap:8px}
   /* ピッカー内サブカテゴリの小見出し */
   .chipgrp-lab{font-size:11px;font-weight:800;color:var(--teal);margin:10px 2px 4px;letter-spacing:.3px}
-  /* 月別相場チャート（値動き→食材タップで表示） */
-  .pchart{display:flex;align-items:flex-end;gap:3px;height:150px;padding:6px 2px 0}
-  .pc-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0}
-  .pc-bar{width:100%;border-radius:4px 4px 0 0;background:var(--grad);min-height:4px;box-shadow:0 0 8px rgba(45,212,191,.4)}
-  .pc-v{font-size:9px;color:var(--sub);margin-bottom:2px;font-variant-numeric:tabular-nums}
-  .pc-m{font-size:9px;color:var(--sub);margin-top:3px;white-space:nowrap}
   /* PFC入力（%とgの2段。片方を入れるともう片方が自動計算） */
   .refunit{display:flex;align-items:center;gap:4px;margin-top:6px}
   .refunit input{flex:1;min-width:0;text-align:center;font-size:16px;font-weight:800}
@@ -1887,15 +1881,30 @@ async function openTrendChart(id){
       .filter(p=>isFinite(p.v)&&p.v>0).sort((a,b)=>a.code<b.code?-1:1).slice(-12)
       .map(p=>({...p,per:Math.round(p.v/m.g*100*(m.f||1))}));
     if(!pts.length)throw new Error("この食材の月別データがありません");
-    const max=Math.max(...pts.map(p=>p.per));
     const avg=Math.round(pts.reduce((s,p)=>s+p.per,0)/pts.length);
-    const lo=Math.min(...pts.map(p=>p.per));
+    const lo=Math.min(...pts.map(p=>p.per)),hi=Math.max(...pts.map(p=>p.per));
     const short=n=>{const mm=String(n).match(/(\d+)月/);return mm?mm[1]+"月":n;};
+    // 折れ線チャート（インラインSVG・テーマの色に追従）
+    const W=480,H=190,padL=10,padR=10,padT=24,padB=26,nn=pts.length;
+    const X=i=>padL+(W-padL-padR)*(nn===1?0.5:i/(nn-1));
+    const span=Math.max(hi-lo,1);
+    const Y=v=>padT+(H-padT-padB)*(1-(v-lo)/span);
+    const lineStr=pts.map((p,i)=>`${X(i)},${Y(p.per)}`).join(" ");
+    const chart=`<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
+      <defs><linearGradient id="lcg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="var(--teal)" stop-opacity=".28"/>
+        <stop offset="1" stop-color="var(--teal)" stop-opacity="0"/></linearGradient></defs>
+      <line x1="${padL}" x2="${W-padR}" y1="${Y(lo)}" y2="${Y(lo)}" stroke="var(--gold)" stroke-width="1" stroke-dasharray="4 4" opacity=".55"/>
+      <path d="M${X(0)},${H-padB} ${pts.map((p,i)=>`L${X(i)},${Y(p.per)}`).join(" ")} L${X(nn-1)},${H-padB} Z" fill="url(#lcg)"/>
+      <polyline points="${lineStr}" fill="none" stroke="var(--teal)" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+      ${pts.map((p,i)=>`<circle cx="${X(i)}" cy="${Y(p.per)}" r="${p.per===lo?4.5:3}" fill="${p.per===lo?"var(--gold)":"var(--teal)"}" stroke="var(--card2)" stroke-width="1.5"/>`).join("")}
+      ${pts.map((p,i)=>`<text x="${X(i)}" y="${Y(p.per)-9}" font-size="10" font-weight="700" text-anchor="middle" fill="var(--sub)">${p.per}</text>`).join("")}
+      ${pts.map((p,i)=>`<text x="${X(i)}" y="${H-8}" font-size="10" text-anchor="middle" fill="var(--sub)">${short(p.m)}</text>`).join("")}
+    </svg>`;
     document.getElementById("modalBody").innerHTML=`
       <div style="font-size:20px;font-weight:800">📈 ${f.name} の月別相場</div>
-      <div class="hint" style="margin:2px 0 8px">${md.area}・¥/100g換算（e-Stat 小売物価統計）。直近${pts.length}か月。</div>
-      <div class="card hl"><div class="pchart">${pts.map(p=>`<div class="pc-col">
-        <span class="pc-v">${p.per}</span><div class="pc-bar" style="height:${Math.max(6,p.per/max*100)}%;${p.per===lo?"filter:brightness(1.15)":""}"></div><span class="pc-m">${short(p.m)}</span></div>`).join("")}</div></div>
+      <div class="hint" style="margin:2px 0 8px">${md.area}・¥/100g換算（e-Stat 小売物価統計）。直近${pts.length}か月。<span style="color:var(--gold)">●</span>＝期間最安。</div>
+      <div class="card hl">${chart}</div>
       <div class="hint" style="margin-top:6px">直近 <b style="color:var(--ink)">¥${pts[pts.length-1].per}</b> ／ 12か月平均 ¥${avg} ／ 最安 <b style="color:var(--teal)">¥${lo}</b>
       ${pts[pts.length-1].per<=avg?`・<b style="color:var(--teal)">平均より安い＝買いどき</b>`:`・平均より高め`}</div>
       <button class="btn-ghost" style="width:100%;margin-top:10px" onclick="openFoodModal('${id}')">🍽 ${f.name} の詳細（栄養・レシピ）を見る</button>`;
