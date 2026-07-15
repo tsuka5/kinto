@@ -101,9 +101,10 @@
   .pill{display:inline-block;font-size:11px;font-weight:800;color:var(--teal-d);background:rgba(13,148,136,.09);
     border:1px solid rgba(13,148,136,.35);padding:4px 11px;border-radius:999px;margin-bottom:8px}
   .pill.warn{color:#b45309;background:rgba(245,158,11,.1);border-color:rgba(217,122,0,.4)}
-  button{font-family:inherit;border:0;border-radius:14px;padding:14px;font-size:16px;font-weight:700;cursor:pointer;
+  button,.abtn{font-family:inherit;border:0;border-radius:14px;padding:14px;font-size:16px;font-weight:700;cursor:pointer;
     transition:transform .15s var(--spring),box-shadow .2s,filter .2s}
-  button:active{transform:scale(.96)}
+  .abtn{display:block;text-align:center;text-decoration:none;box-sizing:border-box}
+  button:active,.abtn:active{transform:scale(.96)}
   .btn-adopt{background:var(--grad);background-size:220% auto;color:#fff;box-shadow:var(--glow)}
   .btn-adopt:hover{background-position:right center;filter:brightness(1.05)}
   .btn-ghost{background:rgba(255,255,255,.92);color:var(--ink);width:100%;margin-top:8px;
@@ -1432,10 +1433,10 @@ function shopLinksHTML(id){
       :`店頭で高いと感じたら比較を。重い物・かさばる物は<b>ネットスーパー配達</b>が便利です。`}</div>
     <div style="display:flex;gap:8px">
       ${shelf
-        ?`<a class="btn-ghost" style="flex:1;margin-top:0;text-align:center;text-decoration:none" href="${ichiba}" target="_blank" rel="noopener sponsored">楽天市場で見る</a>
-           <a class="btn-ghost" style="flex:1;margin-top:0;text-align:center;text-decoration:none" href="${affAmazon(kw)}" target="_blank" rel="noopener sponsored">Amazonで見る</a>`
-        :`<a class="btn-ghost" style="flex:1;margin-top:0;text-align:center;text-decoration:none" href="${netsuper}" target="_blank" rel="noopener sponsored">楽天西友ネットスーパー</a>
-           <a class="btn-ghost" style="flex:1;margin-top:0;text-align:center;text-decoration:none" href="${affAmazon(kw)}" target="_blank" rel="noopener sponsored">Amazonで見る</a>`}
+        ?`<a class="abtn btn-ghost" style="flex:1;margin-top:0" href="${ichiba}" target="_blank" rel="noopener sponsored">楽天市場で見る</a>
+           <a class="abtn btn-ghost" style="flex:1;margin-top:0" href="${affAmazon(kw)}" target="_blank" rel="noopener sponsored">Amazonで見る</a>`
+        :`<a class="abtn btn-ghost" style="flex:1;margin-top:0" href="${netsuper}" target="_blank" rel="noopener sponsored">楽天西友ネットスーパー</a>
+           <a class="abtn btn-ghost" style="flex:1;margin-top:0" href="${affAmazon(kw)}" target="_blank" rel="noopener sponsored">Amazonで見る</a>`}
     </div></div>`;
 }
 // 単一食品の栄養（食材に合った単位：卵1個・納豆1パック等。無い食材は100g）を 1食目安と比較。
