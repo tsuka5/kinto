@@ -41,7 +41,7 @@
 
 ### デプロイ手順（開発者用）
 - 初回のみ: `npx wrangler login`
-- 更新時: 配信物（`app/`・`app-dynamic/`・`_redirects`）をまとめたディレクトリを `npx wrangler pages deploy <dir> --project-name kinto --branch main` でアップロード
+- 更新時: 配信物（`app/`・`_redirects`）をまとめたディレクトリを `npx wrangler pages deploy <dir> --project-name kinto --branch main` でアップロード
 - ルート→`/app/` の転送は `_redirects`（Cloudflare）と `vercel.json`（Vercel・旧URL用に併存）で定義
 
 ### 代替デプロイ先
